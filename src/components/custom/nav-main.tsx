@@ -1,9 +1,10 @@
 import {
-  ChartPie,
+ 
   ChevronRight,
-  FileUser,
   type LucideIcon,
 } from "lucide-react";
+
+import { singleMenuItem } from "./data/data";
 
 import {
   Collapsible,
@@ -36,29 +37,28 @@ export function NavMain({
     }[];
   }[];
 }) {
+  const location = useLocation();
 
-
- const location =  useLocation()
+  
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
-        <SidebarMenuButton
-          tooltip={"Overview"}
-          className={`py-5 ${location.pathname == "/" ? 'bg-sky-100' :''} hover:bg-sky-700 hover:text-sky-200 text-sky-800`}
-        >
-          <ChartPie />
-          <span>Overview</span>
-        </SidebarMenuButton>
-
-        <SidebarMenuButton
-          tooltip={"OT Request"}
-          className="py-5 hover:bg-sky-700 hover:text-sky-200"
-        >
-          <FileUser />
-          <span>Request</span>
-        </SidebarMenuButton>
+        {singleMenuItem?.map((menu) => {
+          return <Link to={menu.path}>
+          <SidebarMenuButton
+         
+            className={`py-5 ${
+              location.pathname == menu.path ? "bg-sky-600 text-sky-200" : ""
+            } hover:bg-sky-100 hover:text-sky-800 duration-300`}
+          >
+            <menu.icon />
+            <span>{menu.title}</span>
+          </SidebarMenuButton>
+        </Link>
+        })}
+       
         {items.map((item) => (
           <Collapsible
             key={item.title}

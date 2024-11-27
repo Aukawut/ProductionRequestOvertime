@@ -19,7 +19,9 @@ const MainLayout: React.FC = () => {
           <BreadcrumbMenu path={location.pathname} />
         </div>
         <div className="h-[95%] overflow-auto">
-          <Outlet />
+          <div className="mb-[2rem]">
+            <Outlet />
+          </div>
         </div>
       </main>
     </SidebarProvider>

@@ -22,7 +22,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const userInfo = {
     name : info.Fullname,
     email : info.Email,
-    avatar : "AK",
+    avatar : (info.Fullname)?.split(" ")[0]?.charAt(0)?.toUpperCase()+(info.Fullname)?.split(" ")[1]?.charAt(0)?.toUpperCase(),
   }
 
 

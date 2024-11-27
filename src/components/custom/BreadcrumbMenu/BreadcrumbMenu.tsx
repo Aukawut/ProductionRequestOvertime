@@ -34,6 +34,14 @@ const BreadcrumbMenu: React.FC<BreadcrumbMenuProps> = ({ path }) => {
             <Slash />
           </BreadcrumbSeparator>
           <BreadcrumbItem>
+            <Link to="/request">
+              <BreadcrumbLink style={{color:""}} className={`${path == "/request" ? 'text-sky-700' : ''}`}>Request</BreadcrumbLink>
+            </Link>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator>
+            <Slash />
+          </BreadcrumbSeparator>
+          <BreadcrumbItem>
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1">
                 {data?.navMain[0]?.title}

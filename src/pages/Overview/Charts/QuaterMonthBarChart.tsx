@@ -2,7 +2,6 @@ import React from "react";
 import {
   BarChart,
   Bar,
-  Rectangle,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -10,10 +9,109 @@ import {
   Legend,
   ResponsiveContainer,
   LabelList,
-  ReferenceLine
 } from "recharts";
 
-const QuaterMonthBarChart: React.FC = () => {
+import moment from "moment"
+
+const data = [
+  {
+    date: "2000-01",
+    uv: 4000,
+    pv: 2400,
+    amt: 2400,
+  },
+  {
+    date: "2000-02",
+    uv: 3000,
+    pv: 1398,
+    amt: 2210,
+  },
+  {
+    date: "2000-03",
+    uv: 2000,
+    pv: 9800,
+    amt: 2290,
+  },
+  {
+    date: "2000-04",
+    uv: 2780,
+    pv: 3908,
+    amt: 2000,
+  },
+  {
+    date: "2000-05",
+    uv: 1890,
+    pv: 4800,
+    amt: 2181,
+  },
+  {
+    date: "2000-06",
+    uv: 2390,
+    pv: 3800,
+    amt: 2500,
+  },
+  {
+    date: "2000-07",
+    uv: 3490,
+    pv: 4300,
+    amt: 2100,
+  },
+  {
+    date: "2000-08",
+    uv: 4000,
+    pv: 2400,
+    amt: 2400,
+  },
+  {
+    date: "2000-09",
+    uv: 3000,
+    pv: 1398,
+    amt: 2210,
+  },
+  {
+    date: "2000-10",
+    uv: 2000,
+    pv: 9800,
+    amt: 2290,
+  },
+  {
+    date: "2000-11",
+    uv: 2780,
+    pv: 3908,
+    amt: 2000,
+  },
+  {
+    date: "2000-12",
+    uv: 1890,
+    pv: 4800,
+    amt: 2181,
+  },
+];
+
+const renderQuarterTick = (tickProps:any):React.ReactElement => {
+
+  const { x, y, payload } = tickProps;
+  const { value, offset } = payload;
+  const date = new Date(value);
+  const month = date.getMonth();
+  const quarterNo = Math.floor(month / 3) + 1;
+
+
+  if (month % 3 === 1) {
+    return <text x={x} y={y - 4} fontSize={10.5} textAnchor="middle">{`Q${quarterNo}`}</text>;
+  }
+
+  const isLast = month === 11;
+
+  if (month % 3 === 0 || isLast) {
+    const pathX = Math.floor(isLast ? x + offset + 0.07 * x : x - offset) + 0.5;
+
+    return <path d={`M${pathX},${y - 4}v${-35}`} stroke="#737171" />;
+  }
+  return <></>;
+};
+
+const QuaterMonthBarChart:React.FC = () => {
   function convertToK(number: number) {
     if (number >= 1000) {
       return (number / 1000).toFixed(1) + "k";
@@ -21,99 +119,33 @@ const QuaterMonthBarChart: React.FC = () => {
     return number.toString();
   }
 
-  
-
-  const data = [
-    {
-      name: "Jan",
-      uv: 4000,
-
-      amt: 2400,
-    },
-    {
-      name: "Feb",
-      uv: 3000,
-
-      amt: 2210,
-    },
-    {
-      name: "Mar",
-      uv: 2000,
-
-      amt: 2290,
-    },
-    {
-      name: "Apr",
-      uv: 2780,
-
-      amt: 2000,
-    },
-    {
-      name: "May",
-      uv: 1890,
-
-      amt: 2181,
-    },
-    {
-      name: "Jun",
-      uv: 2390,
-      amt: 2500,
-    },
-    {
-      name: "Jul",
-      uv: 3490,
-
-      amt: 2100,
-    },
-    {
-      name: "Aug",
-      uv: 3490,
-
-      amt: 2100,
-    },
-    {
-      name: "Sep",
-      uv: 3490,
-
-      amt: 2100,
-    },
-    {
-      name: "Oct",
-      uv: 3490,
-
-      amt: 2100,
-    },
-    {
-      name: "Nov",
-      uv: 3490,
-
-      amt: 2100,
-    },
-    {
-      name: "Dec",
-      uv: 3490,
-
-      amt: 2100,
-    },
-  ];
-
-  const truncateText = (text: string, maxLength: number = 10) => {
-    return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
-  };
-
+ 
   return (
     <div className="h-[200px]">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
+          width={500}
+          height={300}
           data={data}
-         
-          layout="horizontal"
           margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="name" style={{ fontSize: 12 }} type="category" tickFormatter={(tick) => truncateText(tick as string)}>
-         
-          </XAxis>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey="date"
+            style={{ fontSize: 12 }}
+            type="category"
+            tickFormatter={(tick) => moment(tick, 'YYYY-MM').format('MMM')}
+          />
+          <XAxis
+            dataKey="date"
+            axisLine={false}
+            tickLine={false}
+            interval={0}
+            tick={renderQuarterTick}
+            height={1}
+            scale="band"
+            xAxisId="quarter"
+          />
           <YAxis
             style={{ fontSize: 12 }}
             format={""}
@@ -124,81 +156,19 @@ const QuaterMonthBarChart: React.FC = () => {
               return convertToK(Number(e));
             }}
           />
-          <Tooltip
-            formatter={(e) => e}
-            contentStyle={{ fontSize: 12, borderRadius: 5 }}
-          />
+          <Tooltip />
           <Legend />
-
-          <ReferenceLine
-            x="Mar"
-            stroke="red"
-            strokeWidth={0.3}
-            label={{
-              value: "Q1",
-              position: "center",
-              offset: 5,
-              fill: "red",
-              fontSize: 12,
-              textAnchor: "middle",
-            }}
-            position="end"
-          />
-          <ReferenceLine
-            x="Jun"
-            stroke="blue"
-            strokeWidth={0.3}
-            label={{
-              value: "Q2",
-              position: "center",
-              offset: 5,
-              fill: "blue",
-              fontSize: 12,
-            }}
-            position="end"
-          />
-          <ReferenceLine
-            x="Sep"
-            stroke="green"
-            strokeWidth={0.3}
-            label={{
-              value: "Q3",
-              position: "center",
-              offset: 5,
-              fill: "green",
-              fontSize: 12,
-            }}
-            position="end"
-          />
-          <ReferenceLine
-            x="Dec"
-            stroke="purple"
-            strokeWidth={0.3}
-            label={{
-              value: "Q4",
-              position: "center",
-              offset: 5,
-              fill: "purple",
-              fontSize: 12,
-            }}
-            position="end"
-          />
-          <Bar
-            dataKey="uv"
-            fill="#37CEEA"
-            activeBar={<Rectangle />}
-            barSize={25}
-            layout="vertical"
-          >
-            <LabelList
-              dataKey="uv"
+          <Bar dataKey="pv" fill="#3BDCF9"  barSize={25}>
+          <LabelList
+              dataKey="pv"
               position="top"
               style={{ fontSize: 11 }}
               formatter={(e: any) => {
                 return e.toLocaleString();
               }}
             />
-          </Bar>
+            </Bar>
+        
         </BarChart>
       </ResponsiveContainer>
     </div>

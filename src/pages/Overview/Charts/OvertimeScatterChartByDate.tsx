@@ -8,6 +8,7 @@ import {
   Tooltip,
   Cell,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 
 const data = [
@@ -21,9 +22,6 @@ const data = [
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "red", "pink"];
 
 const OvertimeScatterChartByDate: React.FC = () => {
-  
-  
-
   return (
     <div className="h-[300px] bg-white">
       <ResponsiveContainer width="100%" height="100%">
@@ -40,25 +38,22 @@ const OvertimeScatterChartByDate: React.FC = () => {
             type="number"
             dataKey="x"
             name="stature"
-    
             className="text-[11.50px]"
           />
           <YAxis
             type="number"
             dataKey="y"
             name="weight"
-     
             className="text-[11.50px]"
             domain={[0, "dataMax + 300"]}
           />
-          <Tooltip cursor={{ strokeDasharray: "3 3" }} />
-          <Scatter
-            name="A school"
-            data={data}
-            fill="#8884d8"
-     
-            
-          >
+          <Tooltip
+            cursor={{ strokeDasharray: "3 3" }}
+            formatter={(e) => e}
+            contentStyle={{ fontSize: 12, borderRadius: 5 }}
+          />
+           <Legend />
+          <Scatter name="A school" data={data} fill="#8884d8">
             {data.map((_, index) => (
               <Cell
                 key={`cell-${index}`}

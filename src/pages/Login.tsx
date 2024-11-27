@@ -88,7 +88,7 @@ const Login: React.FC = () => {
   return (
     <div className="w-full flex justify-center items-center min-h-screen">
       <motion.div
-        className="w-[950px] bg-white  h-[500px] shadow-smooth rounded-[24px] flex items-cente overflow-hidden"
+        className="w-[840px] bg-white  h-[460px] shadow-smooth rounded-[24px] flex items-cente overflow-hidden"
         initial={{ opacity: 0, y: 80 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "tween", duration: 0.5 }}
