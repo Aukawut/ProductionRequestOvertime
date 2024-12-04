@@ -77,7 +77,7 @@ const DonutRequest = () => {
         <ChartStyle id={id} config={chartConfig} />
         <CardHeader className="flex-row items-start space-y-0 pb-0">
           <div className="grid gap-1">
-            <CardTitle className="text-[15px]">Summary Overtime Person / Month</CardTitle>
+            <CardTitle className="text-[13.5px]">Summary Overtime Person / Month</CardTitle>
             <CardDescription>January - June 2024</CardDescription>
           </div>
           <Select value={activeMonth} onValueChange={setActiveMonth}>
@@ -118,7 +118,7 @@ const DonutRequest = () => {
           <ChartContainer
             id={id}
             config={chartConfig}
-            className="mx-auto aspect-square w-full max-w-[300px]"
+            className="mx-auto aspect-square w-full max-w-[270px]"
           >
             <PieChart>
               <ChartTooltip

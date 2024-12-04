@@ -2,11 +2,12 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowUpDown } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 export type Payment = {
+  id: string;
+  amount: number;
   status: "pending" | "processing" | "success" | "failed";
-  requestNo: string;
+  email: string;
 };
 
 export const columns: ColumnDef<Payment>[] = [
@@ -34,7 +35,7 @@ export const columns: ColumnDef<Payment>[] = [
   },
 
   {
-    accessorKey: "requestNo",
+    accessorKey: "email",
     header: ({ column }) => {
       return (
         <Button
@@ -42,36 +43,15 @@ export const columns: ColumnDef<Payment>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Request No
+          Email
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
-    },
-    cell: ({ row }) => {
-      return <p className="text-[12px]">{row.getValue("requestNo")}</p>;
     },
   },
 
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => {
-      return (
-        <div className="text-center">
-          <Badge
-            variant={"secondary"}
-            className={`${
-              row.getValue("status") == "pending"
-                ? "bg-[#E9F5FF] text-[#42A5FF]"
-                : row.getValue("status") == "success"
-                ? "bg-[#C1EFDF] text-[#005A2B]"
-                : ""
-            }`}
-          >
-            {row.getValue("status")}
-          </Badge>
-        </div>
-      );
-    },
   },
 ];

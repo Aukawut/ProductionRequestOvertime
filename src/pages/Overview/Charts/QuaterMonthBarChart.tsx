@@ -9,9 +9,11 @@ import {
   Legend,
   ResponsiveContainer,
   LabelList,
+  Line,
+  ComposedChart,
 } from "recharts";
 
-import moment from "moment"
+import moment from "moment";
 
 const data = [
   {
@@ -88,17 +90,22 @@ const data = [
   },
 ];
 
-const renderQuarterTick = (tickProps:any):React.ReactElement => {
-
+const renderQuarterTick = (tickProps: any): React.ReactElement => {
   const { x, y, payload } = tickProps;
   const { value, offset } = payload;
   const date = new Date(value);
   const month = date.getMonth();
   const quarterNo = Math.floor(month / 3) + 1;
 
-
   if (month % 3 === 1) {
-    return <text x={x} y={y - 4} fontSize={10.5} textAnchor="middle">{`Q${quarterNo}`}</text>;
+    return (
+      <text
+        x={x}
+        y={y - 4}
+        fontSize={10.5}
+        textAnchor="middle"
+      >{`Q${quarterNo}`}</text>
+    );
   }
 
   const isLast = month === 11;
@@ -111,7 +118,7 @@ const renderQuarterTick = (tickProps:any):React.ReactElement => {
   return <></>;
 };
 
-const QuaterMonthBarChart:React.FC = () => {
+const QuaterMonthBarChart: React.FC = () => {
   function convertToK(number: number) {
     if (number >= 1000) {
       return (number / 1000).toFixed(1) + "k";
@@ -119,17 +126,23 @@ const QuaterMonthBarChart:React.FC = () => {
     return number.toString();
   }
 
- 
   return (
     <div className="h-[200px]">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart
+        <ComposedChart
           width={500}
-          height={300}
+          height={400}
           data={data}
-          margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
+          margin={{
+            top: 20,
+            right: 20,
+            bottom: 20,
+            left: 20,
+          }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
+       
+          
+       <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="date"
             style={{ fontSize: 12 }}
@@ -157,9 +170,21 @@ const QuaterMonthBarChart:React.FC = () => {
             }}
           />
           <Tooltip />
-          <Legend />
-          <Bar dataKey="pv" fill="#3BDCF9"  barSize={25}>
-          <LabelList
+          <Legend
+            formatter={(value: string, _: any) => {
+              if (value === "pv") return "(OT) Actual";
+              if (value === "pv") return "(OT) Actual";
+              return value;
+            }}
+            wrapperStyle={{
+              fontSize: "12px",
+            }}
+          />
+          {/* <Legend /> */}
+
+          <Bar dataKey="pv" fill="#3BDCF9" barSize={25}>
+
+            <LabelList
               dataKey="pv"
               position="top"
               style={{ fontSize: 11 }}
@@ -167,10 +192,12 @@ const QuaterMonthBarChart:React.FC = () => {
                 return e.toLocaleString();
               }}
             />
-            </Bar>
-        
-        </BarChart>
+          </Bar>
+
+          <Line type="monotone" dataKey="pv" stroke="#ff7300" />
+        </ComposedChart>
       </ResponsiveContainer>
+     
     </div>
   );
 };

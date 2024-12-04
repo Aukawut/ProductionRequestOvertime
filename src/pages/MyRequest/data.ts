@@ -1,4 +1,4 @@
-import { File, LucideProps } from "lucide-react";
+import { Check, CircleX, Clock8, File, LucideProps, Undo2 } from "lucide-react";
 
 export interface CardRequestProps {
   title: string;
@@ -9,39 +9,51 @@ export interface CardRequestProps {
   >;
   bgColor: string;
   textColor: string;
+  aliasTitle : string ;
+  titleTH:string ;
 }
 
 export const cardMenu: CardRequestProps[] = [
   {
-    title: "Request",
+    title: "Pending",
     amount: 20,
     sumAll: 100,
-    Icon: File,
+    Icon: Clock8,
     bgColor: "#E9F5FF",
     textColor: "#2697FF",
-  },
-  {
-    title: "Pending",
-    amount: 1,
-    sumAll: 100,
-    Icon: File,
-    bgColor: "#FFF6E7",
-    textColor: "#FF9E0E",
+    aliasTitle:"Pending",
+    titleTH:"รออนุมัติ"
+    
   },
   {
     title: "Reject",
-    amount: 4,
+    amount: 1,
     sumAll: 100,
-    Icon: File,
-    bgColor: "#FED0D0",
-    textColor: "#A30014",
+    Icon: Undo2,
+    bgColor: "#FFF6E7",
+    textColor: "#FF9E0E",
+    aliasTitle:"Reject",
+    titleTH:"รอแก้ไข"
   },
+ 
   {
     title: "Success",
     amount: 20,
     sumAll: 100,
-    Icon: File,
+    Icon: Check,
     bgColor: "#C1EFDF",
     textColor: "#005A2B",
+    aliasTitle:"Approved",
+    titleTH:"อนุมัติ"
+  },
+  {
+    title: "Cancel",
+    amount: 4,
+    sumAll: 100,
+    Icon: CircleX,
+    bgColor: "#FED0D0",
+    textColor: "#A30014",
+    aliasTitle:"Cancel",
+    titleTH:"ยกเลิก"
   },
 ];

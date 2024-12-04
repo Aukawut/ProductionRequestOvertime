@@ -9,6 +9,8 @@ interface Permission {
   FULLNAME: string;
   MAIL: string;
   REAL_DEPT: string;
+  ID_FACTORY : number;
+  ID_GROUP_DEPT: number;
 }
 export interface UserInfo {
     EmployeeCode: string ;

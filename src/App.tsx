@@ -5,6 +5,9 @@ import Login from "./pages/Login";
 import Overview from "./pages/Overview/Overview";
 import Request from "./pages/Request/Request";
 import MyRequest from "./pages/MyRequest/MyRequest";
+import NotFoundAnimate from "./components/loading/notfound-loading";
+import ApproverManagement from "./pages/ApproverManagement/ApproverManagement";
+import Approve from "./pages/Approve/Approve";
 
 const router = createBrowserRouter(
   [
@@ -15,11 +18,17 @@ const router = createBrowserRouter(
         { path: "/", element: <Overview /> },
         { path: "/request", element: <Request /> },
         { path: "/request/me", element: <MyRequest /> },
+        { path: "/approve", element: <Approve /> },
+        { path: "/setting/approver", element: <ApproverManagement /> },
       ],
     },
     {
       path: "/login",
       element: <Login />,
+    },
+    {
+      path: "*",
+      element: <NotFoundAnimate />,
     },
   ],
   {

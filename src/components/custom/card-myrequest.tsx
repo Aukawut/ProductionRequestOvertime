@@ -10,6 +10,8 @@ interface CardRequestProps {
   >;
   bgColor: string;
   textColor: string;
+  titleTH : string ;
+
 }
 const CardRequest: React.FC<CardRequestProps> = ({
   Icon,
@@ -18,14 +20,13 @@ const CardRequest: React.FC<CardRequestProps> = ({
   textColor,
   sumAll,
   amount,
+  titleTH
 }) => {
     const MAX_WIDTH = 180;
   return (
     <div
-      className="w-full bg-white rounded-[10px] p-3 relative"
-      style={{
-        boxShadow: "rgba(0, 0, 0, 0.05) 0px 2px 4px",
-      }}
+      className="w-full bg-white rounded-[10px] px-3 relative py-6 shadow-smooth"
+     
     >
         {/* more Icon */}
       <div className="absolute top-4 right-3">
@@ -34,27 +35,33 @@ const CardRequest: React.FC<CardRequestProps> = ({
     
       <div className="flex items-center justify-between">
         <div
-          className={`w-[50px] h-[50px] rounded-[5px] p-3 flex justify-center items-center`}
+          className={`w-[40px] h-[40px] rounded-[5px] p-[0.7rem] flex justify-center items-center`}
           style={{
             background: bgColor,
           }}
         >
-          <Icon size={22} strokeWidth={3} color={textColor} />
+          <Icon size={30} strokeWidth={3} color={textColor} />
         </div>
-        <p className="mr-[2rem] text-gray-700 text-[35px]">{amount}</p>
+        <p className="mr-[2rem] text-gray-700 text-[30px]">{amount}</p>
       </div>
 
       <div className="text-start my-3">
-        <p className="text-gray-700 text-[20px] font-semibold"> {title}</p>
+        <p className="text-gray-700 text-[18px] font-semibold"> {title}</p>
+        <p className="text-gray-500 text-[12px]"> {titleTH}</p>
       </div>
       <div
         className="h-[5px] rounded-[2px] relative"
         style={{ background: bgColor, width: MAX_WIDTH }}
       >
         <div
-          className="h-[5px] rounded-[2px] absolute"
+          className="h-[5px] rounded-[2px] absolute duration-300"
           style={{ background: textColor, width: `${(amount * 100) / sumAll}%` }}
-        ></div>
+        >
+          <p className="text-gray-800 text-[11px] mt-2">
+          {`${((amount * 100) / sumAll).toFixed(2)}%`}
+          </p>
+         
+        </div>
       </div>
     </div>
   );

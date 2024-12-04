@@ -14,12 +14,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 import {
   Table,
@@ -29,8 +23,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { useState } from "react";
-import { ListFilter, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -47,6 +50,12 @@ export function DataTable<TData, TValue>({
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowsPerPage, setRowsPerPage] = useState(10); // Set initial rows per page
+
+  const [pagination, setPagination] = useState({
+    pageIndex: 0, // Initial page index
+    pageSize: rowsPerPage, // Initial page size
+  });
 
   const table = useReactTable({
     data,
@@ -67,13 +76,26 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
       globalFilter,
+      pagination,
     },
+    onPaginationChange: setPagination,
   });
+  // Handle rows per page change
+  const handleRowsPerPageChange = (value: string) => {
+    const newPageSize = Number(value);
+    setRowsPerPage(newPageSize);
+    setPagination({
+      ...pagination,
+      pageSize: newPageSize,
+    });
+  };
 
   return (
     <div className="py-1 px-4">
       <div className="flex items-center py-4">
         <div className="relative">
+
+            {/* Input Global Search */}
           <Search
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
             size={18}
@@ -87,32 +109,7 @@ export function DataTable<TData, TValue>({
           />
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto" size={"icon"}>
-              <ListFilter />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        
       </div>
       <div className="rounded-md border relative w-full">
         <div className="overflow-auto h-full">
@@ -172,25 +169,53 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
 
-      {/* Pagination */}
+      <div className="flex items-center justify-between py-2">
+        <div className="flex items-center gap-x-1">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            type="button"
+          >
+            <ChevronLeft size={16} />
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            type="button"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+             <ChevronRight size={16} />
+          </Button>
+        </div>
 
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
+        {/* Page Information */}
+        <div className="text-sm flex gap-x-2 items-center">
+          <div className="flex items-center py-2">
+            <Select
+              value={rowsPerPage.toString()}
+              onValueChange={handleRowsPerPageChange}
+            >
+              <SelectTrigger>
+                <SelectValue>{rowsPerPage} rows / page</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {[10, 25, 50, 100].map((size) => (
+                  <SelectItem key={size} value={size.toString()}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <span className="text-[13px]">
+            Page {pagination.pageIndex + 1} of {table.getPageCount()} pages
+          </span>
+        </div>
       </div>
     </div>
   );

@@ -80,7 +80,7 @@ export function NavMain({
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild className="py-4">
                         <Link to={subItem.url}>
-                          <span>{subItem.title}</span>
+                          <span className={subItem.url == location.pathname ? 'text-sky-600' : ''}>{subItem.title}</span>
                         </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>

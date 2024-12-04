@@ -86,7 +86,6 @@ const OvertimeBarChartByDept: React.FC = () => {
             style={{ fontSize: 10 }}
             type="category"
             tickFormatter={(tick) => truncateText(tick as string)}
-        
           />
           <YAxis
             style={{ fontSize: 12 }}
@@ -102,7 +101,16 @@ const OvertimeBarChartByDept: React.FC = () => {
             formatter={(e) => e}
             contentStyle={{ fontSize: 12, borderRadius: 5 }}
           />
-          <Legend />
+          <Legend
+            formatter={(value: string, _: any) => {
+              if (value === "uv") return "(OT) Plan";
+              if (value === "amt") return "(OT) Actual";
+              return value;
+            }}
+            wrapperStyle={{
+              fontSize: "12px",
+            }}
+          />
 
           <Bar
             dataKey="uv"

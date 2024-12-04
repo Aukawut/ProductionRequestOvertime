@@ -1,4 +1,4 @@
-import { BookOpen, ChartPie, FileUser, GalleryVerticalEnd, Settings2 } from "lucide-react";
+import { BookOpen, ChartPie, ChartSpline, CheckCircle, ClipboardPlus, FileUser, GalleryVerticalEnd, Settings2 } from "lucide-react";
 
 
 export const singleMenuItem = [
@@ -8,14 +8,19 @@ export const singleMenuItem = [
     icon: ChartPie
   },
   {
-    title: "Request (OT)",
+    title: "Add Request",
     path: "/request",
-    icon: FileUser
+    icon: ClipboardPlus 
   },
   {
     title: "My Request",
     path: "/request/me",
     icon: FileUser
+  },
+  {
+    title: "Approve",
+    path: "/approve",
+    icon: CheckCircle
   },
  
 ];
@@ -42,27 +47,36 @@ export const data = {
       isActive: true,
       items: [
         {
-          title: "General",
+          title: "Overtime Quota",
           url: "#",
         },
         {
-          title: "Team",
+          title: "Approver",
+          url: "/setting/approver",
+        },
+        {
+          title: "Employee",
+          url: "/employee",
+        },
+        {
+          title: "Approvers",
           url: "#",
         },
         {
-          title: "Billing",
+          title: "Group Department",
           url: "#",
         },
         {
-          title: "Limits",
+          title: "Factory",
           url: "#",
         },
       ],
     },
+    
     {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
+      title: "Report",
+      url: "/report",
+      icon: ChartSpline,
       items: [
         {
           title: "Introduction",
@@ -72,14 +86,7 @@ export const data = {
           title: "Get Started",
           url: "#",
         },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
+        
       ],
     },
   ],

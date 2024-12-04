@@ -52,6 +52,7 @@ const OvertimeScatterChartByDate: React.FC = () => {
             formatter={(e) => e}
             contentStyle={{ fontSize: 12, borderRadius: 5 }}
           />
+         
            <Legend />
           <Scatter name="A school" data={data} fill="#8884d8">
             {data.map((_, index) => (

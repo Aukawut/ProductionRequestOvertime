@@ -12,6 +12,16 @@ import {
 } from "@/components/ui/pagination";
 import OvertimeScatterChartByDate from "./Charts/OvertimeScatterChartByDate";
 
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 const Overview: React.FC = () => {
   function convertFormat(number: number) {
     return number.toLocaleString("en-US", {
@@ -30,6 +40,20 @@ const Overview: React.FC = () => {
       >
         <div className="flex flex-col p-[1rem] justify-center w-full items-start">
           <p className="text-[13px] text-gray-700">Summary Report OT / Year</p>
+          <div className="mt-2">
+            <Select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select Year" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel className="text-[14px]">Years</SelectLabel>
+                  <SelectItem value="2023" className="text-[12px]">2023</SelectItem>
+                  <SelectItem value="2024" className="text-[12px]">2024</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <QuaterMonthBarChart />
@@ -47,6 +71,7 @@ const Overview: React.FC = () => {
                 Summary Report OT / Year
               </p>
             </div>
+
             <OvertimeBarChartByDept />
             <div className="w-full flex justify-end">
               <Pagination className="text-[12px] w-full justify-end">
