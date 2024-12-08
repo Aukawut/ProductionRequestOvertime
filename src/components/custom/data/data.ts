@@ -1,4 +1,4 @@
-import { BookOpen, ChartPie, ChartSpline, CheckCircle, ClipboardPlus, FileUser, GalleryVerticalEnd, Settings2 } from "lucide-react";
+import {  ChartPie, ChartSpline, CheckCircle, ClipboardPlus, FileUser, GalleryVerticalEnd, Settings2 } from "lucide-react";
 
 
 export const singleMenuItem = [

@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import TableRequest from "./TableRequest/TableRequest";
 import CardRequest from "@/components/custom/card-myrequest";
 
 import { cardMenu } from "./data";
 import { Button } from "@/components/ui/button";
-import {Plus } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import DonutRequest from "./chart/DonutRequest";
-import { CountRequestByEmpCode } from "../../function/main";
+import { CountRequestByEmpCode, CountRequestByYear, GetYearMenuOption,GetMonthMenuOption, GetRequestNoAndStatusByUser } from "../../function/main";
 import { motion } from "framer-motion";
 import { useOTManagementSystemStore } from "../../../store";
 
@@ -15,11 +15,40 @@ export interface CountRequest {
   NAME_STATUS: string;
 }
 
+export interface YearMenu {
+  AMOUNT_REQ: number ;
+  YEAR_RQ: number ;
+}
+
+export interface MonthMenu {
+  AMOUNT_REQ: number ;
+  MONTH_RQ: number ;
+}
+
+export interface RequestByYear{
+  AMOUNT_REQ : number ;
+  YEAR_RQ : number ;
+  MONTH_RQ : number ;
+}
+
+export interface RequestNoByUser{
+  REQUEST_NO : string ;
+  REQ_STATUS : number ;
+  REV : number ;
+  NAME_STATUS : string ;
+}
+
 const MyRequest: React.FC = () => {
   const [countRequest, setCountRequest] = useState<CountRequest[]>([]);
   const token = useOTManagementSystemStore((state) => state.token);
   const sum = countRequest?.reduce((acc, obj) => acc + obj.AMOUNT, 0);
+  const containerTop = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(true);
+  const [yearMenu,setYearMenu] = useState<YearMenu[]>([]) ;
+  const [monthMenu,setMonthMenu] = useState<MonthMenu[]>([]) ;
+  const [requestByYear,setRequestByYear] = useState<RequestByYear[]>([]) ;
+  const [requests,setRequests] = useState<RequestNoByUser[]>([]) ;
+
   const empCode = useOTManagementSystemStore(
     (state) => state.info?.EmployeeCode
   );
@@ -34,16 +63,54 @@ const MyRequest: React.FC = () => {
     }
   };
 
+  const [scrollInfo, setScrollInfo] = useState({
+    scrollLeft: 0,
+    scrollTop: 0,
+  });
+
   const fetchData = async () => {
-    setCountRequest(await CountRequestByEmpCode(token, empCode));
+    const year = new Date().getFullYear() ;
+    Promise.all([
+      setCountRequest(await CountRequestByEmpCode(token, empCode)),
+      setYearMenu(await GetYearMenuOption(token)),
+      setMonthMenu(await GetMonthMenuOption(token)),
+      setRequestByYear(await CountRequestByYear(token,year)),
+      setRequests(await GetRequestNoAndStatusByUser(token,empCode)),
+    ]).then(() => {
+       setProgress(false)
+    })
+   
   };
 
   useEffect(() => {
     fetchData();
-    setTimeout(() => {
-      setProgress(false);
-    }, 500);
+   
   }, []);
+
+  const handleScroll = () => {
+    if (containerTop.current) {
+      setScrollInfo({
+        scrollLeft: containerTop.current.scrollLeft,
+        scrollTop: containerTop.current.scrollTop,
+      });
+    }
+  };
+
+  useEffect(() => {
+    const container = containerTop.current;
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
+    }
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+  
+  }, [scrollInfo]);
 
   return (
     <motion.div
@@ -55,22 +122,57 @@ const MyRequest: React.FC = () => {
       <p className="text-[14px] text-gray-700 mt-2 font-medium mb-2">
         My Request / คำขอของฉัน
       </p>
+      <div className="relative">
+        <div
+          className="h-[180px] flex justify-center items-start w-full overflow-auto p-2 scrollbar-hide px-[1rem]"
+          ref={containerTop}
+        >
+          {scrollInfo?.scrollTop > 60 ? (
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, type: "tween" }}
+               className="absolute top-0 -right-1 z-[5] w-4 h-4 flex justify-center items-center bg-blue-50 rounded-sm"
+              type="button"
+              onClick={() => {
+                containerTop.current?.scrollTo(0, 0);
+              }}
+            >
+              <ChevronUp size={16} />
+            </motion.button>
+          ) : (
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, type: "tween" }}
+              className="absolute bottom-0 -right-1 z-[5] w-4 h-4 flex justify-center items-center bg-blue-50 rounded-sm"
+              type="button"
+              onClick={() => {
+                containerTop.current?.scrollTo(0, 180);
+              }}
+            >
+              <ChevronDown size={16} />
+            </motion.button>
+          )}
 
-      <div className="grid grid-cols-12 gap-x-3">
-        {cardMenu?.map((item, index) => (
-          <div className="col-span-12 lg:col-span-3" key={index}>
-            <CardRequest
-              Icon={item.Icon}
-              title={item.title}
-              amount={findAmount(item.aliasTitle)}
-              sumAll={sum}
-              bgColor={item.bgColor}
-              textColor={item.textColor}
-              titleTH={item.titleTH}
-            />
+          <div className="grid grid-cols-12 gap-x-2 gap-y-2 w-full">
+            {cardMenu?.map((item, index) => (
+              <div className="col-span-12 lg:col-span-3" key={index}>
+                <CardRequest
+                  Icon={item.Icon}
+                  title={item.title}
+                  amount={findAmount(item.aliasTitle)}
+                  sumAll={sum}
+                  bgColor={item.bgColor}
+                  textColor={item.textColor}
+                  titleTH={item.titleTH}
+                />
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
+
       <div className="grid grid-cols-12 mt-2 gap-x-2">
         <div className="col-span-12 lg:col-span-6">
           <div
@@ -94,7 +196,7 @@ const MyRequest: React.FC = () => {
               <p className="text-[12px] font-medium text-gray-600">
                 ตารางแสดงข้อมูลสถานะคำขอของคุณ
               </p>
-              <TableRequest />
+              <TableRequest users={requests}/>
             </div>
           </div>
         </div>
@@ -121,7 +223,7 @@ const MyRequest: React.FC = () => {
               </svg>
             </div>
           ) : (
-            <DonutRequest />
+            <DonutRequest yearMenu={yearMenu} requestByYear={requestByYear} monthMenu={monthMenu} />
           )}
         </div>
       </div>

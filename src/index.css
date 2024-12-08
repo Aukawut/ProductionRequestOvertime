@@ -36,8 +36,16 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem
-  ;
+    --chart-6: 300 50% 50%; 
+    --chart-7: 220 60% 45%;
+    --chart-8: 340 70% 50%;
+    --chart-9: 100 40% 55%;
+    --chart-10: 187 100% 57%;
+    --chart-11: 47 100% 57%;
+    --chart-12: 209 100% 57%;
+    --color-december: 27 87% 67%;
+    --color-april : 20 80% 80%;
+    --radius: 0.5rem;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -79,7 +87,10 @@
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%}
+    --sidebar-ring: 217.2 91.2% 59.8%
+  
+  }
+    
 }
 @layer base {
   * {
@@ -89,6 +100,7 @@
   body {
     @apply bg-background text-foreground;
     overflow: hidden;
+    scroll-behavior: smooth;
   }
  
 }
@@ -98,4 +110,7 @@
 .shadow-smooth:hover{
   box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px ;
   cursor: pointer;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
 }

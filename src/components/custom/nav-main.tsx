@@ -45,8 +45,8 @@ export function NavMain({
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
-        {singleMenuItem?.map((menu) => {
-          return <Link to={menu.path}>
+        {singleMenuItem?.map((menu,index) => {
+          return <Link to={menu.path} key={index}>
           <SidebarMenuButton
          
             className={`py-5 ${

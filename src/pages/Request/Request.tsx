@@ -67,7 +67,8 @@ interface Values {
   remark: string;
   actionBy: string;
   workcell: number;
-  workgroup: number;
+  groupworkcell: number;
+ 
 }
 
 interface GroupDeptAll {
@@ -223,16 +224,17 @@ const Request: React.FC = () => {
     setFactory(role[0]?.ID_FACTORY);
     handleCheckedAll(false);
     setOvertimeType(1);
-    setGroup((role[0]?.ID_GROUP_DEPT).toString());
+    setGroup((role[0]?.ID_GROUP_DEPT)?.toString());
 
     handleCheckedAll(false);
   };
+
 
   useEffect(() => {
     fetchData();
     setDateEnd(moment(new Date()).add(1, "hours").toDate());
     setFactory(role[0]?.ID_FACTORY);
-    setGroup((role[0]?.ID_GROUP_DEPT).toString());
+    setGroup((role[0]?.ID_GROUP_DEPT)?.toString());
   }, []);
 
   return (
@@ -285,12 +287,17 @@ const Request: React.FC = () => {
                   remark: "",
                   actionBy: employeeCode,
                   workcell: 1,
-                  workgroup: 1,
+                  groupworkcell: 1,
                 }}
+                
                 onSubmit={async (
                   values: Values,
                   { setSubmitting, resetForm }: FormikHelpers<Values>
                 ) => {
+
+            
+                  console.log(values);
+                  
                   Swal.fire({
                     title: "คุณต้องการส่งคำขอใช่ หรือไม่ ?",
                     text: "กรุณาตรวจสอบข้อมูลก่อนส่งคำขอทุกครั้ง",
@@ -310,17 +317,19 @@ const Request: React.FC = () => {
 
                       if (selectedUser?.length > 0) {
                         const payload = {
-                          overtimeDate: moment(values.overtimeDate).format(
-                            "YYYY-MM-DD"
-                          ),
+                          overtimeDate: moment(values.overtimeDate).format("YYYY-MM-DD"),
                           overtimeType: Number(values.overtimeType),
                           group: Number(values.group),
                           factory: Number(values.factory),
                           remark: values.remark,
                           actionBy: values.actionBy,
                           users: selectedUser,
+                          start:moment(dateStart).format("YYYY-MM-DD HH:mm"),
+                          end:moment(dateEnd).format("YYYY-MM-DD HH:mm"),
+                          groupworkcell:Number(values.groupworkcell),
+                          workcell:Number(values.workcell),
                         };
-
+                      
                         const response = await axios.post(
                           `${baseURL}/request`,
                           payload
@@ -437,6 +446,7 @@ const Request: React.FC = () => {
                             <span className="text-[red]">*</span> ช่วงเวลา /
                             Period
                           </label>
+                          
                           <div className="flex items-center gap-x-5">
                             <TimePicker
                               date={dateStart}
@@ -456,7 +466,7 @@ const Request: React.FC = () => {
                             <span className="text-[red]">*</span> ประเภทโอที
                           </label>
                           <Select
-                            value={overtimeType.toString()}
+                            value={overtimeType?.toString()}
                             onValueChange={(e) => {
                               setFieldValue("overtimeType", Number(e));
                               setOvertimeType(Number(e));
@@ -489,7 +499,7 @@ const Request: React.FC = () => {
                         </label>
                         <Select
                           disabled
-                          value={values.group.toString()}
+                          value={values.group?.toString()}
                           onValueChange={(e) => {
                             setGroup(e);
                             setFieldValue("group", e);
@@ -505,7 +515,7 @@ const Request: React.FC = () => {
                             {allGroupDept?.map((item, index) => {
                               return (
                                 <SelectItem
-                                  value={item.ID_GROUP_DEPT.toString()}
+                                  value={item.ID_GROUP_DEPT?.toString()}
                                   className="text-[13px]"
                                   key={index}
                                 >
@@ -524,7 +534,7 @@ const Request: React.FC = () => {
                           <span className="text-[red]">*</span> โรงงาน / Factory
                         </label>
                         <Select
-                          value={values.factory.toString()}
+                          value={values.factory?.toString()}
                           onValueChange={(e) => {
                             getUserDataByFactory(Number(e));
                             setFactory(Number(e));
@@ -541,7 +551,7 @@ const Request: React.FC = () => {
                             {allFactory?.map((item, index) => {
                               return (
                                 <SelectItem
-                                  value={item.ID_FACTORY.toString()}
+                                  value={item.ID_FACTORY?.toString()}
                                   className="text-[13px]"
                                   key={index}
                                 >
@@ -563,7 +573,7 @@ const Request: React.FC = () => {
                         </label>
 
                         <Select
-                          value={values.workgroup.toString()}
+                          value={values.groupworkcell?.toString()}
                           onValueChange={async (e) => {
                             setFieldValue("workgroup", e);
                             setIsLoadWorkcell(true);
@@ -581,7 +591,7 @@ const Request: React.FC = () => {
                               setTimeout(() => {
                                 setFieldValue(
                                   "workcell",
-                                  (responseWorkcell[0]?.ID_WORKGRP).toString()
+                                  (responseWorkcell[0]?.ID_WORKGRP)?.toString()
                                 );
                               }, 300);
                             } else {

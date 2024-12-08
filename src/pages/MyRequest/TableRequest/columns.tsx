@@ -1,40 +1,25 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-export type Payment = {
-  status: "pending" | "processing" | "success" | "failed";
-  requestNo: string;
-};
+import { RequestNoByUser } from "../MyRequest";
 
-export const columns: ColumnDef<Payment>[] = [
+
+
+export const columns: ColumnDef<RequestNoByUser>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
+    accessorKey: "none",
+    header: () => <p className="text-[13px]">Action</p>,
     cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
+      <Button size={"icon"} className="bg-[#E9F5FF] text-[#2697FF] hover:bg-[#D5E0E9] w-6 h-6">
+        <Eye size={13}></Eye>
+      </Button>
     ),
-    enableSorting: false,
-    enableHiding: false,
   },
 
   {
-    accessorKey: "requestNo",
+    accessorKey: "REQUEST_NO",
     header: ({ column }) => {
       return (
         <Button
@@ -48,12 +33,29 @@ export const columns: ColumnDef<Payment>[] = [
       );
     },
     cell: ({ row }) => {
-      return <p className="text-[12px]">{row.getValue("requestNo")}</p>;
+      return <p className="text-[12px]">{row.getValue("REQUEST_NO")}</p>;
     },
   },
-
   {
-    accessorKey: "status",
+    accessorKey: "REV",
+    header: ({ column }) => {
+      return (
+        <Button
+          size={"sm"}
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Rev. (Lasted)
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return <p className="text-[12px]">{row.getValue("REV")}</p>;
+    },
+  },
+  {
+    accessorKey: "NAME_STATUS",
     header: "Status",
     cell: ({ row }) => {
       return (
@@ -61,14 +63,15 @@ export const columns: ColumnDef<Payment>[] = [
           <Badge
             variant={"secondary"}
             className={`${
-              row.getValue("status") == "pending"
+              row.getValue("NAME_STATUS") == "Pending"
                 ? "bg-[#E9F5FF] text-[#42A5FF]"
-                : row.getValue("status") == "success"
+                : row.getValue("NAME_STATUS") == "Approved"
                 ? "bg-[#C1EFDF] text-[#005A2B]"
-                : ""
+                :row.getValue("NAME_STATUS") == "Cancel"
+                ? "bg-[#FED0D0] text-[#A30014]": ""
             }`}
           >
-            {row.getValue("status")}
+            {row.getValue("NAME_STATUS")}
           </Badge>
         </div>
       );

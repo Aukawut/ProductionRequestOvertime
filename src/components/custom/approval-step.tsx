@@ -58,8 +58,8 @@ const StepApproval: React.FC<StepApprovalProps> = ({
           {approver?.length > 0 ? (
             <div className="flex items-center justify-start bg-white px-2">
               <div className="space-y-6 border-l-2 border-dashed">
-                {approver?.map((item) => (
-                  <div className="relative w-full">
+                {approver?.map((item,index) => (
+                  <div className="relative w-full" key={index}>
                     <div className="absolute left-[2%] z-10 -ml-[0.8rem] h-4 w-4 rounded-full bg-sky-600 border-2 border-[#DEE2E6]"></div>
 
                     <div className="ml-6">

@@ -1,5 +1,6 @@
 import { EllipsisVertical, LucideProps } from "lucide-react";
 import React from "react";
+import CountUp from "react-countup"
 
 interface CardRequestProps {
   title: string;
@@ -25,7 +26,7 @@ const CardRequest: React.FC<CardRequestProps> = ({
     const MAX_WIDTH = 180;
   return (
     <div
-      className="w-full bg-white rounded-[10px] px-3 relative py-6 shadow-smooth"
+      className="w-full bg-white rounded-[10px] px-3 relative py-6 shadow-smooth h-[170px]"
      
     >
         {/* more Icon */}
@@ -42,7 +43,7 @@ const CardRequest: React.FC<CardRequestProps> = ({
         >
           <Icon size={30} strokeWidth={3} color={textColor} />
         </div>
-        <p className="mr-[2rem] text-gray-700 text-[30px]">{amount}</p>
+        <p className="mr-[2rem] text-gray-700 text-[30px]"><CountUp start={0} end={amount} duration={1}/></p>
       </div>
 
       <div className="text-start my-3">

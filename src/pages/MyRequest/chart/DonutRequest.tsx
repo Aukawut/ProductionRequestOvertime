@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Label, Pie, PieChart, Sector } from "recharts";
 import { PieSectorDataItem } from "recharts/types/polar/Pie";
 import {
@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  ChartConfig,
+
   ChartContainer,
   ChartStyle,
   ChartTooltip,
@@ -22,65 +22,98 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { MonthMenu, RequestByYear, YearMenu } from "../MyRequest";
+import { ChageKeyChartDonut, ChangeKeyMonthNoToName } from "@/function/main";
 
-const desktopData = [
-  { month: "january", desktop: 186, fill: "var(--color-january)" },
-  { month: "february", desktop: 305, fill: "var(--color-february)" },
-  { month: "march", desktop: 237, fill: "var(--color-march)" },
-  { month: "april", desktop: 173, fill: "var(--color-april)" },
-  { month: "may", desktop: 209, fill: "var(--color-may)" },
-];
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  desktop: {
-    label: "Desktop",
-  },
-  mobile: {
-    label: "Mobile",
-  },
-  january: {
-    label: "January",
-    color: "hsl(var(--chart-1))",
-  },
-  february: {
-    label: "February",
-    color: "hsl(var(--chart-2))",
-  },
-  march: {
-    label: "March",
-    color: "hsl(var(--chart-3))",
-  },
-  april: {
-    label: "April",
-    color: "hsl(var(--chart-4))",
-  },
-  may: {
-    label: "May",
-    color: "hsl(var(--chart-5))",
-  },
-} satisfies ChartConfig;
+interface DountRequestProps {
+  yearMenu: YearMenu[];
+  requestByYear: RequestByYear[];
+  monthMenu: MonthMenu[];
+}
 
-const DonutRequest = () => {
+import {chartConfig} from "../data"
+
+
+
+const DonutRequest: React.FC<DountRequestProps> = ({ yearMenu,requestByYear ,monthMenu}) => {
   const id = "pie-interactive";
-  const [activeMonth, setActiveMonth] = React.useState(desktopData[0].month);
+  const [monthData,setMonthData] = useState<{monthNo: number; monthName: string | undefined;color: string | undefined;}[]>([]) ;
+  const [requestData,setRequestData] = useState<{ amount: number; monthNo: number; monthName: string | undefined; }[]>([]) ;
+  
+  const [activeMonth, setActiveMonth] = React.useState(requestData[0]?.monthNo);
+
+
   const activeIndex = React.useMemo(
-    () => desktopData.findIndex((item) => item.month === activeMonth),
+    () => requestData.findIndex((item) => item.monthNo === activeMonth),
     [activeMonth]
-  );
-  const months = React.useMemo(() => desktopData.map((item) => item.month), []);
+  )
+   
+  const [year, setYear] = useState(new Date().getFullYear());
+ 
+
+
+  useEffect(() => {
+
+    const newKey = ChangeKeyMonthNoToName(requestByYear);
+    const chartNewKey = ChageKeyChartDonut(monthMenu)
+
+    if(newKey != undefined) {
+      console.log("newKey",newKey);
+      
+      setRequestData(newKey)
+      setActiveMonth(newKey[0]?.monthNo)
+    }
+    if(monthData != undefined) {
+        setMonthData(chartNewKey)
+    }
+    
+  },[requestByYear])
+
+
 
   return (
     <div>
       <Card data-chart={id} className="flex flex-col">
         <ChartStyle id={id} config={chartConfig} />
-        <CardHeader className="flex-row items-start space-y-0 pb-0">
+        <CardHeader className="flex-row items-start space-y-0 pb-0 gap-x-2">
           <div className="grid gap-1">
-            <CardTitle className="text-[13.5px]">Summary Overtime Person / Month</CardTitle>
+            <CardTitle className="text-[13px]">
+              Summary Overtime (OT)
+            </CardTitle>
             <CardDescription>January - June 2024</CardDescription>
           </div>
-          <Select value={activeMonth} onValueChange={setActiveMonth}>
+  
+          <Select
+            value={(year).toString()}
+            onValueChange={(e) => {
+              setYear(Number(e));
+            }}
+          >
+            <SelectTrigger
+              className="ml-auto h-7 w-[130px] rounded-lg pl-2.5"
+              aria-label="Select a value"
+            >
+              <SelectValue placeholder="Select Year" />
+            </SelectTrigger>
+            <SelectContent align="end" className="rounded-xl">
+              {yearMenu.map((key, index) => {
+                return (
+                  <SelectItem
+                    key={index}
+                    value={key.YEAR_RQ.toString()}
+                    className="rounded-lg [&_span]:flex"
+                  >
+                    {key.YEAR_RQ}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+           
+          <Select value={(activeMonth)?.toString()} onValueChange={(e) => {
+           
+            setActiveMonth(Number(e))
+          }}> 
             <SelectTrigger
               className="ml-auto h-7 w-[130px] rounded-lg pl-2.5"
               aria-label="Select a value"
@@ -88,31 +121,31 @@ const DonutRequest = () => {
               <SelectValue placeholder="Select month" />
             </SelectTrigger>
             <SelectContent align="end" className="rounded-xl">
-              {months.map((key) => {
-                const config = chartConfig[key as keyof typeof chartConfig];
-                if (!config) {
-                  return null;
-                }
+
+              {monthData.map((item,index) => {
+              
                 return (
                   <SelectItem
-                    key={key}
-                    value={key}
+                    key={index}
+                    value={(item.monthNo)?.toString()}
                     className="rounded-lg [&_span]:flex"
                   >
                     <div className="flex items-center gap-2 text-xs">
-                      <span
+                      <div
                         className="flex h-3 w-3 shrink-0 rounded-sm"
                         style={{
-                          backgroundColor: `var(--color-${key})`,
+                          backgroundColor: `${item.color}`,
                         }}
                       />
-                      {config?.label}
+                      {item.monthName}
                     </div>
                   </SelectItem>
                 );
               })}
+
             </SelectContent>
           </Select>
+    
         </CardHeader>
         <CardContent className="flex flex-1 justify-center pb-0">
           <ChartContainer
@@ -125,26 +158,30 @@ const DonutRequest = () => {
                 cursor={false}
                 content={<ChartTooltipContent hideLabel />}
               />
+         
               <Pie
-                data={desktopData}
-                dataKey="desktop"
-                nameKey="month"
-                innerRadius={80}
+                data={requestData}
+                dataKey="amount"
+                nameKey="monthName"
+                innerRadius={85}
                 strokeWidth={2}
                 activeIndex={activeIndex}
                 activeShape={({
                   outerRadius = 0,
                   ...props
-                }: PieSectorDataItem) => (
-                  <g>
-                    <Sector {...props} outerRadius={outerRadius + 10} />
-                    <Sector
-                      {...props}
-                      outerRadius={outerRadius + 20}
-                      innerRadius={outerRadius + 12}
-                    />
-                  </g>
-                )}
+                }: PieSectorDataItem) => 
+                 {
+          
+                  return  <g>
+                  <Sector {...props} outerRadius={outerRadius + 10} />
+                  <Sector
+                    {...props}
+                    outerRadius={outerRadius + 18}
+                    innerRadius={outerRadius + 12}
+                  />
+                </g>
+                 }
+                }
               >
                 <Label
                   content={({ viewBox }) => {
@@ -161,7 +198,8 @@ const DonutRequest = () => {
                             y={viewBox.cy}
                             className="fill-foreground text-3xl font-bold"
                           >
-                            {desktopData[activeIndex].desktop.toLocaleString()}
+                            {requestData[activeIndex]?.amount.toLocaleString()}
+                       
                           </tspan>
                           <tspan
                             x={viewBox.cx}
