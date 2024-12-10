@@ -73,6 +73,7 @@ const Overview: React.FC = () => {
             </div>
 
             <OvertimeBarChartByDept />
+
             <div className="w-full flex justify-end">
               <Pagination className="text-[12px] w-full justify-end">
                 <PaginationContent>
@@ -114,7 +115,7 @@ const Overview: React.FC = () => {
               }}
             >
               <p className="text-gray-600 text-[22px] font-medium text-center">
-                {convertFormat(2895400)}
+                {convertFormat(200)}
               </p>
               <p className="text-gray-400 text-[14px] font-medium text-center">
                 Overtime Hours
@@ -127,7 +128,7 @@ const Overview: React.FC = () => {
               }}
             >
               <p className="text-gray-600 text-[22px] font-medium text-center">
-                {(2800).toLocaleString()}
+                {(8).toLocaleString()}
               </p>
               <p className="text-gray-400 text-[14px] font-medium text-center">
                 Overtime Amount
@@ -144,6 +145,7 @@ const Overview: React.FC = () => {
       >
         <div className="flex flex-col p-[1rem] justify-center w-full items-start">
           <p className="text-[13px] text-gray-700">Summary Report OT / Year</p>
+          <p className="text-[12px] text-gray-500">Scatter Chart</p>
         </div>
         <OvertimeScatterChartByDate />
       </div>

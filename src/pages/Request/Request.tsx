@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Formik, Form, FormikHelpers } from "formik";
 import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
-import { Check, UserCheck } from "lucide-react";
+import { Check, Clock8, UserCheck } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -60,7 +60,7 @@ import DialogUserSelected from "./dialog-user-selected";
 import LoadingCircle from "@/components/custom/loading-circle";
 
 interface Values {
-  overtimeDate: Date;
+
   overtimeType: number;
   group: number;
   factory: number;
@@ -68,7 +68,6 @@ interface Values {
   actionBy: string;
   workcell: number;
   groupworkcell: number;
- 
 }
 
 interface GroupDeptAll {
@@ -105,8 +104,14 @@ export interface AllWorkcell {
 const Request: React.FC = () => {
   const token = useOTManagementSystemStore((state) => state.token);
   const [isSubmit, setIsSubmit] = useState(false);
-  const [dateRequest, setDateRequest] = useState<Date>(new Date());
+  const [dateRequestStart, setDateRequestStart] = useState<Date>(new Date());
+  const [dateRequestEnd, setDateRequestEnd] = useState<Date>(new Date());  
+  const [dateStart, setDateStart] = useState<Date>(new Date());
+  const [dateEnd, setDateEnd] = useState<Date>(new Date());
+
   const [group, setGroup] = useState("");
+  const [factory, setFactory] = useState(1); // AVP1
+  const [overtimeType, setOvertimeType] = useState(1); // 1.5
 
   const [allGroupDept, setAllGroupDept] = useState<GroupDeptAll[]>([]);
   const [allOvertime, setAllOvertime] = useState<Overtime[]>([]);
@@ -116,13 +121,22 @@ const Request: React.FC = () => {
   const [allWorkcell, setAllWorkcell] = useState<AllWorkcell[]>([]);
   const [isLoadWorkcell, setIsLoadWorkcell] = useState(false);
 
-  const [factory, setFactory] = useState(1); // AVP1
-  const [overtimeType, setOvertimeType] = useState(1); // 1.5
-
-  const [dateStart, setDateStart] = useState<Date>(new Date());
-  const [dateEnd, setDateEnd] = useState<Date>(new Date());
-
   const [showDialogUser, setShowDialogUser] = useState(false);
+
+  const startFullDate = moment(
+    moment(dateRequestStart).format("YYYY-MM-DD") +
+      " " +
+      moment(dateStart).format("HH:mm")
+  ).toDate();
+  const endFullDate = moment(
+    moment(dateRequestEnd).format("YYYY-MM-DD") +
+      " " +
+      moment(dateEnd).format("HH:mm")
+  ).toDate();
+
+  const duration = moment.duration(moment(endFullDate).diff(moment(startFullDate)));
+
+
 
   const closeDialogUser = () => {
     setShowDialogUser(false); // ปิด Dialog
@@ -207,34 +221,39 @@ const Request: React.FC = () => {
       navigate("/login");
     }
 
-    setAllGroupDept(await GetGroupDepartmentActive(token)); // Promise
-    setAllOvertime(await GetAllOvertimeList(token)); // Promise
-    getUserDataByFactory(Number(role[0]?.ID_FACTORY));
-    setAllFactory(await GetAllFactoryByGroup(token, role[0]?.ID_GROUP_DEPT)); // Promise
+    Promise.all([
+      setAllGroupDept(await GetGroupDepartmentActive(token)),
+      setAllOvertime(await GetAllOvertimeList(token)),
+      setAllFactory(await GetAllFactoryByGroup(token, role[0]?.ID_GROUP_DEPT)),
+      getUserDataByFactory(Number(role[0]?.ID_FACTORY)),
+
+    ])
+  
     const groupWork = await GetWorkcellGroup(token);
+    
     if (groupWork?.length > 0) {
       setAllGroupWorkcell(groupWork);
       setAllWorkcell(
         await GetWorkcellByGroup(token, Number(groupWork[0]?.ID_WORKGRP))
       );
     }
+
   };
 
   const clearState = () => {
     setFactory(role[0]?.ID_FACTORY);
     handleCheckedAll(false);
     setOvertimeType(1);
-    setGroup((role[0]?.ID_GROUP_DEPT)?.toString());
+    setGroup(role[0]?.ID_GROUP_DEPT?.toString());
 
     handleCheckedAll(false);
   };
 
-
   useEffect(() => {
+    // setDateEnd(moment(new Date()).add(2, "hours").toDate());
     fetchData();
-    setDateEnd(moment(new Date()).add(1, "hours").toDate());
     setFactory(role[0]?.ID_FACTORY);
-    setGroup((role[0]?.ID_GROUP_DEPT)?.toString());
+    setGroup(role[0]?.ID_GROUP_DEPT?.toString());
   }, []);
 
   return (
@@ -277,10 +296,10 @@ const Request: React.FC = () => {
         </p>
         <div className="p-2">
           <div className="grid grid-cols-12 gap-x-2">
-            <div className="col-span-12 lg:col-span-7">
+            <div className="col-span-12 lg:col-span-6">
               <Formik
                 initialValues={{
-                  overtimeDate: dateRequest,
+                 
                   overtimeType: 1,
                   group: role[0]?.ID_GROUP_DEPT,
                   factory: role[0]?.ID_FACTORY,
@@ -289,15 +308,12 @@ const Request: React.FC = () => {
                   workcell: 1,
                   groupworkcell: 1,
                 }}
-                
                 onSubmit={async (
                   values: Values,
                   { setSubmitting, resetForm }: FormikHelpers<Values>
                 ) => {
-
-            
                   console.log(values);
-                  
+
                   Swal.fire({
                     title: "คุณต้องการส่งคำขอใช่ หรือไม่ ?",
                     text: "กรุณาตรวจสอบข้อมูลก่อนส่งคำขอทุกครั้ง",
@@ -316,20 +332,20 @@ const Request: React.FC = () => {
                       }));
 
                       if (selectedUser?.length > 0) {
+                      
                         const payload = {
-                          overtimeDate: moment(values.overtimeDate).format("YYYY-MM-DD"),
+                          overtimeDateStart: moment(startFullDate).format("YYYY-MM-DD HH:mm"),
+                          overtimeDateEnd: moment(endFullDate).format("YYYY-MM-DD HH:mm"),
                           overtimeType: Number(values.overtimeType),
                           group: Number(values.group),
                           factory: Number(values.factory),
                           remark: values.remark,
                           actionBy: values.actionBy,
                           users: selectedUser,
-                          start:moment(dateStart).format("YYYY-MM-DD HH:mm"),
-                          end:moment(dateEnd).format("YYYY-MM-DD HH:mm"),
-                          groupworkcell:Number(values.groupworkcell),
-                          workcell:Number(values.workcell),
+                          groupworkcell: Number(values.groupworkcell),
+                          workcell: Number(values.workcell),
                         };
-                      
+
                         const response = await axios.post(
                           `${baseURL}/request`,
                           payload
@@ -391,70 +407,121 @@ const Request: React.FC = () => {
                       Send Request
                     </Button>
                     <div className="grid grid-cols-12 gap-x-1">
-                      <div className="mb-2 col-span-12 lg:col-span-5">
+                      <div className="mb-2 col-span-12 lg:col-span-12">
                         <div className="w-full">
                           <label
                             htmlFor="overtimeDate"
                             className="text-[13px] text-gray-700 mb-2"
                           >
-                            <span className="text-[red]">*</span>{" "}
-                            วันที่เข้าทำงาน (OT)
+                            <span className="text-[red]">*</span> เริ่มทำงาน
                           </label>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "w-full justify-start text-left font-normal text-[13px]",
-                                  !dateRequest && "text-muted-foreground"
-                                )}
-                              >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {dateRequest ? (
-                                  format(dateRequest, "PPP")
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-                              <Calendar
-                                mode="single"
-                                selected={dateRequest}
-                                disabled={(date) => {
-                                  return (
-                                    moment(date).utc().toDate() <
-                                    moment(new Date()).utc().toDate()
-                                  );
-                                }}
-                                onSelect={(date) => {
-                                  setDateRequest(date as Date);
-                                  setFieldValue("overtimeDate", date);
-                                }}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                      </div>
-                      <div className="mb-2 col-span-12 lg:col-span-6">
-                        <div className="mb-2">
-                          <label
-                            htmlFor="shift"
-                            className="text-[13px] text-gray-700"
-                          >
-                            <span className="text-[red]">*</span> ช่วงเวลา /
-                            Period
-                          </label>
-                          
-                          <div className="flex items-center gap-x-5">
+                          <div className="flex gap-x-1">
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                    "w-full justify-start text-left font-normal text-[13px]",
+                                    !dateRequestStart && "text-muted-foreground"
+                                  )}
+                                >
+                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                  {dateRequestStart ? (
+                                    format(dateRequestStart, "PPP")
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                  mode="single"
+                                  selected={dateRequestStart}
+                                  disabled={(date) => {
+                                    return (
+                                      moment(date).utc().toDate() <
+                                      moment(new Date()).utc().toDate()
+                                    );
+                                  }}
+                                  onSelect={(date) => {
+                                    setDateRequestStart(date as Date);
+                                    setDateRequestEnd(
+                                      moment(date).add(3, "hours").toDate()
+                                    );
+                                    setFieldValue("overtimeDate", date);
+                                  }}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
                             <TimePicker
                               date={dateStart}
-                              setDate={setDateStart}
+                              setDate={(e) => {
+                                setDateStart(e);
+                                setDateEnd(moment(e).add(2, "hours").toDate());
+                              }}
                             />
-                            -
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mb-3 col-span-12 lg:col-span-12">
+                        <div className="flex flex-col">
+                          <label
+                            htmlFor="overtimeDate"
+                            className="text-[13px] text-gray-700 mb-2"
+                          >
+                            <span className="text-[red]">*</span> ถึงเวลา
+                          </label>
+                          <div className="flex gap-x-1">
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                    "w-full justify-start text-left font-normal text-[13px]",
+                                    !dateRequestEnd && "text-muted-foreground"
+                                  )}
+                                >
+                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                  {dateRequestEnd ? (
+                                    format(dateRequestEnd, "PPP")
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                  mode="single"
+                                  selected={dateRequestEnd}
+                                  disabled={(date) => {
+                                    return (
+                                      moment(date).utc().toDate() <
+                                        moment(new Date()).utc().toDate() ||
+                                      moment(date).toDate() <
+                                        moment(dateRequestStart).toDate()
+                                    );
+                                  }}
+                                  onSelect={(date) => {
+                                    setDateRequestEnd(date as Date);
+                                    setFieldValue("overtimeDate", date);
+                                  }}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
                             <TimePicker date={dateEnd} setDate={setDateEnd} />
                           </div>
+                        </div>
+                      </div>
+                      <div className="col-span-12 mb-3">
+                        <div className="flex items-center gap-x-2">
+                          <Clock8 size={14} />
+                          <p className="text-[12px]">
+                          {duration.hours()} ชั่วโมง {duration.minutes()} นาที
+                          </p>
+                        
                         </div>
                       </div>
                       <div className="mb-2 col-span-12 lg:col-span-5">
@@ -575,7 +642,7 @@ const Request: React.FC = () => {
                         <Select
                           value={values.groupworkcell?.toString()}
                           onValueChange={async (e) => {
-                            setFieldValue("workgroup", e);
+                            setFieldValue("groupworkcell", e);
                             setIsLoadWorkcell(true);
 
                             // Promise Repert Array Workcell
@@ -583,19 +650,20 @@ const Request: React.FC = () => {
                               token,
                               Number(e)
                             );
-
                             // If array > 0
+
                             if (responseWorkcell?.length > 0) {
+                              console.log("responseWorkcell", responseWorkcell);
+
                               setAllWorkcell(responseWorkcell); // Set Workcell list
                               setIsLoadWorkcell(false);
-                              setTimeout(() => {
-                                setFieldValue(
-                                  "workcell",
-                                  (responseWorkcell[0]?.ID_WORKGRP)?.toString()
-                                );
-                              }, 300);
+                              setFieldValue(
+                                "workcell",
+                                responseWorkcell[0]?.ID_WORKGRP
+                              );
                             } else {
                               setAllWorkcell([]);
+
                               setIsLoadWorkcell(false);
                             }
                           }}

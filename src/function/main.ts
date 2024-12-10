@@ -1,6 +1,7 @@
 import { CountRequest, MonthMenu, RequestByYear } from "@/pages/MyRequest/MyRequest";
 import axios from "axios";
 import { allMonth, colorOfMonth } from "@/pages/MyRequest/data";
+import { CountApprove } from "@/pages/Approve/Approve";
 
 export const GetGroupDepartmentActive: (token: string) => Promise<any> = async (
   token: string
@@ -247,13 +248,13 @@ export const GetYearMenuOption: (token: string) => Promise<any> = async (
   }
 };
 
-export const GetMonthMenuOption: (token: string) => Promise<any> = async (
-  token: string
+export const GetMonthMenuOption: (token: string,year:number) => Promise<any> = async (
+  token: string,year:number
 ) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
-    const response = await axios.get(`${VITE_BASE_URL}/menu/month`, {
+    const response = await axios.get(`${VITE_BASE_URL}/menu/month/${year}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -406,3 +407,107 @@ export const GetCountApproveByCode: (
     return [];
   }
 };
+
+
+export const findCountApproverStatus = (alias:string,countApprove:CountApprove[]) => {
+
+  const obj = countApprove?.find((x) => x.NAME_STATUS == alias)
+  if(obj) {
+    // alert(obj?.AMOUNT)
+    return Number(obj?.AMOUNT)
+  }else{
+    return 0
+  }
+}
+
+export const GetDetailCountApproveByCode: (
+  token: string,
+  empCode: string,
+  status:number
+) => Promise<any> = async (token: string, empCode: string,status:number) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/approve/reqList/${empCode}/${status}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log(response.data);
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const  convertMinutesToHoursMinutes = (minutes:number) =>  {
+  const hours = (minutes / 60).toFixed(2)
+  return hours;
+}
+
+
+export const GetRequestDetailByRequest = async(token:string,requestNo:string) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/summary/request/lasted/${requestNo}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log(response.data);
+    if (!response.data.err && response.data.status == "Ok") {
+     
+      return response.data?.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+
+}
+
+export const GetUserByRequestAndRev = async(token:string,requestNo:string,rev:number) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/requests/users/${requestNo}/${rev}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log(response.data);
+    if (!response.data.err && response.data.status == "Ok") {
+     
+      return response.data?.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+
+}

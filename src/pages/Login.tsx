@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LockKeyhole, User } from "lucide-react";
+import { CheckCircle, LockKeyhole, User } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import bgMobile from "@/assets/images/hands-hold-mobile.jpg";
-import { toast, Toaster } from "react-hot-toast";
+import { toast, Toaster } from "sonner";
 import { motion } from "framer-motion";
-import axios  from "axios";
-import {useOTManagementSystemStore} from "../../store"
+import axios from "axios";
+import { useOTManagementSystemStore } from "../../store";
 
 import React, { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -14,7 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 const Login: React.FC = () => {
   const inputUsername = useRef<HTMLInputElement>(null);
   const inputPassword = useRef<HTMLInputElement>(null);
-  const baseURL = import.meta.env.VITE_BASE_URL ;
+  const baseURL = import.meta.env.VITE_BASE_URL;
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -23,8 +23,7 @@ const Login: React.FC = () => {
   const setInfo = useOTManagementSystemStore((state) => state.setInfo);
   const setToken = useOTManagementSystemStore((state) => state.setToken);
 
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // Handle Submit Form
   const handleLogin = async () => {
@@ -38,52 +37,45 @@ const Login: React.FC = () => {
           </div>
         );
       } else {
-        
         // Send Username and Password to Server
-        const response = await axios.post(`${baseURL}/login`,{
-          username,password
+        const response = await axios.post(`${baseURL}/login`, {
+          username,
+          password,
         });
 
+        if (!response.data.err && response.data.status == "Ok") {
+          login(); // setState Login = true ;
+          setInfo(response.data.results);
+          setToken(response.data.token);
 
-        if(!response.data.err && response.data.status == "Ok") {
-          
-          login() // setState Login = true ;
-          setInfo(response.data.results)
-          setToken(response.data.token)
-       
-          
           toast.success(
-            <div>
-              <p className="text-[14px] text-gray-800">Login success!</p>
-              <p className="text-[12px] text-gray-600">เข้าสู่ระบบสำเร็จ!</p>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="text-green-500" size={20} />
+              <div>
+                <p className="text-[14px] text-gray-800">Login success!</p>
+                <p className="text-[12px] text-gray-600">เข้าสู่ระบบสำเร็จ!</p>
+              </div>
             </div>
-          )
+          );
 
           setTimeout(() => {
-            navigate("/")
-          },1500)
-
-        }else{
+            navigate("/");
+          }, 1500);
+        } else {
           toast.error(
             <div>
               <p className="text-[14px] text-gray-800">{response.data.msg}</p>
-              <p className="text-[12px] text-gray-600">กรุณาตรวจสอบชื่อผู้ใช้ และรหัสผ่านของคุณ</p>
+              <p className="text-[12px] text-gray-600">
+                กรุณาตรวจสอบชื่อผู้ใช้ และรหัสผ่านของคุณ
+              </p>
             </div>
           );
         }
-
-
-
-        
       }
     } catch (err) {
       console.log(err);
     }
   };
-
-
-
-
 
   return (
     <div className="w-full flex justify-center items-center min-h-screen">
@@ -111,21 +103,24 @@ const Login: React.FC = () => {
 
           <Toaster
             position="top-center"
-            reverseOrder={false}
-            gutter={8}
+            richColors
             toastOptions={{
+              
               duration: 1500,
               style: {
-               paddingRight:20,
-               paddingLeft:20,
+                paddingRight: 20,
+                paddingLeft: 20,
               },
+                
             }}
-          
           />
 
           <div className="flex flex-col gap-y-4">
             <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
+              <User
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                size={18}
+              />
               <Input
                 type="text"
                 placeholder="Username"

@@ -23,23 +23,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MonthMenu, RequestByYear, YearMenu } from "../MyRequest";
-import { ChageKeyChartDonut, ChangeKeyMonthNoToName } from "@/function/main";
+import { ChageKeyChartDonut, ChangeKeyMonthNoToName, CountRequestByYear, GetMonthMenuOption } from "@/function/main";
 
 interface DountRequestProps {
   yearMenu: YearMenu[];
   requestByYear: RequestByYear[];
   monthMenu: MonthMenu[];
+  setMonthMenu: React.Dispatch<React.SetStateAction<MonthMenu[]>>;
+  setRequestByYear: React.Dispatch<React.SetStateAction<RequestByYear[]>>;
 }
 
 import {chartConfig} from "../data"
+import { useOTManagementSystemStore } from "../../../../store";
 
 
 
-const DonutRequest: React.FC<DountRequestProps> = ({ yearMenu,requestByYear ,monthMenu}) => {
+const DonutRequest: React.FC<DountRequestProps> = ({ yearMenu,requestByYear ,monthMenu,setMonthMenu,setRequestByYear}) => {
   const id = "pie-interactive";
   const [monthData,setMonthData] = useState<{monthNo: number; monthName: string | undefined;color: string | undefined;}[]>([]) ;
   const [requestData,setRequestData] = useState<{ amount: number; monthNo: number; monthName: string | undefined; }[]>([]) ;
-  
+  const token = useOTManagementSystemStore((state) => state.token);
   const [activeMonth, setActiveMonth] = React.useState(requestData[0]?.monthNo);
 
 
@@ -75,18 +78,37 @@ const DonutRequest: React.FC<DountRequestProps> = ({ yearMenu,requestByYear ,mon
     <div>
       <Card data-chart={id} className="flex flex-col">
         <ChartStyle id={id} config={chartConfig} />
-        <CardHeader className="flex-row items-start space-y-0 pb-0 gap-x-2">
+        <CardHeader className="flex-row items-start space-y-0 pb-0 gap-x-2 justify-between">
           <div className="grid gap-1">
             <CardTitle className="text-[13px]">
               Summary Overtime (OT)
             </CardTitle>
             <CardDescription>January - June 2024</CardDescription>
           </div>
-  
+            <div className="flex gap-x-2">
           <Select
             value={(year).toString()}
-            onValueChange={(e) => {
+            onValueChange={async (e) => {
               setYear(Number(e));
+              const m =  await GetMonthMenuOption(token,Number(e))
+              const req = await CountRequestByYear(token, Number(e))
+
+              if(m?.length > 0) {
+           
+                setMonthMenu(m)
+                const chartNewKey = ChageKeyChartDonut(m);
+                setMonthData(chartNewKey)
+
+              }else{
+                setMonthMenu([])
+                setMonthData([])
+              }
+
+              if(req?.length  > 0) {
+                setRequestByYear(req)
+              }else{
+                setRequestByYear([])
+              }
             }}
           >
             <SelectTrigger
@@ -145,7 +167,7 @@ const DonutRequest: React.FC<DountRequestProps> = ({ yearMenu,requestByYear ,mon
 
             </SelectContent>
           </Select>
-    
+          </div>
         </CardHeader>
         <CardContent className="flex flex-1 justify-center pb-0">
           <ChartContainer

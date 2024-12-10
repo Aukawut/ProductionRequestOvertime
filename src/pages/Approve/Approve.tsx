@@ -1,7 +1,21 @@
 import React, { useEffect, useState } from "react";
 import TableApprove from "./TableApprove/TableApprove";
 import CardRequest from "@/components/custom/card-myrequest";
-import { Check, CircleX, Clock8, Undo2 } from "lucide-react";
+import { Check, CircleX, Clock8, Pin, Undo2 } from "lucide-react";
+
+
+import {
+  GetCountApproveByCode,
+  GetDetailCountApproveByCode,
+  GetRequestDetailByRequest,
+  GetUserByRequestAndRev,
+  findCountApproverStatus,
+} from "@/function/main";
+import { useOTManagementSystemStore } from "../../../store";
+import DialogDetailRequest from "./dialog-detail-request";
+import { toast, Toaster } from "sonner";
+import { motion } from "framer-motion";
+import LoadingCircle from "@/components/custom/loading-circle";
 
 export const data = [
   {
@@ -47,34 +61,135 @@ export const data = [
   },
 ];
 
-interface CountApprove  {
-  NAME_STATUS : string;
-  ID_STATUS_APV:number ;
-  AMOUNT : number ;
+export interface CountApprove {
+  NAME_STATUS: string;
+  ID_STATUS_APV: number;
+  AMOUNT: number;
+}
 
+export interface DetailApprove {
+  REQUEST_NO: string;
+  CODE_APPROVER: string;
+  REV: number;
+  FACTORY_NAME: string;
+  NAME_GROUP: string;
+  ID_FACTORY: number;
+  ID_GROUP_DEPT: number;
+  COUNT_USER: number;
+  DURATION: number;
+  HOURS_AMOUNT: number;
+  SUM_MINUTE: number;
+  MINUTE_TOTAL: number;
+}
 
+export interface SummaryRequestLastRev {
+  REQUEST_NO: string;
+  REV: number;
+  NAME_STATUS: string;
+  FULLNAME: string;
+  OT_TYPE: number;
+  FACTORY_NAME: string;
+  NAME_WORKGRP: string;
+  NAME_WORKCELL: string;
+  USERS_AMOUNT: number;
+  SUM_MINUTE: number;
+  START_DATE: string;
+  END_DATE: string;
+}
+
+export interface UserDetail {
+  EMPLOYEE_CODE: string;
+  FULLNAME: string;
+  UHR_Position: string;
 }
 
 const Approve: React.FC = () => {
+  const [countApprove, setCountApprove] = useState<CountApprove[]>([]);
+  const [detailApprove, setDetailApprove] = useState<DetailApprove[]>([]);
+  const [requestDetail, setRequestDetail] = useState<SummaryRequestLastRev[]>(
+    []
+  );
+  const [users, setUsers] = useState<UserDetail[]>([]);
 
-  const [countApprove,setCountApprove] = useState<CountApprove[]>([])
+  const [status, setStatus] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
+  const [requestNo, setRequestNo] = useState("");
+  const info = useOTManagementSystemStore((state) => state.info);
+  const token = useOTManagementSystemStore((state) => state.token);
 
+  const CloseDialogDetail = () => setShowDetail(false);
 
+  const fetchData = async () => {
+    setLoading(true);
+    await Promise.all([
+      setCountApprove(await GetCountApproveByCode(token, info.EmployeeCode)),
+      setDetailApprove(
+        await GetDetailCountApproveByCode(token, info.EmployeeCode, status)
+      ),
+    ]).then(() => {
+      setTimeout(() => {
+        setLoading(false);
+      }, 300);
+    });
+  };
+
+  const sumAll = countApprove?.reduce((acc, obj) => acc + obj.AMOUNT, 0);
+
+  const FetchDetailRequest = async (
+    tokenStr: string,
+    requestNo: string,
+    rev: number
+  ) => {
+    await Promise.all([
+      GetRequestDetailByRequest(tokenStr, requestNo),
+      GetUserByRequestAndRev(tokenStr, requestNo, rev),
+    ]).then((res) => {
+      if (res?.length > 0) {
+        if (res[0]?.length > 0 && res[1]?.length) {
+          setRequestDetail(res[0]);
+          setUsers(res[1]);
+          setShowDetail(true);
+        }
+      } else {
+        toast.error("--- ไม่พบข้อมูล ---");
+      }
+    });
+  };
 
   useEffect(() => {
-    
-  },[])
+    fetchData();
+  }, []);
 
-  return (
+  return loading ? (
+    <div className="flex min-h-screen justify-center items-center">
+      <div>
+        <LoadingCircle />
+      </div>
+    </div>
+  ) : (
     <div className="p-2">
-      <div className="px-4 py-3 rounded-[18px] bg-white shadow-smooth">
+      <motion.div
+        className="px-4 py-3 rounded-[18px] bg-white shadow-smooth"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "tween", duration: 0.3 }}
+      >
+        <Toaster richColors />
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
-          {data?.map((item) => {
+          {data?.map((item, index) => {
             return (
               <CardRequest
+                key={index}
                 title={item.title}
-                amount={item.amount}
-                sumAll={item.sumAll}
+                amount={
+                  findCountApproverStatus(item.aliasTitle, countApprove) !=
+                  undefined
+                    ? findCountApproverStatus(item.aliasTitle, countApprove)
+                    : 0
+                }
+                sumAll={sumAll}
                 Icon={item.Icon}
                 bgColor={item.bgColor}
                 textColor={item.textColor}
@@ -83,13 +198,36 @@ const Approve: React.FC = () => {
             );
           })}
         </div>
-        <div className="flex flex-col justify-start p-2">
-          <p className="text-[14px]">Approve Requests</p>
-          <p className="text-[13px] text-gray-600">อนุมัติคำขอโอที</p>
-        </div>
 
-        <TableApprove />
-      </div>
+        {/* Dialog */}
+        <DialogDetailRequest
+          setIsOpen={setShowDetail}
+          isOpen={showDetail}
+          closeDialog={CloseDialogDetail}
+          requestNo={requestNo}
+          requestDetail={requestDetail}
+          users={users}
+        />
+
+        <div className="p-2 bg-white rounded-[13px] shadow-smooth mt-1">
+          <div className="flex flex-col justify-start p-2 mt-2">
+            <p className="text-[14px] flex items-center gap-x-2">
+              <Pin size={13} color="red" /> Approve Requests (Pending)
+            </p>
+            <p className="text-[13px] text-gray-600">คำขอรอการอนุมัติจากท่าน</p>
+          </div>
+          {/* Table */}
+          <TableApprove
+            data={detailApprove}
+            FetchDetailRequest={FetchDetailRequest}
+            setRequestNo={setRequestNo}
+          />
+          
+        </div>
+        <div className="flex">
+
+        </div>
+      </motion.div>
     </div>
   );
 };

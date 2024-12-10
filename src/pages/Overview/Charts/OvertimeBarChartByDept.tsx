@@ -22,50 +22,46 @@ const OvertimeBarChartByDept: React.FC = () => {
 
   const data = [
     {
-      name: "PD 1 (A1)",
+      name: "AVP 1",
       uv: 4000,
 
       amt: 2400,
     },
     {
-      name: "PD 2 (A3)",
+      name: "AVP 2",
       uv: 3000,
 
       amt: 2210,
     },
     {
-      name: "PD 1 (A2)",
+      name: "AVP 3",
       uv: 2000,
 
       amt: 2290,
     },
     {
-      name: "PD 3 (A4)",
+      name: "AVP 4",
       uv: 2780,
 
       amt: 2000,
     },
     {
-      name: "PD 3 (A5)",
+      name: "AVP 5",
       uv: 1890,
 
       amt: 2181,
     },
     {
-      name: "Information Technology",
+      name: "AVP-WH",
       uv: 2390,
       amt: 2500,
     },
     {
-      name: "QA",
+      name: "AVP-QA",
       uv: 3490,
       amt: 2100,
     },
-    {
-      name: "WH&LOG",
-      uv: 3490,
-      amt: 2100,
-    },
+   
   ];
 
   const truncateText = (text: string, maxLength: number = 10) => {

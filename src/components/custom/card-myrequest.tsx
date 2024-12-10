@@ -54,12 +54,14 @@ const CardRequest: React.FC<CardRequestProps> = ({
         className="h-[5px] rounded-[2px] relative"
         style={{ background: bgColor, width: MAX_WIDTH }}
       >
+   
         <div
           className="h-[5px] rounded-[2px] absolute duration-300"
-          style={{ background: textColor, width: `${(amount * 100) / sumAll}%` }}
+          style={{ background: textColor, width: `${amount > 0 ? (amount * 100) / sumAll : 0}%` }}
         >
           <p className="text-gray-800 text-[11px] mt-2">
-          {`${((amount * 100) / sumAll).toFixed(2)}%`}
+            {amount > 0 ?  `${((amount * 100) / sumAll).toFixed(2)}%` : '0.00%' }
+         
           </p>
          
         </div>

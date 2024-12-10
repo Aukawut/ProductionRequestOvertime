@@ -4,11 +4,19 @@ import CardRequest from "@/components/custom/card-myrequest";
 
 import { cardMenu } from "./data";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { AlertCircle, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import DonutRequest from "./chart/DonutRequest";
-import { CountRequestByEmpCode, CountRequestByYear, GetYearMenuOption,GetMonthMenuOption, GetRequestNoAndStatusByUser } from "../../function/main";
+import {
+  CountRequestByEmpCode,
+  CountRequestByYear,
+  GetYearMenuOption,
+  GetMonthMenuOption,
+  GetRequestNoAndStatusByUser,
+} from "../../function/main";
 import { motion } from "framer-motion";
 import { useOTManagementSystemStore } from "../../../store";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useNavigate } from "react-router-dom";
 
 export interface CountRequest {
   AMOUNT: number;
@@ -16,26 +24,26 @@ export interface CountRequest {
 }
 
 export interface YearMenu {
-  AMOUNT_REQ: number ;
-  YEAR_RQ: number ;
+  AMOUNT_REQ: number;
+  YEAR_RQ: number;
 }
 
 export interface MonthMenu {
-  AMOUNT_REQ: number ;
-  MONTH_RQ: number ;
+  AMOUNT_REQ: number;
+  MONTH_RQ: number;
 }
 
-export interface RequestByYear{
-  AMOUNT_REQ : number ;
-  YEAR_RQ : number ;
-  MONTH_RQ : number ;
+export interface RequestByYear {
+  AMOUNT_REQ: number;
+  YEAR_RQ: number;
+  MONTH_RQ: number;
 }
 
-export interface RequestNoByUser{
-  REQUEST_NO : string ;
-  REQ_STATUS : number ;
-  REV : number ;
-  NAME_STATUS : string ;
+export interface RequestNoByUser {
+  REQUEST_NO: string;
+  REQ_STATUS: number;
+  REV: number;
+  NAME_STATUS: string;
 }
 
 const MyRequest: React.FC = () => {
@@ -44,10 +52,10 @@ const MyRequest: React.FC = () => {
   const sum = countRequest?.reduce((acc, obj) => acc + obj.AMOUNT, 0);
   const containerTop = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(true);
-  const [yearMenu,setYearMenu] = useState<YearMenu[]>([]) ;
-  const [monthMenu,setMonthMenu] = useState<MonthMenu[]>([]) ;
-  const [requestByYear,setRequestByYear] = useState<RequestByYear[]>([]) ;
-  const [requests,setRequests] = useState<RequestNoByUser[]>([]) ;
+  const [yearMenu, setYearMenu] = useState<YearMenu[]>([]);
+  const [monthMenu, setMonthMenu] = useState<MonthMenu[]>([]);
+  const [requestByYear, setRequestByYear] = useState<RequestByYear[]>([]);
+  const [requests, setRequests] = useState<RequestNoByUser[]>([]);
 
   const empCode = useOTManagementSystemStore(
     (state) => state.info?.EmployeeCode
@@ -69,22 +77,20 @@ const MyRequest: React.FC = () => {
   });
 
   const fetchData = async () => {
-    const year = new Date().getFullYear() ;
+    const year = new Date().getFullYear();
     Promise.all([
       setCountRequest(await CountRequestByEmpCode(token, empCode)),
       setYearMenu(await GetYearMenuOption(token)),
-      setMonthMenu(await GetMonthMenuOption(token)),
-      setRequestByYear(await CountRequestByYear(token,year)),
-      setRequests(await GetRequestNoAndStatusByUser(token,empCode)),
+      setMonthMenu(await GetMonthMenuOption(token,year)),
+      setRequestByYear(await CountRequestByYear(token, year)),
+      setRequests(await GetRequestNoAndStatusByUser(token, empCode)),
     ]).then(() => {
-       setProgress(false)
-    })
-   
+      setProgress(false);
+    });
   };
 
   useEffect(() => {
     fetchData();
-   
   }, []);
 
   const handleScroll = () => {
@@ -96,6 +102,8 @@ const MyRequest: React.FC = () => {
     }
   };
 
+  const navigate = useNavigate();
+  
   useEffect(() => {
     const container = containerTop.current;
     if (container) {
@@ -107,10 +115,9 @@ const MyRequest: React.FC = () => {
       }
     };
   }, []);
-
-  useEffect(() => {
   
-  }, [scrollInfo]);
+
+  useEffect(() => {}, [scrollInfo]);
 
   return (
     <motion.div
@@ -132,7 +139,7 @@ const MyRequest: React.FC = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, type: "tween" }}
-               className="absolute top-0 -right-1 z-[5] w-4 h-4 flex justify-center items-center bg-blue-50 rounded-sm"
+              className="absolute top-0 -right-1 z-[5] w-4 h-4 flex justify-center items-center bg-blue-50 rounded-sm"
               type="button"
               onClick={() => {
                 containerTop.current?.scrollTo(0, 0);
@@ -185,6 +192,9 @@ const MyRequest: React.FC = () => {
               type="button"
               size={"sm"}
               className="rounded-[8px] text-[12px] mt-2"
+              onClick={() => {
+                navigate("/request")
+              }}
             >
               <Plus />
               New
@@ -196,7 +206,7 @@ const MyRequest: React.FC = () => {
               <p className="text-[12px] font-medium text-gray-600">
                 ตารางแสดงข้อมูลสถานะคำขอของคุณ
               </p>
-              <TableRequest users={requests}/>
+              <TableRequest users={requests} />
             </div>
           </div>
         </div>
@@ -222,8 +232,22 @@ const MyRequest: React.FC = () => {
                 />
               </svg>
             </div>
+          ) : requestByYear?.length > 0 ? (
+            <DonutRequest
+              yearMenu={yearMenu}
+              requestByYear={requestByYear}
+              monthMenu={monthMenu}
+              setMonthMenu={setMonthMenu}
+              setRequestByYear={setRequestByYear}
+            />
           ) : (
-            <DonutRequest yearMenu={yearMenu} requestByYear={requestByYear} monthMenu={monthMenu} />
+            <Alert variant="destructive">
+              <AlertCircle className="h-5 w-5" />
+              <AlertTitle>Sorry, </AlertTitle>
+              <AlertDescription className="text-[13px]">
+                your information was not found.
+              </AlertDescription>
+            </Alert>
           )}
         </div>
       </div>
