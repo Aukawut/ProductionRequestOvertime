@@ -47,21 +47,18 @@ export const data = {
       isActive: true,
       items: [
         {
-          title: "Overtime Quota",
-          url: "#",
+          title: "Overtime Plan",
+          url: "/main/plan",
         },
         {
-          title: "Approver",
+          title: "Approvers",
           url: "/setting/approver",
         },
         {
           title: "Employee",
           url: "/employee",
         },
-        {
-          title: "Approvers",
-          url: "#",
-        },
+      
         {
           title: "Group Department",
           url: "#",

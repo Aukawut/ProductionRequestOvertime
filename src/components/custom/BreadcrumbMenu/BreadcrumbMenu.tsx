@@ -24,7 +24,7 @@ const BreadcrumbMenu: React.FC<BreadcrumbMenuProps> = ({ path }) => {
   return (
     <>
       <Breadcrumb>
-        <BreadcrumbList>
+        <BreadcrumbList className="text-[13px]">
           <BreadcrumbItem>
             <Link to="/">
               <BreadcrumbLink style={{color:""}} className={`${path == "/" ? 'text-sky-700' : ''}`}>Overview</BreadcrumbLink>

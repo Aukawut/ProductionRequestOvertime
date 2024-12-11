@@ -159,6 +159,7 @@ const Approve: React.FC = () => {
 
   useEffect(() => {
     fetchData();
+    setStatus(1)
   }, []);
 
   return loading ? (

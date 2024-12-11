@@ -8,6 +8,7 @@ import MyRequest from "./pages/MyRequest/MyRequest";
 import NotFoundAnimate from "./components/loading/notfound-loading";
 import ApproverManagement from "./pages/ApproverManagement/ApproverManagement";
 import Approve from "./pages/Approve/Approve";
+import MainPlan from "./pages/MainPlan/MainPlan";
 
 const router = createBrowserRouter(
   [
@@ -20,6 +21,7 @@ const router = createBrowserRouter(
         { path: "/request/me", element: <MyRequest /> },
         { path: "/approve", element: <Approve /> },
         { path: "/setting/approver", element: <ApproverManagement /> },
+        { path: "/main/plan", element: <MainPlan /> },
       ],
     },
     {

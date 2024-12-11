@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 
 import { ArrowUpDown, Info } from "lucide-react";
 import { DetailApprove } from "../Approve";
-import { Badge } from "@/components/ui/badge";
 import { convertMinutesToHoursMinutes } from "@/function/main";
+import BadgeStyle from "@/components/custom/BadgeStyle/BadgeStyle";
 
 export const columns = (
   FetchDetailRequest: (
@@ -51,9 +51,14 @@ export const columns = (
       );
     },
     cell: ({ row }) => (
-      <Badge className="text-[10px] bg-blue-300 shadow-none text-white hover:bg-blue-950">
-        {row.getValue("FACTORY_NAME")}
-      </Badge>
+      <div className="w-[100%] flex justify-center">
+        <BadgeStyle
+          text={row.getValue("FACTORY_NAME")}
+          variant="success"
+          width={60}
+          height={30}
+        />
+      </div>
     ),
   },
   {
@@ -83,7 +88,7 @@ export const columns = (
         </Button>
       );
     },
-    cell: ({ row }) => convertMinutesToHoursMinutes(row.getValue("SUM_MINUTE")),
+    cell: ({ row }) => Number(convertMinutesToHoursMinutes(row.getValue("SUM_MINUTE"))) / Number(row.getValue("COUNT_USER")),
   },
   {
     accessorKey: "MINUTE_TOTAL",
@@ -95,7 +100,7 @@ export const columns = (
       );
     },
     cell: ({ row }) =>
-      convertMinutesToHoursMinutes(row.getValue("MINUTE_TOTAL")),
+      (Number(convertMinutesToHoursMinutes(row.getValue("SUM_MINUTE"))) / Number(row.getValue("COUNT_USER"))) * Number(row.getValue("COUNT_USER")),
   },
   {
     accessorKey: "REV",

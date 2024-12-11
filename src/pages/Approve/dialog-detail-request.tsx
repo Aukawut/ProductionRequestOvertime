@@ -125,6 +125,9 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
 
           {/* Timeline */}
           <div className="w-full">
+            <p className="text-gray-800">
+              Timeline การอนุมัติคำขอ
+            </p>
             <TimelineApprove data={commentApprover} />
           </div>
         </div>
