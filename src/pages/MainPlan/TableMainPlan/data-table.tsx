@@ -132,13 +132,13 @@ export function DataTableMainPlan<TData, TValue>({
         <div className="shadow-smooth">
           <div className="relative h-[50vh] overflow-auto">
             <Table className="w-full relative text-[13px]">
-              <TableHeader className="sticky top-0 z-10 bg-blue-200">
+              <TableHeader className="sticky top-0 z-10 bg-[#0E7FDB] hover:bg-[#0e7fdbf3]">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
                       <TableHead
                         key={header.id}
-                        className="h-10 overflow-clip relative text-gray-800 text-center"
+                        className="h-10 overflow-clip relative text-gray-800 text-center text-white"
                       >
                         {header.isPlaceholder
                           ? null

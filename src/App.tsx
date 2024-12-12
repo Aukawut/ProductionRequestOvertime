@@ -9,6 +9,7 @@ import NotFoundAnimate from "./components/loading/notfound-loading";
 import ApproverManagement from "./pages/ApproverManagement/ApproverManagement";
 import Approve from "./pages/Approve/Approve";
 import MainPlan from "./pages/MainPlan/MainPlan";
+import OvertimeActual from "./pages/OvertimeActual/OvertimeActual";
 
 const router = createBrowserRouter(
   [
@@ -22,6 +23,7 @@ const router = createBrowserRouter(
         { path: "/approve", element: <Approve /> },
         { path: "/setting/approver", element: <ApproverManagement /> },
         { path: "/main/plan", element: <MainPlan /> },
+        { path: "/overtime/actual", element: <OvertimeActual /> },
       ],
     },
     {

@@ -60,8 +60,8 @@ export const data = {
         },
       
         {
-          title: "Group Department",
-          url: "#",
+          title: "Overtime Actual",
+          url: "/overtime/actual",
         },
         {
           title: "Factory",

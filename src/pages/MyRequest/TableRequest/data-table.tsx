@@ -117,12 +117,12 @@ export function DataTable<TData, TValue>({
       <div className="rounded-md border relative w-full">
         <div className="overflow-auto h-full">
           <Table className="text-[13px] min-w-full">
-            <TableHeader className="sticky top-0 z-10 bg-blue-50">
+            <TableHeader className="sticky top-0 z-10 bg-[#0E7FDB]">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead key={header.id}>
+                      <TableHead key={header.id} className=" text-white">
                         {header.isPlaceholder
                           ? null
                           : flexRender(

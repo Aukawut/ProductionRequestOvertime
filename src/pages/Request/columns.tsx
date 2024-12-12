@@ -37,6 +37,7 @@ export const columns = (
 
             handleCheckedAll(Boolean(value));
           }}
+          className="border-red-50"
           aria-label="Select all"
         >
           {table.getRowCount()}
@@ -68,7 +69,7 @@ export const columns = (
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           รหัสพนักงาน
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-2 h-4 w-4 text-[#09447F]" />
         </Button>
       );
     },

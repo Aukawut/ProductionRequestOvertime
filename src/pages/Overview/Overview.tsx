@@ -114,7 +114,7 @@ const Overview: React.FC = () => {
                 boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
               }}
             >
-              <p className="text-gray-600 text-[22px] font-medium text-center">
+              <p className="text-[#1DA2AF] text-[22px] font-semibold text-center">
                 {convertFormat(200)}
               </p>
               <p className="text-gray-400 text-[14px] font-medium text-center">
@@ -127,7 +127,7 @@ const Overview: React.FC = () => {
                 boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
               }}
             >
-              <p className="text-gray-600 text-[22px] font-medium text-center">
+              <p className="text-[22px] font-medium text-center text-[#FB8601]">
                 {(8).toLocaleString()}
               </p>
               <p className="text-gray-400 text-[14px] font-medium text-center">

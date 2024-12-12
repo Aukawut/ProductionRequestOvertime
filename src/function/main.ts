@@ -176,6 +176,31 @@ export const GetWorkcellGroup: (token: string) => Promise<any> = async (
   }
 };
 
+export const GetWorkcellByFactory: (token: string,factory:number) => Promise<any> = async (
+  token: string,
+  factory:number
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/workcell/factory/${factory}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
 export const GetWorkcellByGroup: (
   token: string,
   groupId: number
@@ -626,6 +651,60 @@ export const UpdateMainPlan = async (
 
     console.log(response.data);
     return response.data;
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const GetPlanByFactory: (
+  token: string,
+  idFactory: number,
+  year : number ,
+  month : number ,
+) => Promise<any> = async (token: string, idFactory: number,year:number,month:number) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/plan/factory/${year}/${month}/${idFactory}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const GetPlanByWorkcell: (
+  token: string,
+  idWorkcell: number,
+  year : number ,
+  month : number ,
+) => Promise<any> = async (token: string, idWorkcell: number,year:number,month:number) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/plan/workcell/${year}/${month}/${idWorkcell}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
   } catch (err) {
     console.log(err);
 

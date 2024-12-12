@@ -15,7 +15,7 @@ const MainLayout: React.FC = () => {
 
       <SidebarTrigger />
       <main className="w-full max-h-screen overflow-hidden">
-        <div className="h-[40px] w-full flex items-center justify-between px-[4.5rem]">
+        <div className="h-[40px] w-full flex items-center justify-between px-[2rem]">
           {/* Breadcrumb Menu */}
           <BreadcrumbMenu path={location.pathname} />
           <div className="relative">

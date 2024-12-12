@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { ChevronDownIcon, Slash } from "lucide-react";
 import { Link } from "react-router-dom";
+import Logo from "../../../assets/images/Prospira_logos.png";
 
 interface BreadcrumbMenuProps {
   path: string;
@@ -22,7 +23,10 @@ interface BreadcrumbMenuProps {
 
 const BreadcrumbMenu: React.FC<BreadcrumbMenuProps> = ({ path }) => {
   return (
-    <>
+    <div className="flex items-center gap-x-2">
+
+        <img src={Logo} className="h-[1.4rem]" />
+ 
       <Breadcrumb>
         <BreadcrumbList className="text-[13px]">
           <BreadcrumbItem>
@@ -66,7 +70,7 @@ const BreadcrumbMenu: React.FC<BreadcrumbMenuProps> = ({ path }) => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-    </>
+    </div>
   );
 };
 

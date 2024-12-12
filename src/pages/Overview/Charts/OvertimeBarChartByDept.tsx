@@ -112,7 +112,7 @@ const OvertimeBarChartByDept: React.FC = () => {
             dataKey="uv"
             fill="#FF9532"
             activeBar={<Rectangle />}
-            barSize={25}
+            barSize={15}
             layout="vertical"
           >
             <LabelList
@@ -128,7 +128,7 @@ const OvertimeBarChartByDept: React.FC = () => {
             dataKey="amt"
             fill="#82ca9d"
             activeBar={<Rectangle />}
-            barSize={25}
+            barSize={15}
             layout="vertical"
           >
             <LabelList

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Formik, Form, FormikHelpers } from "formik";
 import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
-import { Check, Clock8, UserCheck } from "lucide-react";
+import { Check, Clock8, Info, UserCheck } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -45,7 +45,9 @@ import {
   GetAllFactoryByGroup,
   GetAllOvertimeList,
   GetGroupDepartmentActive,
-  GetWorkcellByGroup,
+  GetPlanByFactory,
+  GetPlanByWorkcell,
+  GetWorkcellByFactory,
   GetWorkcellGroup,
 } from "@/function/main";
 import { useOTManagementSystemStore } from "../../../store";
@@ -60,7 +62,6 @@ import DialogUserSelected from "./dialog-user-selected";
 import LoadingCircle from "@/components/custom/loading-circle";
 
 interface Values {
-
   overtimeType: number;
   group: number;
   factory: number;
@@ -94,18 +95,34 @@ export interface Factory {
 export interface WorkcellGroup {
   ID_WORKGRP: number;
   NAME_WORKGRP: string;
+  DESC: string;
 }
 
 export interface AllWorkcell {
-  ID_WORKGRP: number;
-  NAME_WORKGRP: string;
+  ID_WORK_CELL: number;
+  NAME_WORKCELL: string;
+
+}
+
+interface PlanByFactory {
+  YEAR : number ;
+  MONTH : number ;
+  ID_FACTORY : number ;
+  SUM_HOURS : number ;
+}
+
+interface PlanByWorkcell {
+  YEAR : number ;
+  MONTH : number ;
+  ID_WORK_CELL : number ;
+  SUM_HOURS : number ;
 }
 
 const Request: React.FC = () => {
   const token = useOTManagementSystemStore((state) => state.token);
   const [isSubmit, setIsSubmit] = useState(false);
   const [dateRequestStart, setDateRequestStart] = useState<Date>(new Date());
-  const [dateRequestEnd, setDateRequestEnd] = useState<Date>(new Date());  
+  const [dateRequestEnd, setDateRequestEnd] = useState<Date>(new Date());
   const [dateStart, setDateStart] = useState<Date>(new Date());
   const [dateEnd, setDateEnd] = useState<Date>(new Date());
 
@@ -120,8 +137,11 @@ const Request: React.FC = () => {
   const [allGroupWorkcell, setAllGroupWorkcell] = useState<WorkcellGroup[]>([]);
   const [allWorkcell, setAllWorkcell] = useState<AllWorkcell[]>([]);
   const [isLoadWorkcell, setIsLoadWorkcell] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const [showDialogUser, setShowDialogUser] = useState(false);
+  const [descGroup, setDescGroup] = useState("");
+  const [planByFactory,setPlanByFactory] = useState<PlanByFactory[]>([])
+  const [planByWorkcell,setPlanByWorkcell] = useState<PlanByWorkcell[]>([])
 
   const startFullDate = moment(
     moment(dateRequestStart).format("YYYY-MM-DD") +
@@ -134,9 +154,9 @@ const Request: React.FC = () => {
       moment(dateEnd).format("HH:mm")
   ).toDate();
 
-  const duration = moment.duration(moment(endFullDate).diff(moment(startFullDate)));
-
-
+  const duration = moment.duration(
+    moment(endFullDate).diff(moment(startFullDate))
+  );
 
   const closeDialogUser = () => {
     setShowDialogUser(false); // ปิด Dialog
@@ -216,28 +236,54 @@ const Request: React.FC = () => {
     }
   };
 
+  const FindDescriptionGroup = (id: number) => {
+   
+    const obj = allGroupWorkcell?.find((x) => x.ID_WORKGRP == id);
+    if (obj) {
+      setDescGroup(obj.DESC);
+    } else {
+      setDescGroup("");
+    }
+  };
+
   const fetchData = async () => {
+    setLoading(true);
+
+    const month =  new Date().getMonth() + 1 ;
+
     if (!token || token == "") {
       navigate("/login");
     }
 
-    Promise.all([
+   await Promise.all([
       setAllGroupDept(await GetGroupDepartmentActive(token)),
       setAllOvertime(await GetAllOvertimeList(token)),
       setAllFactory(await GetAllFactoryByGroup(token, role[0]?.ID_GROUP_DEPT)),
-      getUserDataByFactory(Number(role[0]?.ID_FACTORY)),
-
+      await getUserDataByFactory(Number(role[0]?.ID_FACTORY)),
     ])
-  
-    const groupWork = await GetWorkcellGroup(token);
-    
-    if (groupWork?.length > 0) {
-      setAllGroupWorkcell(groupWork);
-      setAllWorkcell(
-        await GetWorkcellByGroup(token, Number(groupWork[0]?.ID_WORKGRP))
-      );
-    }
+      .then(async (response) => {
+      console.log(response);
+        
+      const work = await GetWorkcellByFactory(token, Number(role[0]?.ID_FACTORY));
+      
+       setPlanByFactory(await GetPlanByFactory(token,Number(role[0]?.ID_FACTORY),new Date().getFullYear(),month));
+       const groupWork = await GetWorkcellGroup(token);
 
+        if (work?.length > 0) {
+          setAllWorkcell(work);
+          setPlanByWorkcell(await GetPlanByWorkcell(token,Number(work[0]?.ID_WORK_CELL),new Date().getFullYear(),month))
+        }
+
+        if (groupWork?.length > 0) {
+          setAllGroupWorkcell(groupWork);
+          FindDescriptionGroup(Number(groupWork[0]?.ID_WORKGRP))
+          
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const clearState = () => {
@@ -249,6 +295,8 @@ const Request: React.FC = () => {
     handleCheckedAll(false);
   };
 
+ 
+
   useEffect(() => {
     // setDateEnd(moment(new Date()).add(2, "hours").toDate());
     fetchData();
@@ -256,7 +304,11 @@ const Request: React.FC = () => {
     setGroup(role[0]?.ID_GROUP_DEPT?.toString());
   }, []);
 
-  return (
+  return loading ? (
+    <div className="flex h-[100vh] w-full justify-center items-center">
+      <LoadingCircle />
+    </div>
+  ) : (
     <div className="p-4">
       {/* Toast Alert */}
       <Toaster
@@ -299,7 +351,6 @@ const Request: React.FC = () => {
             <div className="col-span-12 lg:col-span-6">
               <Formik
                 initialValues={{
-                 
                   overtimeType: 1,
                   group: role[0]?.ID_GROUP_DEPT,
                   factory: role[0]?.ID_FACTORY,
@@ -332,10 +383,11 @@ const Request: React.FC = () => {
                       }));
 
                       if (selectedUser?.length > 0) {
-                      
                         const payload = {
-                          overtimeDateStart: moment(startFullDate).format("YYYY-MM-DD HH:mm"),
-                          overtimeDateEnd: moment(endFullDate).format("YYYY-MM-DD HH:mm"),
+                          overtimeDateStart:
+                            moment(startFullDate).format("YYYY-MM-DD HH:mm"),
+                          overtimeDateEnd:
+                            moment(endFullDate).format("YYYY-MM-DD HH:mm"),
                           overtimeType: Number(values.overtimeType),
                           group: Number(values.group),
                           factory: Number(values.factory),
@@ -519,12 +571,48 @@ const Request: React.FC = () => {
                         <div className="flex items-center gap-x-2">
                           <Clock8 size={14} />
                           <p className="text-[12px]">
-                          {duration.hours()} ชั่วโมง {duration.minutes()} นาที
+                            {duration.hours()} ชั่วโมง {duration.minutes()} นาที
                           </p>
-                        
                         </div>
                       </div>
-                      <div className="mb-2 col-span-12 lg:col-span-5">
+                      <div className="col-span-12">
+                        <table className="my-2">
+                          <tbody>
+                            <tr className="align-middle">
+                              <td className="p-1">
+                                <p className="text-[13px] flex items-center gap-x-2">
+                                  Factory Plan Target :
+                                </p>
+                              </td>
+                              <td className="p-1">
+                                <div className="flex gap-x-2 items-center">
+                                  <span className="flex bg-blue-200 text-[13px] px-2 py-1 rounded-sm text-blue-800">
+                                   {planByFactory?.length > 0 ? Number(planByFactory[0]?.SUM_HOURS) : 0}
+                                  </span>
+                                  <p className="text-[12px]">ชั่วโมง</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr className="align-middle">
+                              <td className="p-1">
+                                <p className="text-[13px] flex items-center gap-x-2">
+                                  Workcell Plan Target :
+                                </p>
+                              </td>
+                              <td className="p-1">
+                                <div className="flex gap-x-2 items-center">
+                                  <span className="flex bg-blue-200 text-[13px] px-2 py-1 rounded-sm text-blue-800">
+                                  {planByWorkcell?.length > 0 ? Number(planByWorkcell[0]?.SUM_HOURS) : 0}
+                                  </span>
+                                  <p className="text-[12px]">ชั่วโมง</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div className="mb-2 col-span-12 lg:col-span-6">
                         <div className="mb-2">
                           <label
                             htmlFor="overtimeType"
@@ -570,6 +658,7 @@ const Request: React.FC = () => {
                           onValueChange={(e) => {
                             setGroup(e);
                             setFieldValue("group", e);
+                           
                           }}
                         >
                           <SelectTrigger className="w-full">
@@ -593,79 +682,38 @@ const Request: React.FC = () => {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="mb-2 col-span-12 lg:col-span-7">
-                        <label
-                          htmlFor="Factory"
-                          className="text-[13px] text-gray-700"
-                        >
-                          <span className="text-[red]">*</span> โรงงาน / Factory
-                        </label>
-                        <Select
-                          value={values.factory?.toString()}
-                          onValueChange={(e) => {
-                            getUserDataByFactory(Number(e));
-                            setFactory(Number(e));
-                            setFieldValue("factory", e);
-                          }}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue
-                              placeholder="Group Department"
-                              className="text-[13px]"
-                            />
-                          </SelectTrigger>
-                          <SelectContent className="h-[180px]">
-                            {allFactory?.map((item, index) => {
-                              return (
-                                <SelectItem
-                                  value={item.ID_FACTORY?.toString()}
-                                  className="text-[13px]"
-                                  key={index}
-                                >
-                                  {item.FACTORY_NAME}
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
                       <div className="mb-2 col-span-12 lg:col-span-6">
                         <label
                           htmlFor="Factory"
-                          className="text-[13px] text-gray-700"
+                          className="text-[13px] text-gray-700 flex gap-x-2 items-center mb-1"
                         >
                           <span className="text-[red]">*</span> Work Group /
                           กลุ่มงาน
+                          <Tooltip>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info
+                                    size={16}
+                                    className="text-gray-400 cursor-pointer"
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent className="w-[280px] h-[80px] overflow-auto p-2 bg-blue-50">
+                                  <p className="text-[13px] font-medium underline text-gray-800 mb-[0.2rem]">คำอธิบาย</p>
+                                  <p className="text-gray-800">
+                                   {descGroup}
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </Tooltip>
                         </label>
 
                         <Select
                           value={values.groupworkcell?.toString()}
                           onValueChange={async (e) => {
                             setFieldValue("groupworkcell", e);
-                            setIsLoadWorkcell(true);
-
-                            // Promise Repert Array Workcell
-                            const responseWorkcell = await GetWorkcellByGroup(
-                              token,
-                              Number(e)
-                            );
-                            // If array > 0
-
-                            if (responseWorkcell?.length > 0) {
-                              console.log("responseWorkcell", responseWorkcell);
-
-                              setAllWorkcell(responseWorkcell); // Set Workcell list
-                              setIsLoadWorkcell(false);
-                              setFieldValue(
-                                "workcell",
-                                responseWorkcell[0]?.ID_WORKGRP
-                              );
-                            } else {
-                              setAllWorkcell([]);
-
-                              setIsLoadWorkcell(false);
-                            }
+                            FindDescriptionGroup(Number(e))
                           }}
                         >
                           <SelectTrigger className="w-full">
@@ -683,6 +731,61 @@ const Request: React.FC = () => {
                                   key={index}
                                 >
                                   {item.NAME_WORKGRP}
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="mb-2 col-span-12 lg:col-span-6">
+                        <label
+                          htmlFor="Factory"
+                          className="text-[13px] text-gray-700"
+                        >
+                          <span className="text-[red]">*</span> โรงงาน / Factory
+                        </label>
+                        <Select
+                          value={values.factory?.toString()}
+                          onValueChange={async (e) => {
+                            setIsLoadWorkcell(true);
+                            getUserDataByFactory(Number(e));
+                            setFactory(Number(e));
+                            setFieldValue("factory", e);
+                            // Promise Repert Array Workcell
+                            const responseWorkcell = await GetWorkcellByFactory(
+                              token,
+                              Number(e)
+                            );
+
+                            if (responseWorkcell?.length > 0) {
+                              setAllWorkcell(responseWorkcell); // Set Workcell list
+                              setIsLoadWorkcell(false);
+                              setFieldValue(
+                                "workcell",
+                                responseWorkcell[0]?.ID_WORK_CELL
+                              );
+                            } else {
+                              setAllWorkcell([]);
+                              setIsLoadWorkcell(false);
+                            }
+                          }}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue
+                              placeholder="Group Department"
+                              className="text-[13px]"
+                            />
+                          </SelectTrigger>
+                          <SelectContent className="h-[180px]">
+                            {allFactory?.map((item, index) => {
+                              return (
+                                <SelectItem
+                                  value={item.ID_FACTORY?.toString()}
+                                  className="text-[13px]"
+                                  key={index}
+                                >
+                                  {item.FACTORY_NAME}
                                 </SelectItem>
                               );
                             })}
@@ -719,17 +822,36 @@ const Request: React.FC = () => {
                               {allWorkcell?.map((item, index) => {
                                 return (
                                   <SelectItem
-                                    value={item.ID_WORKGRP.toString()}
+                                    value={item.ID_WORK_CELL.toString()}
                                     className="text-[13px]"
                                     key={index}
                                   >
-                                    {item.NAME_WORKGRP}
+                                    {item.NAME_WORKCELL}
                                   </SelectItem>
                                 );
                               })}
                             </SelectContent>
                           </Select>
                         )}
+                      </div>
+                    </div>
+                    <p className="text-gray-800 text-[13px] mb-1 flex items-center mt-2">
+                      <span className="text-[#F3424B] flex items-center gap-x-2">
+                        <Info size={13} /> ท่านขอ OT เกินแผนที่วางไว้ (ชั่วโมง)
+                        :{" "}
+                      </span>
+                    </p>
+                  
+                    <p className="my-2 text-[13px] text-gray-800 mt-[.5rem]">
+                      รวมเวลาทั้งหมด : 
+                    </p>
+                    <div className="grid grid-cols-12 mb-[1rem]">
+                      <div className="col-span-4">
+                        <div className="flex items-center gap-x-2">
+                          <div className="border-2 boder-[#038509] p-2 rounded-[5px] flex items-center w-full">
+                            <p className="text-[14px] text-gray-800 font-medium">2,000</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div className="mb-2">

@@ -75,6 +75,13 @@ const TableRequestDetail: React.FC<DetailRequestProps> = ({
                 )?.toFixed(2)}
               </TableCell>
             </TableRow>
+
+            <TableRow>
+              <TableCell className="text-center">แผน (ชั่วโมง)</TableCell>
+              <TableCell className="text-center bg-red-400">
+                5,000
+              </TableCell>
+            </TableRow>
             <TableRow>
               <TableCell className="text-center">ประเภทโอที</TableCell>
               <TableCell className="text-center">

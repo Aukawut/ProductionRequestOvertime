@@ -28,7 +28,7 @@ const DialogUserSelected: React.FC<ShowUsersSelected> = ({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="w-[90%] max-w-none h-[95vh] overflow-hidden">
         <DialogHeader>
-          <DialogTitle className="text-[15px] text-gray-700">
+          <DialogTitle className="text-[15px] text-gray-700 font-medium">
             Users selected | ข้อมูลพนักงานที่ท่านเลือก ({users?.length} ท่าน)
           </DialogTitle>
           <DialogDescription className="text-[13px] flex items-center gap-x-2">
