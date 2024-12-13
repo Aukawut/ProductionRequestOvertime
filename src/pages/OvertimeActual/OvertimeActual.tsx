@@ -1,111 +1,126 @@
 import React, { useState } from "react";
 
-import Papa from "papaparse";
-import moment from "moment";
+import TablePreviewOvertime from "./TablePreviewOvertime/TablePreviewOvertime";
+import { format } from "date-fns";
+import { Popover, PopoverTrigger } from "@radix-ui/react-popover";
+import { Button } from "@/components/ui/button";
+import { CalendarIcon, Pin, PlusCircle, Search } from "lucide-react";
+import { PopoverContent } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import DialogAddOvertime from "./dialog-add-actual";
+import { Toaster } from "sonner";
 
-const OvertimeActual = () => {
-  const [csvData, setCsvData] = useState<any[]>([]);
-  
-  const ChangeDateFormat = (date:string) => {
-    const christianYear = parseInt(date?.split('/')[2]) - 543;
+export interface CsvData {
+  date: string;
+  employeeCode: string;
+  end: string;
+  overtime1: number;
+  overtime2: number;
+  overtime3: number;
+  overtime15: number;
+  total: number;
+  shift: string;
+  start: string;
+}
 
-    const formattedDate = moment(`${date?.split('/')[0]}/${date?.split('/')[1]}/${christianYear}`, "D/M/YYYY").format("YYYY-MM-DD");
-
-    return formattedDate
-  }
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (file) {
-      Papa.parse(file, {
-        header: true, // Automatically generate keys from the CSV header
-        skipEmptyLines: true,
-        complete: (result) => {
-          const data = result.data;
-          let dataObj = [];
-          console.log(data);
-
-          setCsvData(result.data); // Set parsed data into state
-          const columnDataEmployeeCode = data.map((item: any) => item["����"]);
-          const scan = data.map((item: any) => item["�������-�͡"]);
-          const overtime1 = data.map((item: any) => item["OT1"]);
-          const overtime15 = data.map((item: any) => item["OT1.5"]);
-          const overtime2 = data.map((item: any) => item["OT2"]);
-          const overtime3 = data.map((item: any) => item["OT3"]);
-          const date = data.map((item: any) => item["�ѹ���"]);
-
-          for (let i = 0; i < date?.length; i++) {
-            dataObj.push({
-              employeeCode: columnDataEmployeeCode[i],
-              date: ChangeDateFormat(date[i]),
-              scan: scan[i],
-              overtime1:
-                overtime1[i] == "" ||
-                overtime1[i] == " " ||
-                overtime1[i] == null ||
-                overtime1[i] == "0" ||
-                overtime1[i] == 0
-                  ? 0
-                  : Number(overtime1[i]),
-              overtime15:
-                overtime15[i] == "" ||
-                overtime15[i] == " " ||
-                overtime15[i] == null ||
-                overtime15[i] == "0" ||
-                overtime15[i] == 0
-                  ? 0
-                  : Number(overtime15[i]),
-              overtime2:
-                overtime2[i] == "" ||
-                overtime2[i] == " " ||
-                overtime2[i] == null ||
-                overtime2[i] == "0" ||
-                overtime2[i] == 0
-                  ? 0
-                  : Number(overtime2[i]),
-              overtime3:
-                overtime3[i] == "" ||
-                overtime3[i] == " " ||
-                overtime3[i] == null ||
-                overtime3[i] == "0" ||
-                overtime3[i] == 0
-                  ? 0
-                  : Number(overtime3[i]),
-            });
-          }
-
-          const filter = dataObj?.filter(
-            (x) => x.scan !== "" && x.scan !== " "
-          );
-
-          const final = filter?.map((item) => ({
-            employeeCode : item.employeeCode,
-            date : item.date,
-            overtime1 : item.overtime1,
-            overtime15 : item.overtime15,
-            overtime2 : item.overtime2,
-            overtime3 : item.overtime3,
-            scan:item.scan
-
-          }))
-
-          console.log(filter);
-        },
-        error: (error) => {
-          console.error("Error parsing CSV file:", error);
-        },
-      });
-    }
-  };
+const OvertimeActual: React.FC = () => {
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
+  const [showAdd, setShowAdd] = useState(false);
 
   return (
     <div>
-      <h2>Upload and Read CSV</h2>
-      <input type="file" accept=".csv" onChange={handleFileUpload} />
-      <div>
-        <h3>Parsed CSV Data:</h3>
-        <pre>{JSON.stringify(csvData, null, 2)}</pre>
+      <div className="my-2 flex items-center gap-x-2">
+        <Pin size={16} color="red" />{" "}
+        <p className="text-[14.5px] text-gray-800">Overtime Actual</p>
+      </div>
+
+      <Toaster
+        position="top-center"
+        richColors
+        toastOptions={{
+          duration: 1500,
+          style: {
+            paddingRight: 20,
+            paddingLeft: 20,
+          },
+        }}
+      />
+
+      <div className="my-2">
+        <Button
+          size={"sm"}
+          className="bg-[#107EDB] text-white hover:bg-[#1c77c2]"
+          onClick={() => setShowAdd(true)}
+        >
+          <PlusCircle /> Add
+        </Button>
+      </div>
+      <div className="text-[12px]">เลือกช่วงเวลา</div>
+      <div className="my-1 flex items-center gap-x-1">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-[200px] justify-start text-left font-normal",
+                !startDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon />
+              {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={startDate}
+              onSelect={setStartDate}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+        -
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-[200px] justify-start text-left font-normal",
+                !endDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon />
+              {endDate ? format(endDate, "PPP") : <span>Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={endDate}
+              onSelect={setEndDate}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+        <Button
+          type="button"
+          className="bg-[#107EDB] text-white hover:bg-[#1c77c2]"
+          size={"sm"}
+        >
+          ค้นหา <Search />
+        </Button>
+      </div>
+      <hr />
+
+      <DialogAddOvertime setIsOpen={setShowAdd} isOpen={showAdd} />
+
+      <div className="p-2 my-2">
+        <p className="text-[14px] font-medium text-gray-800">
+          ตารางแสดงข้อมูลการทำโอที | Table showing Overtime Data
+        </p>
+        <TablePreviewOvertime data={[]} />
       </div>
     </div>
   );

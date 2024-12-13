@@ -39,3 +39,7 @@
 button:focus-visible{
   border: none;  
 }
+
+.swal2-container {
+  z-index: 99999 !important;
+}

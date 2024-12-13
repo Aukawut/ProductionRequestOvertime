@@ -97,7 +97,7 @@ const DialogAddPlan: React.FC<DialogAddPlan> = ({
                   <div className="grid grid-cols-12 gap-x-2">
                     <div className="mb-2 col-span-12 lg:col-span-4">
                       <label htmlFor="month" className="text-[13px]">
-                        <span className="text-[red]">*</span> ปี / Year
+                        <span className="text-[red]">*</span> Workcell
                       </label>
                       <Select
                         required

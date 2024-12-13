@@ -20,7 +20,7 @@ import DialogAddPlan from "./dialog-add-plan";
 import { Toaster } from "sonner";
 import DialogUpdatePlan from "./dialog-update-plan";
 import LoadingCircle from "@/components/custom/loading-circle";
-import {motion} from "framer-motion" ;
+import { motion } from "framer-motion";
 
 export interface Factory {
   ID_FACTORY: number;
@@ -72,11 +72,11 @@ const MainPlan: React.FC = () => {
       <LoadingCircle />
     </div>
   ) : (
-    <motion.div className="py-4"
-      initial={{opacity:0,y:20}}
-      animate={{opacity:1,y:0}}
-      transition={{type:"tween",duration:0.3}}
-
+    <motion.div
+      className="py-4"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: "tween", duration: 0.3 }}
     >
       <Toaster
         position="top-center"
