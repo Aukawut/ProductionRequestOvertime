@@ -6,6 +6,7 @@ import {
 import axios from "axios";
 import { allMonth, colorOfMonth } from "@/pages/MyRequest/data";
 import { CountApprove } from "@/pages/Approve/Approve";
+import moment from "moment";
 
 export const GetGroupDepartmentActive: (token: string) => Promise<any> = async (
   token: string
@@ -542,11 +543,12 @@ export const GetUserByRequestAndRev = async (
 };
 
 interface PayloadMainPlan {
-  factory: number;
+  workcell: number;
   month: number;
   year: number;
   hours: number;
   action:string ;
+  userGroup:number ;
 }
 export const InsertMainPlan = async (
   token: string,
@@ -695,6 +697,98 @@ export const GetPlanByWorkcell: (
 
   try {
     const response = await axios.get(`${VITE_BASE_URL}/plan/workcell/${year}/${month}/${idWorkcell}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const GetAllWorkcell: (token: string) => Promise<any> = async (token: string) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/workcell`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const GetUserGroup: (token: string) => Promise<any> = async (token: string) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/users/ugroup`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+
+export const DeletePlan: (token: string,id:number) => Promise<any> = async (token: string,id:number) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.delete(`${VITE_BASE_URL}/plan/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return {err: false, msg : response.data.msg}
+    } else {
+      return {err: true, msg : response.data.msg};
+    }
+  } catch (err) {
+    return {err: true, msg : err};
+  }
+};
+
+export const ConvertDateFormat = (date:Date) => {
+    return moment(date).format("YYYY-MM-DD HH:mm")
+}
+
+
+export const GetActualOvertime: (token: string) => Promise<any> = async (token: string) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/users/ugroup`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import TablePreviewOvertime from "./TablePreviewOvertime/TablePreviewOvertime";
 import { format } from "date-fns";
@@ -24,15 +24,26 @@ export interface CsvData {
   start: string;
 }
 
+interface AllActual {
+
+}
+
 const OvertimeActual: React.FC = () => {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [showAdd, setShowAdd] = useState(false);
+  const [allActual,setAllActual] = useState([])
+  
+  useEffect(() => {
+    setStartDate(new Date())
+    setEndDate(new Date())
 
+
+  },[])
   return (
     <div>
       <div className="my-2 flex items-center gap-x-2">
-        <Pin size={16} color="red" />{" "}
+        <Pin size={16} color="red" />
         <p className="text-[14.5px] text-gray-800">Overtime Actual</p>
       </div>
 
@@ -67,9 +78,13 @@ const OvertimeActual: React.FC = () => {
                 "w-[200px] justify-start text-left font-normal",
                 !startDate && "text-muted-foreground"
               )}
+              
             >
               <CalendarIcon />
-              {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+              <p className="text-[13px]">
+              {startDate ? format(startDate, "PPP") : "Pick a date"}
+              </p>
+             
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
@@ -78,6 +93,7 @@ const OvertimeActual: React.FC = () => {
               selected={startDate}
               onSelect={setStartDate}
               initialFocus
+            
             />
           </PopoverContent>
         </Popover>
@@ -92,7 +108,10 @@ const OvertimeActual: React.FC = () => {
               )}
             >
               <CalendarIcon />
-              {endDate ? format(endDate, "PPP") : <span>Pick a date</span>}
+              <p className="text-[13px]">
+              {endDate ? format(endDate, "PPP") : "Pick a date"}
+              </p>
+       
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
@@ -120,7 +139,7 @@ const OvertimeActual: React.FC = () => {
         <p className="text-[14px] font-medium text-gray-800">
           ตารางแสดงข้อมูลการทำโอที | Table showing Overtime Data
         </p>
-        <TablePreviewOvertime data={[]} />
+        <TablePreviewOvertime data={allActual} />
       </div>
     </div>
   );

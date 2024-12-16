@@ -101,21 +101,30 @@ export interface WorkcellGroup {
 export interface AllWorkcell {
   ID_WORK_CELL: number;
   NAME_WORKCELL: string;
-
 }
 
 interface PlanByFactory {
-  YEAR : number ;
-  MONTH : number ;
-  ID_FACTORY : number ;
-  SUM_HOURS : number ;
+  YEAR: number;
+  MONTH: number;
+  ID_FACTORY: number;
+  SUM_HOURS: number;
 }
 
 interface PlanByWorkcell {
-  YEAR : number ;
-  MONTH : number ;
-  ID_WORK_CELL : number ;
-  SUM_HOURS : number ;
+  YEAR: number;
+  MONTH: number;
+  ID_WORK_CELL: number;
+  SUM_HOURS: number;
+}
+
+interface InitialData {
+  overtimeType: number;
+  group: number;
+  factory: number;
+  remark: string;
+  actionBy: string;
+  workcell: number;
+  groupworkcell: number;
 }
 
 const Request: React.FC = () => {
@@ -140,8 +149,25 @@ const Request: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showDialogUser, setShowDialogUser] = useState(false);
   const [descGroup, setDescGroup] = useState("");
-  const [planByFactory,setPlanByFactory] = useState<PlanByFactory[]>([])
-  const [planByWorkcell,setPlanByWorkcell] = useState<PlanByWorkcell[]>([])
+  const [planByFactory, setPlanByFactory] = useState<PlanByFactory[]>([]);
+  const [planByWorkcell, setPlanByWorkcell] = useState<PlanByWorkcell[]>([]);
+  const [actualWorkcell,setActualWorkcell] = useState(0);
+  const [actualFactory,setActualFactory] = useState(0);
+
+  const employeeCode = useOTManagementSystemStore(
+    (state) => state.info.EmployeeCode
+  );
+  const role = useOTManagementSystemStore((state) => state.info?.Role);
+
+  const [initialData, setInitialData] = useState<InitialData>({
+    overtimeType: 1,
+    group: role[0]?.ID_GROUP_DEPT,
+    factory: role[0]?.ID_FACTORY,
+    remark: "",
+    actionBy: employeeCode,
+    workcell: 1,
+    groupworkcell: 1,
+  });
 
   const startFullDate = moment(
     moment(dateRequestStart).format("YYYY-MM-DD") +
@@ -161,12 +187,6 @@ const Request: React.FC = () => {
   const closeDialogUser = () => {
     setShowDialogUser(false); // ปิด Dialog
   };
-
-  const employeeCode = useOTManagementSystemStore(
-    (state) => state.info.EmployeeCode
-  );
-
-  const role = useOTManagementSystemStore((state) => state.info?.Role);
 
   const navigate = useNavigate();
   const baseURL = import.meta.env.VITE_BASE_URL;
@@ -237,7 +257,6 @@ const Request: React.FC = () => {
   };
 
   const FindDescriptionGroup = (id: number) => {
-   
     const obj = allGroupWorkcell?.find((x) => x.ID_WORKGRP == id);
     if (obj) {
       setDescGroup(obj.DESC);
@@ -249,35 +268,63 @@ const Request: React.FC = () => {
   const fetchData = async () => {
     setLoading(true);
 
-    const month =  new Date().getMonth() + 1 ;
+    const month = new Date().getMonth() + 1;
 
     if (!token || token == "") {
       navigate("/login");
     }
 
-   await Promise.all([
+    await Promise.all([
       setAllGroupDept(await GetGroupDepartmentActive(token)),
       setAllOvertime(await GetAllOvertimeList(token)),
       setAllFactory(await GetAllFactoryByGroup(token, role[0]?.ID_GROUP_DEPT)),
       await getUserDataByFactory(Number(role[0]?.ID_FACTORY)),
     ])
       .then(async (response) => {
-      console.log(response);
+        console.log(response);
+
+        const work = await GetWorkcellByFactory(
+          token,
+          Number(role[0]?.ID_FACTORY)
+        );
+
+        setPlanByFactory(
+          await GetPlanByFactory(
+            token,
+            Number(role[0]?.ID_FACTORY),
+            new Date().getFullYear(),
+            month
+          )
+        );
+
+        setInitialData((prev) => {
+          prev.factory = role[0]?.ID_FACTORY
+          return prev
+        })
         
-      const work = await GetWorkcellByFactory(token, Number(role[0]?.ID_FACTORY));
-      
-       setPlanByFactory(await GetPlanByFactory(token,Number(role[0]?.ID_FACTORY),new Date().getFullYear(),month));
-       const groupWork = await GetWorkcellGroup(token);
+        const groupWork = await GetWorkcellGroup(token);
 
         if (work?.length > 0) {
           setAllWorkcell(work);
-          setPlanByWorkcell(await GetPlanByWorkcell(token,Number(work[0]?.ID_WORK_CELL),new Date().getFullYear(),month))
+          
+          setInitialData((prev) => {
+            prev.workcell = Number(work[0]?.ID_WORK_CELL);
+            return prev;
+          });
+
+          setPlanByWorkcell(
+            await GetPlanByWorkcell(
+              token,
+              Number(work[0]?.ID_WORK_CELL),
+              new Date().getFullYear(),
+              month
+            )
+          );
         }
 
         if (groupWork?.length > 0) {
           setAllGroupWorkcell(groupWork);
-          FindDescriptionGroup(Number(groupWork[0]?.ID_WORKGRP))
-          
+          FindDescriptionGroup(Number(groupWork[0]?.ID_WORKGRP));
         }
         setLoading(false);
       })
@@ -294,8 +341,6 @@ const Request: React.FC = () => {
 
     handleCheckedAll(false);
   };
-
- 
 
   useEffect(() => {
     // setDateEnd(moment(new Date()).add(2, "hours").toDate());
@@ -350,15 +395,7 @@ const Request: React.FC = () => {
           <div className="grid grid-cols-12 gap-x-2">
             <div className="col-span-12 lg:col-span-6">
               <Formik
-                initialValues={{
-                  overtimeType: 1,
-                  group: role[0]?.ID_GROUP_DEPT,
-                  factory: role[0]?.ID_FACTORY,
-                  remark: "",
-                  actionBy: employeeCode,
-                  workcell: 1,
-                  groupworkcell: 1,
-                }}
+                initialValues={{ ...initialData }}
                 onSubmit={async (
                   values: Values,
                   { setSubmitting, resetForm }: FormikHelpers<Values>
@@ -490,9 +527,12 @@ const Request: React.FC = () => {
                                   mode="single"
                                   selected={dateRequestStart}
                                   disabled={(date) => {
+                                
+                                 
                                     return (
                                       moment(date).utc().toDate() <
                                       moment(new Date()).utc().toDate()
+
                                     );
                                   }}
                                   onSelect={(date) => {
@@ -548,11 +588,13 @@ const Request: React.FC = () => {
                                   mode="single"
                                   selected={dateRequestEnd}
                                   disabled={(date) => {
+                                    const duration = moment.duration(moment(date).diff(dateRequestStart));
+                                  
+
                                     return (
-                                      moment(date).utc().toDate() <
-                                        moment(new Date()).utc().toDate() ||
-                                      moment(date).toDate() <
-                                        moment(dateRequestStart).toDate()
+                                     ( moment(date).utc().toDate() < moment(new Date()).utc().toDate() ||
+                                      moment(date).toDate() <  moment(dateRequestStart).toDate()) 
+                                      || duration.asDays() > 1
                                     );
                                   }}
                                   onSelect={(date) => {
@@ -587,7 +629,9 @@ const Request: React.FC = () => {
                               <td className="p-1">
                                 <div className="flex gap-x-2 items-center">
                                   <span className="flex bg-blue-200 text-[13px] px-2 py-1 rounded-sm text-blue-800">
-                                   {planByFactory?.length > 0 ? Number(planByFactory[0]?.SUM_HOURS) : 0}
+                                    {planByFactory?.length > 0
+                                      ? Number(planByFactory[0]?.SUM_HOURS)
+                                      : 0}
                                   </span>
                                   <p className="text-[12px]">ชั่วโมง</p>
                                 </div>
@@ -602,7 +646,9 @@ const Request: React.FC = () => {
                               <td className="p-1">
                                 <div className="flex gap-x-2 items-center">
                                   <span className="flex bg-blue-200 text-[13px] px-2 py-1 rounded-sm text-blue-800">
-                                  {planByWorkcell?.length > 0 ? Number(planByWorkcell[0]?.SUM_HOURS) : 0}
+                                    {planByWorkcell?.length > 0
+                                      ? Number(planByWorkcell[0]?.SUM_HOURS)
+                                      : 0}
                                   </span>
                                   <p className="text-[12px]">ชั่วโมง</p>
                                 </div>
@@ -658,7 +704,6 @@ const Request: React.FC = () => {
                           onValueChange={(e) => {
                             setGroup(e);
                             setFieldValue("group", e);
-                           
                           }}
                         >
                           <SelectTrigger className="w-full">
@@ -699,10 +744,10 @@ const Request: React.FC = () => {
                                   />
                                 </TooltipTrigger>
                                 <TooltipContent className="w-[280px] h-[80px] overflow-auto p-2 bg-blue-50">
-                                  <p className="text-[13px] font-medium underline text-gray-800 mb-[0.2rem]">คำอธิบาย</p>
-                                  <p className="text-gray-800">
-                                   {descGroup}
+                                  <p className="text-[13px] font-medium underline text-gray-800 mb-[0.2rem]">
+                                    คำอธิบาย
                                   </p>
+                                  <p className="text-gray-800">{descGroup}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
@@ -713,7 +758,7 @@ const Request: React.FC = () => {
                           value={values.groupworkcell?.toString()}
                           onValueChange={async (e) => {
                             setFieldValue("groupworkcell", e);
-                            FindDescriptionGroup(Number(e))
+                            FindDescriptionGroup(Number(e));
                           }}
                         >
                           <SelectTrigger className="w-full">
@@ -748,6 +793,9 @@ const Request: React.FC = () => {
                         <Select
                           value={values.factory?.toString()}
                           onValueChange={async (e) => {
+
+                      
+
                             setIsLoadWorkcell(true);
                             getUserDataByFactory(Number(e));
                             setFactory(Number(e));
@@ -758,6 +806,14 @@ const Request: React.FC = () => {
                               Number(e)
                             );
 
+                            setPlanByFactory(
+                              await GetPlanByFactory(
+                                token,
+                                Number(e),
+                                new Date().getFullYear(),
+                                moment(dateRequestStart)?.month() + 1
+                              )
+                            );  
                             if (responseWorkcell?.length > 0) {
                               setAllWorkcell(responseWorkcell); // Set Workcell list
                               setIsLoadWorkcell(false);
@@ -765,10 +821,24 @@ const Request: React.FC = () => {
                                 "workcell",
                                 responseWorkcell[0]?.ID_WORK_CELL
                               );
+
+                           
+                         
+                              setPlanByWorkcell(
+                                await GetPlanByWorkcell(
+                                  token,
+                                  Number(responseWorkcell[0]?.ID_WORK_CELL),
+                                  new Date().getFullYear(),
+                                  moment(dateStart).month() + 1
+                                )
+                              );
                             } else {
                               setAllWorkcell([]);
                               setIsLoadWorkcell(false);
+                              setPlanByWorkcell([])
                             }
+
+                          
                           }}
                         >
                           <SelectTrigger className="w-full">
@@ -808,8 +878,17 @@ const Request: React.FC = () => {
                         ) : (
                           <Select
                             value={values.workcell.toString()}
-                            onValueChange={(e) => {
+                            onValueChange={async (e) => {
                               setFieldValue("workcell", e);
+
+                              setPlanByWorkcell(
+                                await GetPlanByWorkcell(
+                                  token,
+                                  Number(e),
+                                  new Date().getFullYear(),
+                                  moment(dateStart).month() + 1
+                                )
+                              );
                             }}
                           >
                             <SelectTrigger className="w-full">
@@ -836,20 +915,27 @@ const Request: React.FC = () => {
                       </div>
                     </div>
                     <p className="text-gray-800 text-[13px] mb-1 flex items-center mt-2">
-                      <span className="text-[#F3424B] flex items-center gap-x-2">
-                        <Info size={13} /> ท่านขอ OT เกินแผนที่วางไว้ (ชั่วโมง)
-                        :{" "}
-                      </span>
+                      {actualFactory +  ((usersData?.filter((x) => x.CHECKED)?.length) * duration.asHours()) > planByFactory[0]?.SUM_HOURS ? <span className="text-[#F3424B] flex items-center gap-x-2">
+                        <Info size={13} /> ท่านขอ OT เกินแผน / Factory (ชั่วโมง)
+                        :
+                      </span> : '' }
+
+                      {actualFactory +  ((usersData?.filter((x) => x.CHECKED)?.length) * duration.asHours()) > planByWorkcell[0]?.SUM_HOURS ? <span className="text-[#F3424B] flex items-center gap-x-2">
+                        <Info size={13} /> ท่านขอ OT เกินแผน / Workcell (ชั่วโมง)
+                        :
+                      </span> : '' }
                     </p>
-                  
+
                     <p className="my-2 text-[13px] text-gray-800 mt-[.5rem]">
-                      รวมเวลาทั้งหมด : 
+                      รวมเวลาทั้งหมด (ชั่วโมง) :
                     </p>
                     <div className="grid grid-cols-12 mb-[1rem]">
                       <div className="col-span-4">
                         <div className="flex items-center gap-x-2">
                           <div className="border-2 boder-[#038509] p-2 rounded-[5px] flex items-center w-full">
-                            <p className="text-[14px] text-gray-800 font-medium">2,000</p>
+                            <p className="text-[14px] text-gray-800 font-medium">
+                             {((usersData?.filter((x) => x.CHECKED)?.length) * duration.asHours())?.toLocaleString()}
+                            </p>
                           </div>
                         </div>
                       </div>

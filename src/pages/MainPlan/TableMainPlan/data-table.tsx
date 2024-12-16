@@ -35,7 +35,7 @@ import { ChevronLeft, ChevronRight, CirclePlus, FileDown, Search } from "lucide-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  setShowDialogAdd:React.Dispatch<React.SetStateAction<boolean>>
+  setShowDialogAdd:React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function DataTableMainPlan<TData, TValue>({
@@ -138,7 +138,7 @@ export function DataTableMainPlan<TData, TValue>({
                     {headerGroup.headers.map((header) => (
                       <TableHead
                         key={header.id}
-                        className="h-10 overflow-clip relative text-gray-800 text-center text-white"
+                        className="h-10 overflow-clip relative text-center text-white"
                       >
                         {header.isPlaceholder
                           ? null
