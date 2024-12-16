@@ -10,99 +10,47 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Formik } from "formik";
 
-import { Check, CheckCircle, ChevronsUpDown, Info } from "lucide-react";
+import {CheckCircle, Info } from "lucide-react";
 import { allMonth } from "../MyRequest/data";
-import { MainPlan, UserGroup, WorkcellAll } from "./MainPlan";
-import { GetMenuyear, UpdateMainPlan } from "@/function/main";
+import { UserGroup } from "./PlanOB";
+import { GetMenuyear, InsertPlanOB } from "@/function/main";
 import { useOTManagementSystemStore } from "../../../store";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
-import { Popover } from "@/components/ui/popover";
-import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
+import { Factory } from "./PlanOB";
 
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-
-interface DialogUpdatePlan {
+interface DialogAddPlan {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  fetchData: (load:boolean) => Promise<void>;
-  workcell: WorkcellAll[];
+  fetchData: (load: boolean) => Promise<void>;
+  factory: Factory[];
   userGroup: UserGroup[];
-  oldPlan: MainPlan | undefined;
 }
 
-interface InitialData {
-  month: number;
-  year: number;
-  hours: number;
-  workcell: number;
-  ugroup: number;
-}
-
-const DialogUpdatePlan: React.FC<DialogUpdatePlan> = ({
+const DialogAddPlan: React.FC<DialogAddPlan> = ({
   isOpen,
   setIsOpen,
   fetchData,
-  workcell,
+  factory,
   userGroup,
-  oldPlan,
 }) => {
   const yearMenu = GetMenuyear();
   const token = useOTManagementSystemStore((state) => state.token);
   const code = useOTManagementSystemStore((state) => state.info?.EmployeeCode);
-  const [open, setOpen] = useState(false);
-
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const filteredWorkcells = workcell.filter((work) =>
-    work.NAME_WORKCELL.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const [initialData, setInitialData] = useState<InitialData>({
-    month: new Date().getMonth() + 1,
-    year: new Date().getFullYear(),
-    hours: 200,
-    workcell: 1,
-    ugroup: 1,
-  });
-
-
-  useEffect(() => {
-    if (oldPlan !== undefined) {
-      
-      setTimeout(() => {
-     
-        setInitialData({
-          workcell: oldPlan.ID_WORK_CELL,
-          month: oldPlan.MONTH,
-          hours: oldPlan.HOURS,
-          year: oldPlan.YEAR,
-          ugroup:oldPlan.ID_UGROUP,
-        });
-      },400)
-    }
-  }, [oldPlan]);
+ 
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="w-[90%] lg:w-[50%] max-w-none h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-[14.5px] text-gray-700 font-medium">
-            Update Main Plan | แก้ไขแผนการทำโอที
+            Add Main Plan (OB) | เพิ่มแผนการทำโอที (OB)
           </DialogTitle>
           <DialogDescription className="text-[13px] flex items-center gap-x-2">
             <Info size={15} color={"red"} /> กรุณาตรวจสอบข้อมูลก่อนบันทึกข้อมูล
@@ -111,22 +59,27 @@ const DialogUpdatePlan: React.FC<DialogUpdatePlan> = ({
         <div className="h-[80vh] overflow-auto">
           <div>
             <Formik
-              enableReinitialize
-              initialValues={{...initialData}}
+              initialValues={{
+                month: new Date().getMonth() + 1,
+                year: new Date().getFullYear(),
+                hours: 200,
+                factory: 1,
+                ugroup: 1,
+              }}
               onSubmit={async (values, { setSubmitting, resetForm }) => {
                 const payload = {
-                  workcell: Number(values.workcell),
+                  factory: Number(values.factory),
                   month: Number(values.month),
                   year: Number(values.year),
                   hours: Number(values.hours),
                   action: code,
-                  userGroup:Number(values.ugroup)
+                  userGroup: Number(values.ugroup),
                 };
                 setTimeout(async () => {
-                  const response = await UpdateMainPlan(token, payload,Number(oldPlan?.ID_PLAN))
-           
+                  const response = await InsertPlanOB(token, payload);
+                  console.log("response", response);
                   if (!response.err) {
-                    toast.success("แก้ไขข้อมูลสำเร็จ !");
+                    toast.success("บันทึกข้อมูลสำเร็จ !");
 
                     setTimeout(() => {
                       resetForm();
@@ -156,82 +109,26 @@ const DialogUpdatePlan: React.FC<DialogUpdatePlan> = ({
                       <div className="flex flex-col justify-center">
                         <div>
                           <label htmlFor="month" className="text-[13px]">
-                            <span className="text-[red]">*</span> Workcell
+                            <span className="text-[red]">*</span> Factory
                           </label>
                         </div>
-
-                        <Popover open={open} onOpenChange={setOpen}>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              aria-expanded={open}
-                              className="justify-between"
-                            >
-                              {values.workcell
-                                ? workcell.find(
-                                    (work) =>
-                                      work.ID_WORK_CELL?.toString() === values.workcell?.toString()
-                                  )?.NAME_WORKCELL
-                                : "Select Workcell..."}
-                              <ChevronsUpDown className="opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="p-0 z-[20] h-[200px] overflow-auto">
-                            <Command className="border-[1.2px]">
-                              <CommandInput
-                                placeholder="Search Workcell..."
-                                className="h-9"
-                                onValueChange={(inputValue) =>
-                                  setSearchTerm(inputValue)
-                                }
-                                
-                              />
-                              <CommandList >
-                                {filteredWorkcells.length === 0 ? (
-                                  <CommandEmpty>
-                                    No framework found.
-                                  </CommandEmpty>
-                                ) : (
-                                  <CommandGroup>
-                                    {filteredWorkcells?.map((work) => (
-                                      <CommandItem
-                                       
-                                        className="text-[13px]"
-                                        defaultValue={values?.workcell}
-                                        onSelect={() => {
-                                         
-                                          setFieldValue(
-                                            "workcell",
-                                            work.ID_WORK_CELL
-                                          );
-
-                                          setOpen(false);
-                                        }}
-                                      >
-                                        {work.NAME_WORKCELL} - (
-                                        {work.FACTORY_NAME})
-
-                                        <Check
-                                          className={cn(
-                                            "ml-auto",
-                                            Number(values.workcell) ==
-                                              Number(work.ID_WORK_CELL)
-                                              ? "opacity-100"
-                                              : "opacity-0"
-                                          )}
-                                        />
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                )}
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
+                        <Select value={values.factory?.toString()} onValueChange={(e) => setFieldValue("factory",Number(e))}> 
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Factory" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {factory?.map((item, index) => (
+                                <SelectItem value={item.ID_FACTORY?.toString()} key={index}>
+                                  {item.FACTORY_NAME}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
                       </div>
                       <p className="text-[red] text-[12px]">
-                        {errors.workcell && touched.workcell && errors.workcell}
+                        {errors.factory && touched.factory && errors.factory}
                       </p>
                     </div>
 
@@ -359,7 +256,7 @@ const DialogUpdatePlan: React.FC<DialogUpdatePlan> = ({
                     size={"sm"}
                     className="bg-[#107EDB] text-white hover:bg-[#1c77c2]"
                   >
-                    <CheckCircle /> Update Plan
+                    <CheckCircle /> Save Plan
                   </Button>
                 </form>
               )}
@@ -370,4 +267,4 @@ const DialogUpdatePlan: React.FC<DialogUpdatePlan> = ({
     </Dialog>
   );
 };
-export default DialogUpdatePlan;
+export default DialogAddPlan;

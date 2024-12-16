@@ -572,11 +572,63 @@ export const InsertMainPlan = async (
   }
 };
 
+interface PayloadPlanOB {
+  factory: number;
+  month: number;
+  year: number;
+  hours: number;
+  action:string ;
+  userGroup:number ;
+}
+
+export const InsertPlanOB = async (
+  token: string,
+  payload: PayloadPlanOB
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.post(`${VITE_BASE_URL}/ob/plan`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log(response.data);
+    return response.data;
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
 export const GetMainPlan = async (token: string) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
     const response = await axios.get(`${VITE_BASE_URL}/plan/main`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.data.err) {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const GetMainPlanOB = async (token: string) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/ob/plan`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -646,6 +698,29 @@ export const UpdateMainPlan = async (
 
   try {
     const response = await axios.put(`${VITE_BASE_URL}/plan/main/${id}`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log(response.data);
+    return response.data;
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const UpdatePlanOB = async (
+  token: string,
+  payload: PayloadPlanOB,
+  id:number
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.put(`${VITE_BASE_URL}/ob/plan/${id}`, payload, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

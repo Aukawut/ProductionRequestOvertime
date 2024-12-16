@@ -63,7 +63,7 @@ const DialogAddPlan: React.FC<DialogAddPlan> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="w-[90%] lg:w-[50%] max-w-none h-[80vh] overflow-hidden flex flex-col">
+      <DialogContent className="w-[90%] lg:w-[50%] max-w-none h-[80vh] overflow-hidden flex flex-col" >
         <DialogHeader>
           <DialogTitle className="text-[14.5px] text-gray-700 font-medium">
             Add Main Plan | เพิ่มแผนการทำโอที

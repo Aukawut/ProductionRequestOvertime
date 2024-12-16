@@ -10,6 +10,7 @@ import ApproverManagement from "./pages/ApproverManagement/ApproverManagement";
 import Approve from "./pages/Approve/Approve";
 import MainPlan from "./pages/MainPlan/MainPlan";
 import OvertimeActual from "./pages/OvertimeActual/OvertimeActual";
+import PlanOB from "./pages/PlanOB/PlanOB";
 
 const router = createBrowserRouter(
   [
@@ -23,6 +24,7 @@ const router = createBrowserRouter(
         { path: "/approve", element: <Approve /> },
         { path: "/setting/approver", element: <ApproverManagement /> },
         { path: "/main/plan", element: <MainPlan /> },
+        { path: "/plan/ob", element: <PlanOB /> },
         { path: "/overtime/actual", element: <OvertimeActual /> },
       ],
     },

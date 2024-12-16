@@ -51,6 +51,10 @@ export const data = {
           url: "/main/plan",
         },
         {
+          title: "Overtime Plan (OB)",
+          url: "/plan/ob",
+        },
+        {
           title: "Approvers",
           url: "/setting/approver",
         },
