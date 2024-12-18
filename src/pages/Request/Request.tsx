@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Formik, Form, FormikHelpers } from "formik";
 import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
-import { Check, Clock8, Info, UserCheck } from "lucide-react";
+import { Check, CheckCircle, Clock8, Info, UserCheck } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -55,7 +55,8 @@ import { useNavigate } from "react-router-dom";
 import { DataTable } from "./data-table";
 import { columns, Users } from "./columns";
 import axios from "axios";
-import toast, { Toaster } from "react-hot-toast";
+import { toast, Toaster } from "sonner";
+
 import moment from "moment";
 import { TimePicker } from "./time-picker";
 import DialogUserSelected from "./dialog-user-selected";
@@ -151,8 +152,8 @@ const Request: React.FC = () => {
   const [descGroup, setDescGroup] = useState("");
   const [planByFactory, setPlanByFactory] = useState<PlanByFactory[]>([]);
   const [planByWorkcell, setPlanByWorkcell] = useState<PlanByWorkcell[]>([]);
-  const [actualWorkcell,setActualWorkcell] = useState(0);
-  const [actualFactory,setActualFactory] = useState(0);
+  const [actualWorkcell, setActualWorkcell] = useState(0);
+  const [actualFactory, setActualFactory] = useState(0);
 
   const employeeCode = useOTManagementSystemStore(
     (state) => state.info.EmployeeCode
@@ -298,15 +299,15 @@ const Request: React.FC = () => {
         );
 
         setInitialData((prev) => {
-          prev.factory = role[0]?.ID_FACTORY
-          return prev
-        })
-        
+          prev.factory = role[0]?.ID_FACTORY;
+          return prev;
+        });
+
         const groupWork = await GetWorkcellGroup(token);
 
         if (work?.length > 0) {
           setAllWorkcell(work);
-          
+
           setInitialData((prev) => {
             prev.workcell = Number(work[0]?.ID_WORK_CELL);
             return prev;
@@ -357,16 +358,13 @@ const Request: React.FC = () => {
     <div className="p-4">
       {/* Toast Alert */}
       <Toaster
-        position="bottom-center"
-        reverseOrder={false}
-        gutter={8}
+        position="top-center"
+        richColors
         toastOptions={{
-          duration: 3000,
+          duration: 1500,
           style: {
             paddingRight: 20,
             paddingLeft: 20,
-            paddingTop: 30,
-            paddingBottom: 30,
           },
         }}
       />
@@ -450,10 +448,22 @@ const Request: React.FC = () => {
                           resetForm();
 
                           toast.success(
-                            <div className="flex flex-start">
-                              <p className="text-[13px]">ส่งคำขอสำเร็จ !</p>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle
+                                className="text-green-500"
+                                size={20}
+                              />
+                              <div>
+                                <p className="text-[14px] text-gray-800">
+                                  Success !
+                                </p>
+                                <p className="text-[12px] text-gray-600">
+                                  ส่งคำขอสำเร็จ !
+                                </p>
+                              </div>
                             </div>
                           );
+                        
                         } else {
                           setSubmitting(false);
                           setIsSubmit(false);
@@ -527,12 +537,9 @@ const Request: React.FC = () => {
                                   mode="single"
                                   selected={dateRequestStart}
                                   disabled={(date) => {
-                                
-                                 
                                     return (
                                       moment(date).utc().toDate() <
                                       moment(new Date()).utc().toDate()
-
                                     );
                                   }}
                                   onSelect={(date) => {
@@ -555,7 +562,7 @@ const Request: React.FC = () => {
                             />
                           </div>
                         </div>
-                      </div>
+                      </div>  
 
                       <div className="mb-3 col-span-12 lg:col-span-12">
                         <div className="flex flex-col">
@@ -588,13 +595,16 @@ const Request: React.FC = () => {
                                   mode="single"
                                   selected={dateRequestEnd}
                                   disabled={(date) => {
-                                    const duration = moment.duration(moment(date).diff(dateRequestStart));
-                                  
+                                    const duration = moment.duration(
+                                      moment(date).diff(dateRequestStart)
+                                    );
 
                                     return (
-                                     ( moment(date).utc().toDate() < moment(new Date()).utc().toDate() ||
-                                      moment(date).toDate() <  moment(dateRequestStart).toDate()) 
-                                      || duration.asDays() > 1
+                                      moment(date).utc().toDate() <
+                                        moment(new Date()).utc().toDate() ||
+                                      moment(date).toDate() <
+                                        moment(dateRequestStart).toDate() ||
+                                      duration.asDays() > 1
                                     );
                                   }}
                                   onSelect={(date) => {
@@ -690,7 +700,7 @@ const Request: React.FC = () => {
                           </Select>
                         </div>
                       </div>
-                      <div className="mb-2 col-span-12 lg:col-span-6 hidden">
+                      <div className="mb-2 col-span-12 lg:col-span-6">
                         <label
                           htmlFor="Department"
                           className="text-[13px] text-gray-700"
@@ -699,11 +709,70 @@ const Request: React.FC = () => {
                           Department
                         </label>
                         <Select
-                          disabled
                           value={values.group?.toString()}
-                          onValueChange={(e) => {
+                          onValueChange={async (e) => {
                             setGroup(e);
                             setFieldValue("group", e);
+                            const fac: Factory[] = await GetAllFactoryByGroup(
+                              token,
+                              Number(e)
+                            );
+                            if (fac?.length > 0) {
+                              setAllFactory(fac);
+
+                              setIsLoadWorkcell(true);
+                              getUserDataByFactory(Number(fac[0]?.ID_FACTORY));
+                              setFactory(Number(fac[0]?.ID_FACTORY));
+
+                              setTimeout(() => {
+                                setFieldValue("factory", fac[0]?.ID_FACTORY);
+                              }, 300);
+
+                              // Promise Repert Array Workcell
+                              const responseWorkcell =
+                                await GetWorkcellByFactory(
+                                  token,
+                                  Number(fac[0]?.ID_FACTORY)
+                                );
+                                let year = moment(dateRequestStart).year()
+                                let month =  moment(dateRequestStart)?.month() + 1
+
+                          
+                              setPlanByFactory(
+                                await GetPlanByFactory(
+                                  token,
+                                  Number(fac[0]?.ID_FACTORY),
+                                  year,
+                                  month
+                                )
+                              );
+                              if (responseWorkcell?.length > 0) {
+                                setAllWorkcell(responseWorkcell); // Set Workcell list
+                                setIsLoadWorkcell(false);
+                                setFieldValue(
+                                  "workcell",
+                                  responseWorkcell[0]?.ID_WORK_CELL
+                                );
+
+                                let year = moment(dateRequestStart).year()
+                                let month =  moment(dateRequestStart)?.month() + 1
+
+                                setPlanByWorkcell(
+                                  await GetPlanByWorkcell(
+                                    token,
+                                    Number(responseWorkcell[0]?.ID_WORK_CELL),
+                                    year,
+                                    month
+                                  )
+                                );
+                              } else {
+                                setAllWorkcell([]);
+                                setIsLoadWorkcell(false);
+                                setPlanByWorkcell([]);
+                              }
+                            } else {
+                              setAllFactory([]);
+                            }
                           }}
                         >
                           <SelectTrigger className="w-full">
@@ -712,7 +781,7 @@ const Request: React.FC = () => {
                               className="text-[13px]"
                             />
                           </SelectTrigger>
-                          <SelectContent className="h-[240px]">
+                          <SelectContent className="h-[150px]">
                             {allGroupDept?.map((item, index) => {
                               return (
                                 <SelectItem
@@ -763,7 +832,7 @@ const Request: React.FC = () => {
                         >
                           <SelectTrigger className="w-full">
                             <SelectValue
-                              placeholder="Group Department"
+                              placeholder="Group Workcell"
                               className="text-[13px]"
                             />
                           </SelectTrigger>
@@ -793,7 +862,6 @@ const Request: React.FC = () => {
                         <Select
                           value={values.factory?.toString()}
                           onValueChange={async (e) => {
-
                             setIsLoadWorkcell(true);
                             getUserDataByFactory(Number(e));
                             setFactory(Number(e));
@@ -803,15 +871,16 @@ const Request: React.FC = () => {
                               token,
                               Number(e)
                             );
-
+                            let year = moment(dateRequestStart).year()
+                            let month =  moment(dateRequestStart)?.month() + 1
                             setPlanByFactory(
                               await GetPlanByFactory(
                                 token,
                                 Number(e),
-                                new Date().getFullYear(),
-                                moment(dateRequestStart)?.month() + 1
+                                year,
+                                month
                               )
-                            );  
+                            );
                             if (responseWorkcell?.length > 0) {
                               setAllWorkcell(responseWorkcell); // Set Workcell list
                               setIsLoadWorkcell(false);
@@ -819,22 +888,21 @@ const Request: React.FC = () => {
                                 "workcell",
                                 responseWorkcell[0]?.ID_WORK_CELL
                               );
-
+                              let year = moment(dateRequestStart).year()
+                              let month =  moment(dateRequestStart)?.month() + 1
                               setPlanByWorkcell(
                                 await GetPlanByWorkcell(
                                   token,
                                   Number(responseWorkcell[0]?.ID_WORK_CELL),
-                                  new Date().getFullYear(),
-                                  moment(dateStart).month() + 1
+                                  year,
+                                  month
                                 )
                               );
                             } else {
                               setAllWorkcell([]);
                               setIsLoadWorkcell(false);
-                              setPlanByWorkcell([])
+                              setPlanByWorkcell([]);
                             }
-
-                          
                           }}
                         >
                           <SelectTrigger className="w-full">
@@ -911,15 +979,29 @@ const Request: React.FC = () => {
                       </div>
                     </div>
                     <p className="text-gray-800 text-[13px] mb-1 flex items-center mt-2">
-                      {actualFactory +  ((usersData?.filter((x) => x.CHECKED)?.length) * duration.asHours()) > planByFactory[0]?.SUM_HOURS ? <span className="text-[#F3424B] flex items-center gap-x-2">
-                        <Info size={13} /> ท่านขอ OT เกินแผน / Factory (ชั่วโมง)
-                        :
-                      </span> : '' }
+                      {actualFactory +
+                        usersData?.filter((x) => x.CHECKED)?.length *
+                          duration.asHours() >
+                      planByFactory[0]?.SUM_HOURS ? (
+                        <span className="text-[#F3424B] flex items-center gap-x-2">
+                          <Info size={13} /> ท่านขอ OT เกินแผน / Factory
+                          (ชั่วโมง) :
+                        </span>
+                      ) : (
+                        ""
+                      )}
 
-                      {actualFactory +  ((usersData?.filter((x) => x.CHECKED)?.length) * duration.asHours()) > planByWorkcell[0]?.SUM_HOURS ? <span className="text-[#F3424B] flex items-center gap-x-2">
-                        <Info size={13} /> ท่านขอ OT เกินแผน / Workcell (ชั่วโมง)
-                        :
-                      </span> : '' }
+                      {actualFactory +
+                        usersData?.filter((x) => x.CHECKED)?.length *
+                          duration.asHours() >
+                      planByWorkcell[0]?.SUM_HOURS ? (
+                        <span className="text-[#F3424B] flex items-center gap-x-2">
+                          <Info size={13} /> ท่านขอ OT เกินแผน / Workcell
+                          (ชั่วโมง) :
+                        </span>
+                      ) : (
+                        ""
+                      )}
                     </p>
 
                     <p className="my-2 text-[13px] text-gray-800 mt-[.5rem]">
@@ -930,7 +1012,10 @@ const Request: React.FC = () => {
                         <div className="flex items-center gap-x-2">
                           <div className="border-2 boder-[#038509] p-2 rounded-[5px] flex items-center w-full">
                             <p className="text-[14px] text-gray-800 font-medium">
-                             {((usersData?.filter((x) => x.CHECKED)?.length) * duration.asHours())?.toLocaleString()}
+                              {(
+                                usersData?.filter((x) => x.CHECKED)?.length *
+                                duration.asHours()
+                              )?.toLocaleString()}
                             </p>
                           </div>
                         </div>
