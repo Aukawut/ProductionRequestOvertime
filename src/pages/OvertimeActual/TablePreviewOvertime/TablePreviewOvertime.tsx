@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { columns } from "./columns";
-import { DataTable } from "./data-approve-table";
+import { DataTable } from "./data-preview-table";
 import { useOTManagementSystemStore } from "../../../../store";
 import { CsvData } from "../OvertimeActual";
 

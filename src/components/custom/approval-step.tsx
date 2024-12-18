@@ -33,7 +33,7 @@ const StepApproval: React.FC<StepApprovalProps> = ({
     setLoad(true);
     const approver = await GetApproverByGroupId(token, groupId, factory);
     if (overtimeType == 1) {
-      setApprover(approver?.slice(0, 1));
+      setApprover(approver?.slice(-1));
     } else {
       setApprover(approver);
     }

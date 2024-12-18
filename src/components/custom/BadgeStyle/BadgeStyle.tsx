@@ -15,7 +15,7 @@ const BadgeStyle: React.FC<BadgeStyleProps> = ({
 }) => {
   return variant == "success" ? (
     <div
-      className="text-[12px] bg-[#ECFDF5] text-[#19B27B] rounded-[12px] flex items-center justify-center"
+      className="text-[12px] bg-[#ECFDF5] text-[#19B27B] rounded-[8px] flex items-center justify-center"
       style={{ width: width, height: height }}
     >
       {text}

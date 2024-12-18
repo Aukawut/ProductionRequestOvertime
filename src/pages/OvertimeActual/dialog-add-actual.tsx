@@ -16,7 +16,7 @@ import TablePreviewOvertime from "./TablePreviewOvertime/TablePreviewOvertime";
 import BarChartActual from "./BarChartActual/BarChartActual";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import Swal from "sweetalert2";
+
 
 interface DialogAddOvertimeProps {
   isOpen: boolean;
@@ -42,7 +42,7 @@ const DialogAddOvertime: React.FC<DialogAddOvertimeProps> = ({
 }) => {
   const [csvData, setCsvData] = useState<CsvData[]>([]);
   const [dataFile, setDataFile] = useState<File>();
-  const [showBar, setShowBar] = useState(false);
+
   const [isSubmit, setIsSubmit] = useState(false);
   const baseURL = import.meta.env.VITE_BASE_URL;
 
@@ -204,6 +204,8 @@ const DialogAddOvertime: React.FC<DialogAddOvertimeProps> = ({
 
     if (!response.data.err && response.data.status == "Ok") {
       toast.success("บันทึกข้อมูลสำเร็จ");
+      setIsSubmit(false)
+      setCsvData([])
       setIsOpen(false)
     } else {
       toast.error(response.data.msg);

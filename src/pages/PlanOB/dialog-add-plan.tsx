@@ -62,7 +62,7 @@ const DialogAddPlan: React.FC<DialogAddPlan> = ({
               initialValues={{
                 month: new Date().getMonth() + 1,
                 year: new Date().getFullYear(),
-                hours: 200,
+                hours: 1000,
                 factory: 1,
                 ugroup: 1,
               }}

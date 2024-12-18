@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import TableApprove from "./TableApprove/TableApprove";
 import CardRequest from "@/components/custom/card-myrequest";
-import { Check, CircleX, Clock8, Pin, Undo2 } from "lucide-react";
-
+import { Check, CheckCheckIcon, CircleX, Clock8, Undo2 } from "lucide-react";
 
 import {
+  GetCommentApproverByRequestNo,
   GetCountApproveByCode,
   GetDetailCountApproveByCode,
+  GetPlanByWorkcell,
   GetRequestDetailByRequest,
   GetUserByRequestAndRev,
   findCountApproverStatus,
@@ -16,6 +17,7 @@ import DialogDetailRequest from "./dialog-detail-request";
 import { toast, Toaster } from "sonner";
 import { motion } from "framer-motion";
 import LoadingCircle from "@/components/custom/loading-circle";
+import moment from "moment";
 
 export const data = [
   {
@@ -95,6 +97,10 @@ export interface SummaryRequestLastRev {
   SUM_MINUTE: number;
   START_DATE: string;
   END_DATE: string;
+  ID_FACTORY: number;
+  SUM_PLAN: number;
+  SUM_PLAN_OB: number;
+  ID_WORK_CELL: number;
 }
 
 export interface UserDetail {
@@ -103,12 +109,33 @@ export interface UserDetail {
   UHR_Position: string;
 }
 
+export interface CommentApprover {
+  REQUEST_NO: string;
+  ID_STATUS_APV: number;
+  CODE_APPROVER: string;
+  CREATED_AT: string;
+  UPDATED_AT: string;
+  NAME_STATUS: string;
+  REMARK: string;
+  DEPARTMENT: string;
+  POSITION: string;
+  FULLNAME: string;
+}
+
+export interface PlanWorkcell {
+  ID_FACTORY: number;
+  MONTH: number;
+  SUM_HOURS: number;
+  YEAR: number;
+}
+
 const Approve: React.FC = () => {
   const [countApprove, setCountApprove] = useState<CountApprove[]>([]);
   const [detailApprove, setDetailApprove] = useState<DetailApprove[]>([]);
   const [requestDetail, setRequestDetail] = useState<SummaryRequestLastRev[]>(
     []
   );
+  const [commentApprover, setCommentApprover] = useState<CommentApprover[]>([]);
   const [users, setUsers] = useState<UserDetail[]>([]);
 
   const [status, setStatus] = useState(1);
@@ -117,6 +144,7 @@ const Approve: React.FC = () => {
   const [requestNo, setRequestNo] = useState("");
   const info = useOTManagementSystemStore((state) => state.info);
   const token = useOTManagementSystemStore((state) => state.token);
+  const [planWorkcell, setPlanWorkcell] = useState<PlanWorkcell[]>([]);
 
   const CloseDialogDetail = () => setShowDetail(false);
 
@@ -144,12 +172,31 @@ const Approve: React.FC = () => {
     await Promise.all([
       GetRequestDetailByRequest(tokenStr, requestNo),
       GetUserByRequestAndRev(tokenStr, requestNo, rev),
-    ]).then((res) => {
+      GetCommentApproverByRequestNo(tokenStr, requestNo, rev),
+    ]).then(async (res) => {
       if (res?.length > 0) {
         if (res[0]?.length > 0 && res[1]?.length) {
           setRequestDetail(res[0]);
           setUsers(res[1]);
           setShowDetail(true);
+
+          const month = moment(res[0][0]?.START_DATE).month() + 1;
+          const year = moment(res[0][0]?.START_DATE).year();
+          const work = res[0][0]?.ID_WORK_CELL;
+
+          const planWorkcell = await GetPlanByWorkcell(
+            token,
+            work,
+            year,
+            month
+          );
+
+          setPlanWorkcell(planWorkcell);
+        }
+        if (res[2]?.length > 0) {
+          setCommentApprover(res[2]);
+        } else {
+          setCommentApprover([]);
         }
       } else {
         toast.error("--- ไม่พบข้อมูล ---");
@@ -159,7 +206,7 @@ const Approve: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-    setStatus(1)
+    setStatus(1);
   }, []);
 
   return loading ? (
@@ -208,12 +255,14 @@ const Approve: React.FC = () => {
           requestNo={requestNo}
           requestDetail={requestDetail}
           users={users}
+          commentApprover={commentApprover}
+          planWorkcell={planWorkcell}
         />
 
         <div className="p-2 bg-white rounded-[13px] shadow-smooth mt-1">
           <div className="flex flex-col justify-start p-2 mt-2">
             <p className="text-[14px] flex items-center gap-x-2">
-              <Pin size={13} color="red" /> Approve Requests (Pending)
+              <CheckCheckIcon size={13} color="red" /> Approve Requests (Pending)
             </p>
             <p className="text-[13px] text-gray-600">คำขอรอการอนุมัติจากท่าน</p>
           </div>
@@ -222,12 +271,10 @@ const Approve: React.FC = () => {
             data={detailApprove}
             FetchDetailRequest={FetchDetailRequest}
             setRequestNo={setRequestNo}
+            GetPlanByWorkcell={GetPlanByWorkcell}
           />
-          
         </div>
-        <div className="flex">
-
-        </div>
+        <div className="flex"></div>
       </motion.div>
     </div>
   );

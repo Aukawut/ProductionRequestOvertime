@@ -15,7 +15,7 @@ export interface PlanOB {
 import React, { useEffect, useState } from "react";
 import { DataTablePlanOB } from "./TableMainPlan/data-table";
 import {
-  DeletePlan,
+  DeletePlanOB,
   GetAllFactory,
   GetMainPlanOB,
   GetUserGroup,
@@ -28,6 +28,7 @@ import { Toaster } from "sonner";
 import DialogUpdatePlan from "./dialog-update-plan";
 import LoadingCircle from "@/components/custom/loading-circle";
 import { motion } from "framer-motion";
+import { BookCheck } from "lucide-react";
 
 export interface Factory {
   ID_FACTORY: number;
@@ -105,6 +106,12 @@ const PlanOB: React.FC = () => {
 
   return (
     <>
+     <div className="flex items-center gap-x-2">
+        <BookCheck size={18} />
+        <p className="text-[15px] text-gray-800 my-1">
+          Add Overtime Plan (OB) per Factory
+        </p>
+      </div>
       <Toaster
         position="top-center"
         richColors
@@ -148,13 +155,13 @@ const PlanOB: React.FC = () => {
 
           {/* Table Plan */}
           <DataTablePlanOB
-            columns={columns(FindOldPlan, DeletePlan, token, fetchData)}
+            columns={columns(FindOldPlan, DeletePlanOB, token, fetchData)}
             data={plan}
             setShowDialogAdd={setShowDialogAdd}
           />
         </motion.div>
       )}
-      ;
+      
     </>
   );
 };

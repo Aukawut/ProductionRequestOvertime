@@ -10,63 +10,45 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Formik } from "formik";
 
-import { Check, CheckCircle, ChevronsUpDown, Info } from "lucide-react";
+import {CheckCircle, Info } from "lucide-react";
 import { allMonth } from "../MyRequest/data";
-import {  UserGroup, WorkcellAll } from "./MainPlan";
-import { GetMenuyear, InsertMainPlan } from "@/function/main";
+
+import { GetMenuyear, InsertPlanOB } from "@/function/main";
 import { useOTManagementSystemStore } from "../../../store";
 import { toast } from "sonner";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import { Popover } from "@/components/ui/popover";
-import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
-
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
+import { Factory } from "./ApproverManagement";
 
 interface DialogAddPlan {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  fetchData: (load:boolean) => Promise<void>;
-  workcell: WorkcellAll[];
-  userGroup: UserGroup[];
+  fetchData: (load: boolean) => Promise<void>;
+  factory: Factory[];
 }
 
-const DialogAddPlan: React.FC<DialogAddPlan> = ({
+const DialogAddApprover: React.FC<DialogAddPlan> = ({
   isOpen,
   setIsOpen,
   fetchData,
-  workcell,
-  userGroup,
+  factory,
 }) => {
   const yearMenu = GetMenuyear();
   const token = useOTManagementSystemStore((state) => state.token);
   const code = useOTManagementSystemStore((state) => state.info?.EmployeeCode);
-  const [open, setOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const filteredWorkcells = workcell.filter((work) =>
-    work.NAME_WORKCELL.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+ 
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="w-[90%] lg:w-[50%] max-w-none h-[80vh] overflow-hidden flex flex-col" >
+      <DialogContent className="w-[90%] lg:w-[50%] max-w-none h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-[14.5px] text-gray-700 font-medium">
-            Add Main Plan | เพิ่มแผนการทำโอที
+            Add Main Plan (OB) | เพิ่มแผนการทำโอที (OB)
           </DialogTitle>
           <DialogDescription className="text-[13px] flex items-center gap-x-2">
             <Info size={15} color={"red"} /> กรุณาตรวจสอบข้อมูลก่อนบันทึกข้อมูล
@@ -78,22 +60,21 @@ const DialogAddPlan: React.FC<DialogAddPlan> = ({
               initialValues={{
                 month: new Date().getMonth() + 1,
                 year: new Date().getFullYear(),
-                hours: 1000,
-                workcell: 1,
+                hours: 200,
+                factory: 1,
                 ugroup: 1,
               }}
               onSubmit={async (values, { setSubmitting, resetForm }) => {
-
                 const payload = {
-                  workcell: Number(values.workcell),
+                  factory: Number(values.factory),
                   month: Number(values.month),
                   year: Number(values.year),
                   hours: Number(values.hours),
                   action: code,
-                  userGroup:Number(values.ugroup)
+                  userGroup: Number(values.ugroup),
                 };
                 setTimeout(async () => {
-                  const response = await InsertMainPlan(token, payload);
+                  const response = await InsertPlanOB(token, payload);
                   console.log("response", response);
                   if (!response.err) {
                     toast.success("บันทึกข้อมูลสำเร็จ !");
@@ -102,8 +83,7 @@ const DialogAddPlan: React.FC<DialogAddPlan> = ({
                       resetForm();
                       setIsOpen(false);
                       fetchData(false);
-                    },500)
-                 
+                    }, 500);
                   } else {
                     toast.error(response.msg);
                   }
@@ -127,112 +107,29 @@ const DialogAddPlan: React.FC<DialogAddPlan> = ({
                       <div className="flex flex-col justify-center">
                         <div>
                           <label htmlFor="month" className="text-[13px]">
-                            <span className="text-[red]">*</span> Workcell
+                            <span className="text-[red]">*</span> Factory
                           </label>
                         </div>
-             
-                        <Popover open={open} onOpenChange={setOpen} >
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              aria-expanded={open}
-                              className="justify-between"
-                            >
-                              {values.workcell
-                                ? workcell.find(
-                                    (work) =>
-                                      work.ID_WORK_CELL?.toString() === values.workcell?.toString()
-                                  )?.NAME_WORKCELL
-                                : "Select Workcell..."}
-                              <ChevronsUpDown className="opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="p-0 z-[20] h-[200px] overflow-auto">
-                            <Command className="border-[1.2px]">
-                              <CommandInput
-                                placeholder="Search Workcell..."
-                                className="h-9"
-                                onValueChange={(inputValue) =>
-                                  setSearchTerm(inputValue)
-                                }
-                              />
-                              <CommandList>
-                                {filteredWorkcells.length === 0 ? (
-                                  <CommandEmpty>
-                                    No framework found.
-                                  </CommandEmpty>
-                                ) : (
-                                  <CommandGroup>
-                                    {filteredWorkcells?.map((work) => (
-                                      <CommandItem
-                                        className="text-[13px]"
-                                        onSelect={() => {
-                                      
-                                          setFieldValue(
-                                            "workcell",
-                                            work.ID_WORK_CELL
-                                          );
-
-                                          setOpen(false);
-                                        }}
-                                      >
-                                        {work.NAME_WORKCELL} - (
-                                        {work.FACTORY_NAME})
-                                        <Check
-                                          className={cn(
-                                            "ml-auto",
-                                            Number(values.workcell) ==
-                                              Number(work.ID_WORK_CELL)
-                                              ? "opacity-100"
-                                              : "opacity-0"
-                                          )}
-                                        />
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                )}
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
+                        <Select value={values.factory?.toString()} onValueChange={(e) => setFieldValue("factory",Number(e))}> 
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Factory" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {factory?.map((item, index) => (
+                                <SelectItem value={item.ID_FACTORY?.toString()} key={index}>
+                                  {item.FACTORY_NAME}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
                       </div>
                       <p className="text-[red] text-[12px]">
-                        {errors.workcell && touched.workcell && errors.workcell}
+                        {errors.factory && touched.factory && errors.factory}
                       </p>
                     </div>
 
-                    <div className="mb-2 col-span-12 lg:col-span-6">
-                      <label htmlFor="month" className="text-[13px]">
-                        <span className="text-[red]">*</span> Group
-                      </label>
-                      <Select
-                        required
-                        name="ugroup"
-                        value={values.ugroup?.toString()}
-                        onValueChange={(value) => {
-                          setFieldValue("ugroup", value);
-                        }}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Group" />
-                        </SelectTrigger>
-                        <SelectContent className="max-h-[300px]">
-                          {userGroup?.map((item, index) => (
-                            <SelectItem
-                              className="text-[12px]"
-                              value={item.ID_UGROUP?.toString()}
-                              key={index}
-                            >
-                              {item.NAME_UGROUP}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <p className="text-[red] text-[12px]">
-                        {errors.ugroup && touched.ugroup && errors.ugroup}
-                      </p>
-                    </div>
                   </div>
                   <div className="grid grid-cols-12 gap-x-2">
                     <div className="mb-2 col-span-12 lg:col-span-4">
@@ -337,4 +234,4 @@ const DialogAddPlan: React.FC<DialogAddPlan> = ({
     </Dialog>
   );
 };
-export default DialogAddPlan;
+export default DialogAddApprover;

@@ -56,7 +56,7 @@ export const columns = (
           text={row.getValue("FACTORY_NAME")}
           variant="success"
           width={60}
-          height={30}
+          height={24}
         />
       </div>
     ),
@@ -77,7 +77,7 @@ export const columns = (
     header: () => {
       return "โอที";
     },
-    cell: ({ row }) => row.getValue("HOURS_AMOUNT"),
+    cell: ({ row }) => "OT"+row.getValue("HOURS_AMOUNT"),
   },
   {
     accessorKey: "SUM_MINUTE",
@@ -93,21 +93,16 @@ export const columns = (
   {
     accessorKey: "MINUTE_TOTAL",
     header: () => {
-      return (
-        <Button size={"sm"} variant="ghost">
-          ทั้งหมด (ชั่วโมง)
-        </Button>
-      );
+      return ("OT (Hrs.)");
     },
     cell: ({ row }) =>
       (Number(convertMinutesToHoursMinutes(row.getValue("SUM_MINUTE"))) / Number(row.getValue("COUNT_USER"))) * Number(row.getValue("COUNT_USER")),
   },
   {
     accessorKey: "REV",
-    enableSorting: false,
-    enableHiding: true,
-    cell: () => null,
-    header: () => null,
+
+    cell: ({row}) => row.getValue("REV"),
+    header: () => "Revise",
   },
   {
     accessorKey: "No",

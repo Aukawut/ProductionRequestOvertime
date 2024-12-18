@@ -491,7 +491,7 @@ export const GetRequestDetailByRequest = async (
 
   try {
     const response = await axios.get(
-      `${VITE_BASE_URL}/summary/request/lasted/${requestNo}`,
+    `${VITE_BASE_URL}/summary/request/lasted/${requestNo}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -499,7 +499,7 @@ export const GetRequestDetailByRequest = async (
       }
     );
 
-    console.log(response.data);
+    console.log("response.data",response.data);
     if (!response.data.err && response.data.status == "Ok") {
       return response.data?.results;
     } else {
@@ -522,6 +522,36 @@ export const GetUserByRequestAndRev = async (
   try {
     const response = await axios.get(
       `${VITE_BASE_URL}/requests/users/${requestNo}/${rev}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log(response.data);
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data?.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const GetCommentApproverByRequestNo = async (
+  token: string,
+  requestNo: string,
+  rev: number
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/comment/request/${requestNo}/${rev}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -661,6 +691,19 @@ export const GetMenuyear = () => {
 
   // สร้าง Menu Year ปัจจุบัน + 3 สำหรับ Select
   for (let i = currentYear; i < currentYear + 3; i++) {
+    menu.push(i);
+  }
+
+  return menu;
+};
+
+export const GetMenuyearOverview = () => {
+  let menu = [];
+
+  const currentYear = new Date().getFullYear() - 5;
+
+  
+  for (let i = currentYear; i < new Date().getFullYear() + 3; i++) {
     menu.push(i);
   }
 
@@ -854,6 +897,26 @@ export const DeletePlan: (token: string,id:number) => Promise<any> = async (toke
   }
 };
 
+export const DeletePlanOB: (token: string,id:number) => Promise<any> = async (token: string,id:number) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.delete(`${VITE_BASE_URL}/ob/plan/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return {err: false, msg : response.data.msg}
+    } else {
+      return {err: true, msg : response.data.msg};
+    }
+  } catch (err) {
+    return {err: true, msg : err};
+  }
+};
+
 export const ConvertDateFormat = (date:Date) => {
     return moment(date).format("YYYY-MM-DD HH:mm")
 }
@@ -863,7 +926,96 @@ export const GetActualOvertime: (token: string) => Promise<any> = async (token: 
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
-    const response = await axios.get(`${VITE_BASE_URL}/users/ugroup`, {
+    const response = await axios.get(`${VITE_BASE_URL}/actual/overtime`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const GetSummaryActualComparePlan: (token: string,year:number) => Promise<any> = async (token: string,year:number) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/actual/summary/compare/plan/${year}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const GetSummaryActualByFactory: (token: string,start:string,end:string,ugroup:number) => Promise<any> = async (token: string,start:string,end:string,ugroup:number) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/actual/summary/factory/plan/${start}/${end}/${ugroup}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const GetCountActualByUserGroup: (token: string,start:string,end:string,ugroup:number) => Promise<any> = async (token: string,start:string,end:string,ugroup:number) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/actual/count/${start}/${end}/${ugroup}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+
+export const GetSummaryActualByDate: (token: string,start:string,end:string,ugroup:number) => Promise<any> = async (token: string,start:string,end:string,ugroup:number) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/actual/summary/date/${start}/${end}/${ugroup}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-import TablePreviewOvertime from "./TablePreviewOvertime/TablePreviewOvertime";
 import { format } from "date-fns";
 import { Popover, PopoverTrigger } from "@radix-ui/react-popover";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,10 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import DialogAddOvertime from "./dialog-add-actual";
 import { Toaster } from "sonner";
+import TableOvertime from "./TablePreviewOvertime/TableOvertime";
+import { useOTManagementSystemStore } from "../../../store";
+import { GetActualOvertime } from "@/function/main";
+import LoadingCircle from "@/components/custom/loading-circle";
 
 export interface CsvData {
   date: string;
@@ -24,22 +27,53 @@ export interface CsvData {
   start: string;
 }
 
-interface AllActual {
-
+export interface AllActual {
+  Id: number;
+  EMPLOYEE_CODE: string;
+  SCAN_IN: string;
+  SCAN_OUT: string;
+  OT_DATE: string;
+  SHIFT: string;
+  OT1_HOURS: number;
+  OT15_HOURS: number;
+  OT2_HOURS: number;
+  OT3_HOURS: number;
+  TOTAL_HOURS: number;
+  UPDATED_AT: string;
+  CREATED_BY: string;
+  UPDATED_BY: string;
+  FACTORY_NAME: string;
+  NAME_UGROUP: string;
+  NAME_UTYPE: string;
 }
 
 const OvertimeActual: React.FC = () => {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [showAdd, setShowAdd] = useState(false);
-  const [allActual,setAllActual] = useState([])
-  
+  const [allActual, setAllActual] = useState<AllActual[]>([]);
+  const token = useOTManagementSystemStore((state) => state.token);
+  const [load, setLoad] = useState(false);
+
+  const fetchData = async () => {
+    setLoad(true);
+    await Promise.all([await GetActualOvertime(token)]).then((res) => {
+   
+      if (res[0]?.length > 0) {
+        setAllActual(res[0]);
+      } else {
+        setAllActual([]);
+      }
+      setLoad(false);
+    
+    });
+  };
+
   useEffect(() => {
-    setStartDate(new Date())
-    setEndDate(new Date())
-
-
-  },[])
+    setStartDate(new Date());
+    setEndDate(new Date());
+    fetchData();
+  }, []);
   return (
     <div>
       <div className="my-2 flex items-center gap-x-2">
@@ -78,13 +112,11 @@ const OvertimeActual: React.FC = () => {
                 "w-[200px] justify-start text-left font-normal",
                 !startDate && "text-muted-foreground"
               )}
-              
             >
               <CalendarIcon />
               <p className="text-[13px]">
-              {startDate ? format(startDate, "PPP") : "Pick a date"}
+                {startDate ? format(startDate, "PPP") : "Pick a date"}
               </p>
-             
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
@@ -93,7 +125,6 @@ const OvertimeActual: React.FC = () => {
               selected={startDate}
               onSelect={setStartDate}
               initialFocus
-            
             />
           </PopoverContent>
         </Popover>
@@ -109,9 +140,8 @@ const OvertimeActual: React.FC = () => {
             >
               <CalendarIcon />
               <p className="text-[13px]">
-              {endDate ? format(endDate, "PPP") : "Pick a date"}
+                {endDate ? format(endDate, "PPP") : "Pick a date"}
               </p>
-       
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
@@ -139,7 +169,13 @@ const OvertimeActual: React.FC = () => {
         <p className="text-[14px] font-medium text-gray-800">
           ตารางแสดงข้อมูลการทำโอที | Table showing Overtime Data
         </p>
-        <TablePreviewOvertime data={allActual} />
+        {!load ? (
+          <TableOvertime data={allActual} />
+        ) : (
+          <div className="flex justify-center items-center h-[50vh]">
+            <div ><LoadingCircle /></div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -7,17 +7,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { SummaryRequestLastRev } from "./Approve";
+import { PlanWorkcell, SummaryRequestLastRev } from "./Approve";
 import moment from "moment";
+import { ConvertDateFormat } from "@/function/main";
 
 interface DetailRequestProps {
   requestDetail: SummaryRequestLastRev[];
+  planWorkcell: PlanWorkcell[];
 }
 
 const TableRequestDetail: React.FC<DetailRequestProps> = ({
   requestDetail,
+  planWorkcell,
 }) => {
-  useEffect(() => {}, [requestDetail]);
+  const sumHoursReq = Number(requestDetail[0]?.SUM_MINUTE) / 60;
+  const plan = Number(requestDetail[0]?.SUM_PLAN);
+  const planOB = Number(requestDetail[0]?.SUM_PLAN_OB);
+  const planWC =
+    planWorkcell?.length > 0 ? Number(planWorkcell[0]?.SUM_HOURS) : 0;
+
+  useEffect(() => {}, [requestDetail, planWorkcell]);
   return (
     <>
       <div className="rounded-md border relative w-full">
@@ -46,21 +55,25 @@ const TableRequestDetail: React.FC<DetailRequestProps> = ({
               </TableCell>
             </TableRow>
             <TableRow>
+              <TableCell className="text-center">ประเภทโอที</TableCell>
               <TableCell className="text-center">
-                เริ่ม (วัน/เดือน/ปี ชั่วโมง:นาที)
+                OT{requestDetail[0]?.OT_TYPE}
               </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-center">เริ่ม</TableCell>
               <TableCell className="text-center">
-                {moment(requestDetail[0]?.START_DATE).format(
-                  "DD/MM/YYYY HH:mm"
+                {ConvertDateFormat(
+                  moment(requestDetail[0]?.START_DATE).toDate()
                 )}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-center">
-                ถึง (วัน/เดือน/ปี ชั่วโมง:นาที)
+                ถึง
               </TableCell>
               <TableCell className="text-center">
-                {moment(requestDetail[0]?.END_DATE).format("DD/MM/YYYY HH:mm")}
+                {ConvertDateFormat(moment(requestDetail[0]?.END_DATE).toDate())}
               </TableCell>
             </TableRow>
 
@@ -77,17 +90,26 @@ const TableRequestDetail: React.FC<DetailRequestProps> = ({
             </TableRow>
 
             <TableRow>
-              <TableCell className="text-center">แผน (ชั่วโมง)</TableCell>
-              <TableCell className="text-center bg-red-400">
-                5,000
+              <TableCell className="text-center">แผน (ชั่วโมง) - Factory</TableCell>
+              <TableCell className="text-center bg-red-400 text-red-50">
+                {plan}
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="text-center">ประเภทโอที</TableCell>
-              <TableCell className="text-center">
-                {requestDetail[0]?.OT_TYPE}
+              <TableCell className="text-center">แผน (ชั่วโมง) - OB </TableCell>
+              <TableCell className="text-center bg-red-400 text-red-50">
+                {planOB}
               </TableCell>
             </TableRow>
+            <TableRow>
+              <TableCell className="text-center">
+                แผน (ชั่วโมง) / Workcell
+              </TableCell>
+              <TableCell className="text-center bg-red-400 text-red-50">
+                {planWC}
+              </TableCell>
+            </TableRow>
+          
             <TableRow>
               <TableCell className="text-center">Factory</TableCell>
               <TableCell className="text-center">
@@ -114,9 +136,9 @@ const TableRequestDetail: React.FC<DetailRequestProps> = ({
             </TableRow>
             <TableRow>
               <TableCell className="text-center">รวม (คน x ชั่วโมง)</TableCell>
-              <TableCell className="text-center bg-blue-100">
+              <TableCell className={`text-center bg-blue-100`}>
                 <div className="flex justify-center items-center">
-                  {(Number(requestDetail[0]?.SUM_MINUTE) / 60)?.toFixed(2)}
+                  {sumHoursReq?.toFixed(2)}
                 </div>
               </TableCell>
             </TableRow>

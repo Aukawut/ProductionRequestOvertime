@@ -3,8 +3,8 @@ export interface MainPlan {
   ID_FACTORY: number;
   NAME_WORKCELL: string;
   FACTORY_NAME: string;
-  NAME_UGROUP: string ;
-  ID_UGROUP: number ;
+  NAME_UGROUP: string;
+  ID_UGROUP: number;
   CREATED_AT: string;
   MONTH: number;
   YEAR: number;
@@ -17,7 +17,6 @@ export interface MainPlan {
 import React, { useEffect, useState } from "react";
 import { DataTableMainPlan } from "./TableMainPlan/data-table";
 import {
-
   DeletePlan,
   GetAllWorkcell,
   GetMainPlan,
@@ -31,6 +30,7 @@ import { Toaster } from "sonner";
 import DialogUpdatePlan from "./dialog-update-plan";
 import LoadingCircle from "@/components/custom/loading-circle";
 import { motion } from "framer-motion";
+import { BookCheck } from "lucide-react";
 
 export interface Factory {
   ID_FACTORY: number;
@@ -58,7 +58,7 @@ const MainPlan: React.FC = () => {
   const [workcell, setWorkcell] = useState<WorkcellAll[]>([]);
   const [userGroup, setUserGroup] = useState<UserGroup[]>([]);
 
-  const fetchData = async (load:boolean) => {
+  const fetchData = async (load: boolean) => {
     setLoad(load);
     await Promise.all([
       GetMainPlan(token),
@@ -68,8 +68,8 @@ const MainPlan: React.FC = () => {
       .then((response) => {
         if (response[0]?.length > 0) {
           setPlan(response[0]);
-        }else{
-          setPlan([])
+        } else {
+          setPlan([]);
         }
         if (response[1]?.length > 0) {
           setWorkcell(response[1]);
@@ -101,6 +101,12 @@ const MainPlan: React.FC = () => {
 
   return (
     <>
+      <div className="flex items-center gap-x-2">
+        <BookCheck size={18} />
+        <p className="text-[15px] text-gray-800 my-1">
+          Add Overtime Plan per Workcell
+        </p>
+      </div>
       <Toaster
         position="top-center"
         richColors
@@ -144,7 +150,7 @@ const MainPlan: React.FC = () => {
 
           {/* Table Plan */}
           <DataTableMainPlan
-            columns={columns(FindOldPlan,DeletePlan,token,fetchData)}
+            columns={columns(FindOldPlan, DeletePlan, token, fetchData)}
             data={plan}
             setShowDialogAdd={setShowDialogAdd}
           />

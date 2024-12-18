@@ -12,21 +12,7 @@ import {
   Bar,
 } from "recharts";
 import moment from "moment";
-
-const data = [
-  { date: "2024-01", uv: 4000, pv: 2400, amt: 2400 },
-  { date: "2024-02", uv: 3000, pv: 1398, amt: 2210 },
-  { date: "2024-03", uv: 2000, pv: 9800, amt: 2290 },
-  { date: "2024-04", uv: 2780, pv: 3908, amt: 2000 },
-  { date: "2024-05", uv: 1890, pv: 4800, amt: 2181 },
-  { date: "2024-06", uv: 2390, pv: 3800, amt: 2500 },
-  { date: "2024-07", uv: 3490, pv: 4300, amt: 2100 },
-  { date: "2024-08", uv: 4000, pv: 2400, amt: 2400 },
-  { date: "2024-09", uv: 3000, pv: 1398, amt: 2210 },
-  { date: "2024-10", uv: 2000, pv: 9800, amt: 2290 },
-  { date: "2024-11", uv: 2780, pv: 3908, amt: 2000 },
-  { date: "2024-12", uv: 1890, pv: 4800, amt: 2181 },
-];
+import { SummaryActualComparePlan } from "../Overview";
 
 const renderQuarterTick = (tickProps: any): React.ReactElement => {
   const { x, y, payload } = tickProps;
@@ -37,7 +23,7 @@ const renderQuarterTick = (tickProps: any): React.ReactElement => {
 
   if (month % 3 === 1) {
     return (
-      <text x={x} y={y - 4} fontSize={10.5} textAnchor="middle">
+      <text x={x + 30} y={y - 6} fontSize={10.5} textAnchor="middle">
         {`Q${quarterNo}`}
       </text>
     );
@@ -53,7 +39,12 @@ const renderQuarterTick = (tickProps: any): React.ReactElement => {
   return <></>;
 };
 
-const QuaterMonthBarChart: React.FC = () => {
+interface QuaterMonthBarChartProps {
+  data: SummaryActualComparePlan[];
+  year: number;
+}
+
+const QuaterMonthBarChart: React.FC<QuaterMonthBarChartProps> = ({ data }) => {
   const convertToK = (number: number) => {
     if (number >= 1000) {
       return (number / 1000).toFixed(1) + "k";
@@ -68,14 +59,14 @@ const QuaterMonthBarChart: React.FC = () => {
           data={data}
           margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
+      <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis
-            dataKey="date"
+            dataKey="MONTH_NAME"
             style={{ fontSize: 12 }}
             tickFormatter={(tick) => moment(tick, "YYYY-MM").format("MMM")}
           />
           <XAxis
-            dataKey="date"
+            dataKey="MONTH_NAME"
             axisLine={false}
             tickLine={false}
             interval={0}
@@ -89,55 +80,61 @@ const QuaterMonthBarChart: React.FC = () => {
             domain={[0, "dataMax + 500"]}
             tickFormatter={(e) => convertToK(Number(e))}
           />
-          <Tooltip />
+
+          <Tooltip
+            formatter={(value, name) => [
+              `${value?.toLocaleString()} Hours`,
+              name == "SUM_OT_ACTUAL"
+                ? "OT Actual"
+                : name == "SUM_OT_PLANWC"
+                ? "Planed"
+                : name == "SUM_OT_PLANOB"
+                ? "Planed (OB)"
+                : "",
+            ]}
+            contentStyle={{ fontSize: 12, borderRadius: 5 }}
+          />
+
           <Legend
             formatter={(value: string) =>
-              value === "uv"
-                ? "(OT) Planned"
-                : value === "pv"
-                ? "(OT) Actual"
+              value === "SUM_OT_PLANWC"
+                ? "Planned"
+                : value === "SUM_OT_ACTUAL"
+                ? "Actual"
+                : value === "SUM_OT_PLANOB"
+                ? "Planned (OB)"
                 : value
             }
             wrapperStyle={{ fontSize: "12px" }}
           />
 
           {/* First Bar */}
-          <Bar dataKey="uv" fill="#3BDCF9" barSize={15}>
-            <LabelList
-              dataKey="uv"
-              position="top"
-              style={{ fontSize: 11 }}
-              formatter={(e: any) => `${(e / 1000).toFixed(1)}k`}
-
-            />
-          </Bar>
+          <Bar dataKey="SUM_OT_PLANOB" fill="#3BDCF9" barSize={15}></Bar>
 
           {/* Second Bar */}
-          <Bar dataKey="pv" fill="#82ca9d" barSize={15}>
+          <Bar dataKey="SUM_OT_ACTUAL" fill="#82ca9d" barSize={15}>
             <LabelList
-              dataKey="pv"
+              dataKey="SUM_OT_ACTUAL"
               position="top"
               style={{ fontSize: 11 }}
               formatter={(e: any) => `${(e / 1000).toFixed(1)}k`}
-
             />
           </Bar>
 
           {/* Third Bar */}
-          <Bar dataKey="amt" fill="#FF9532" barSize={15}>
+          <Bar dataKey="SUM_OT_PLANWC" fill="#FF9532" barSize={15}>
             <LabelList
-              dataKey="amt"
+              dataKey="SUM_OT_PLANWC"
               position="top"
               style={{ fontSize: 11 }}
               formatter={(e: any) => `${(e / 1000).toFixed(1)}k`}
-
             />
           </Bar>
 
           {/* Line overlay on first Bar */}
           <Line
             type="monotone"
-            dataKey="uv"
+            dataKey="SUM_OT_PLANWC"
             stroke="#ff7300"
             strokeWidth={1}
             dot={{ r: 4 }}

@@ -794,8 +794,6 @@ const Request: React.FC = () => {
                           value={values.factory?.toString()}
                           onValueChange={async (e) => {
 
-                      
-
                             setIsLoadWorkcell(true);
                             getUserDataByFactory(Number(e));
                             setFactory(Number(e));
@@ -822,8 +820,6 @@ const Request: React.FC = () => {
                                 responseWorkcell[0]?.ID_WORK_CELL
                               );
 
-                           
-                         
                               setPlanByWorkcell(
                                 await GetPlanByWorkcell(
                                   token,

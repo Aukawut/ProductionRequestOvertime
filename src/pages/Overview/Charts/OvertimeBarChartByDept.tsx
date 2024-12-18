@@ -11,58 +11,21 @@ import {
   ResponsiveContainer,
   LabelList,
 } from "recharts";
+import { SummaryActualComparePlanByFac } from "../Overview";
 
-const OvertimeBarChartByDept: React.FC = () => {
+interface OvertimeBarChartByDeptProps {
+  data: SummaryActualComparePlanByFac[];
+}
+
+const OvertimeBarChartByDept: React.FC<OvertimeBarChartByDeptProps> = ({
+  data,
+}) => {
   function convertToK(number: number) {
     if (number >= 1000) {
       return (number / 1000).toFixed(2) + "k";
     }
     return number.toString();
   }
-
-  const data = [
-    {
-      name: "AVP 1",
-      uv: 4000,
-
-      amt: 2400,
-    },
-    {
-      name: "AVP 2",
-      uv: 3000,
-
-      amt: 2210,
-    },
-    {
-      name: "AVP 3",
-      uv: 2000,
-
-      amt: 2290,
-    },
-    {
-      name: "AVP 4",
-      uv: 2780,
-
-      amt: 2000,
-    },
-    {
-      name: "AVP 5",
-      uv: 1890,
-
-      amt: 2181,
-    },
-    {
-      name: "AVP-WH",
-      uv: 2390,
-      amt: 2500,
-    },
-    {
-      name: "AVP-QA",
-      uv: 3490,
-      amt: 2100,
-    },
-   
-  ];
 
   const truncateText = (text: string, maxLength: number = 10) => {
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
@@ -78,7 +41,7 @@ const OvertimeBarChartByDept: React.FC = () => {
         >
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis
-            dataKey="name"
+            dataKey="FACTORY_NAME"
             style={{ fontSize: 10 }}
             type="category"
             tickFormatter={(tick) => truncateText(tick as string)}
@@ -94,13 +57,23 @@ const OvertimeBarChartByDept: React.FC = () => {
             }}
           />
           <Tooltip
-            formatter={(e) => e}
+            formatter={(value, name) => [
+              `${value?.toLocaleString()} Hours`,
+              name == "SUM_PLAN"
+                ? "Plan"
+                : name == "SUM_PLAN_OB"
+                ? "Plan (OB)"
+                : name == "SUM_ACTUAL"
+                ? "OT Actual"
+                : "",
+            ]}
             contentStyle={{ fontSize: 12, borderRadius: 5 }}
           />
           <Legend
             formatter={(value: string, _: any) => {
-              if (value === "uv") return "(OT) Plan";
-              if (value === "amt") return "(OT) Actual";
+              if (value === "SUM_PLAN") return "Plan";
+              if (value === "SUM_ACTUAL") return "(OT) Actual";
+              if (value === "SUM_PLAN_OB") return "Planed (OB)";
               return value;
             }}
             wrapperStyle={{
@@ -109,7 +82,7 @@ const OvertimeBarChartByDept: React.FC = () => {
           />
 
           <Bar
-            dataKey="uv"
+            dataKey="SUM_PLAN"
             fill="#FF9532"
             activeBar={<Rectangle />}
             barSize={15}
@@ -125,14 +98,30 @@ const OvertimeBarChartByDept: React.FC = () => {
             />
           </Bar>
           <Bar
-            dataKey="amt"
+            dataKey="SUM_ACTUAL"
             fill="#82ca9d"
             activeBar={<Rectangle />}
             barSize={15}
             layout="vertical"
           >
             <LabelList
-              dataKey="amt"
+              dataKey="SUM_ACTUAL"
+              position="top"
+              style={{ fontSize: 11 }}
+              formatter={(e: any) => {
+                return convertToK(Number(e));
+              }}
+            />
+          </Bar>
+          <Bar
+            dataKey="SUM_PLAN_OB"
+            fill="#3BDCF9"
+            activeBar={<Rectangle />}
+            barSize={15}
+            layout="vertical"
+          >
+            <LabelList
+              dataKey="SUM_PLAN_OB"
               position="top"
               style={{ fontSize: 11 }}
               formatter={(e: any) => {

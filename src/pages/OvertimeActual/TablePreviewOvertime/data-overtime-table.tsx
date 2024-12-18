@@ -10,22 +10,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-} from "@/components/ui/dropdown-menu";
 
 import {
   Table,
@@ -35,7 +23,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useEffect, useState } from "react";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import { useState } from "react";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
@@ -43,15 +40,16 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
+export function DataTableOvertime<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
   const [rowSelection, setRowSelection] = useState({});
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [globalFilter, setGlobalFilter] = useState("");
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowsPerPage, setRowsPerPage] = useState(10); // Set initial rows per page
 
   const [pagination, setPagination] = useState({
@@ -62,14 +60,13 @@ export function DataTable<TData, TValue>({
   const table = useReactTable({
     data,
     columns,
-    autoResetPageIndex: false,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
+    onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     globalFilterFn: "includesString",
@@ -83,7 +80,6 @@ export function DataTable<TData, TValue>({
     },
     onPaginationChange: setPagination,
   });
-
   // Handle rows per page change
   const handleRowsPerPageChange = (value: string) => {
     const newPageSize = Number(value);
@@ -94,68 +90,37 @@ export function DataTable<TData, TValue>({
     });
   };
 
-  useEffect(() => {}, [data]);
-
   return (
-    <div className="px-4">
+    <div className="py-1 px-4">
+      <div className="flex items-center py-4">
+        <div className="relative">
 
-      <div className="flex items-center gap-x-2">
-        <div className="flex justify-between items-center gap-x-2 w-full my-2">
-          <div>
-            <p className="text-[13px] mb-2">ข้อมูลพนักงาน ({data?.length} คน)</p>
-          </div>
-          <div className="relative">
-            <Search
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-              size={18}
-            />
-            <Input
-              type="text"
-              className="pr-10 py-3 text-lg"
-              placeholder="ค้นหา"
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-            />
-          </div>
+            {/* Input Global Search */}
+          <Search
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            size={18}
+          />
+          
+          <Input
+            type="text"
+            placeholder="ค้นหา"
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            className="max-w-sm pr-10 text-lg"
+          />
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        
       </div>
-
-      {/* Select rows per page */}
-
-      <div className="w-full">
-        <div className="shadow-smooth">
-          <div className="relative h-[50vh] overflow-auto">
-            <Table className="w-full relative text-[13px]">
-              <TableHeader className="sticky top-0 z-10 bg-blue-200">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead
-                        key={header.id}
-                        className="h-10 overflow-clip relative text-gray-800"
-                      >
+      <div className="rounded-md border w-full">
+        <div className="overflow-auto h-[60vh]">
+          <Table className="text-[13px] w-full text-center">
+            <TableHeader className="sticky top-0 z-10 bg-[#0E7FDB]">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} >
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id} className="text-center text-white">
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -163,24 +128,21 @@ export function DataTable<TData, TValue>({
                               header.getContext()
                             )}
                       </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-
-              <TableBody>
-                {table.getRowModel().rows.length ? (
+                    );
+                  })}
+                </TableRow>
+              ))}
+              
+            </TableHeader>
+            <TableBody>
+                {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}
-                 
-                      className="text-center"
+               
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell
-                          key={cell.id}
-                          className="text-[13px] text-center"
-                        >
+                        <TableCell key={cell.id} className="text-center">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -200,12 +162,10 @@ export function DataTable<TData, TValue>({
                   </TableRow>
                 )}
               </TableBody>
-            </Table>
-          </div>
+          </Table>
         </div>
       </div>
 
-      {/* Pagination */}
       <div className="flex items-center justify-between py-2">
         <div className="flex items-center gap-x-1">
           <Button
@@ -215,7 +175,7 @@ export function DataTable<TData, TValue>({
             disabled={!table.getCanPreviousPage()}
             type="button"
           >
-            <ChevronLeft />
+            <ChevronLeft size={16} />
             Previous
           </Button>
           <Button
@@ -225,7 +185,8 @@ export function DataTable<TData, TValue>({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Next <ChevronRight />
+            Next
+             <ChevronRight size={16} />
           </Button>
         </div>
 
