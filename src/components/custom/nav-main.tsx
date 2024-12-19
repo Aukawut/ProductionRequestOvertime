@@ -54,7 +54,7 @@ export function NavMain({
             } hover:bg-sky-100 hover:text-sky-800 duration-300`}
           >
             <menu.icon />
-            <span>{menu.title}</span>
+            <span className="text-[13px]">{menu.title}</span>
           </SidebarMenuButton>
         </Link>
         })}
@@ -70,7 +70,7 @@ export function NavMain({
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton tooltip={item.title}>
                   {item.icon && <item.icon />}
-                  <span>{item.title}</span>
+                  <span className="text-[13px]">{item.title}</span>
                   <ChevronRight className="ml-auto transition-transform duration-300 group-data-[state=open]/collapsible:rotate-90" />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
@@ -80,7 +80,7 @@ export function NavMain({
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild className="py-4">
                         <Link to={subItem.url}>
-                          <span className={subItem.url == location.pathname ? 'text-sky-600' : ''}>{subItem.title}</span>
+                          <span className={subItem.url == location.pathname ? 'text-sky-600 text-[13px]' : 'text-[13px]'}>{subItem.title}</span>
                         </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>

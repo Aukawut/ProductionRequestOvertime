@@ -7,14 +7,17 @@ import { toast, Toaster } from "sonner";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { useOTManagementSystemStore } from "../../store";
+import Logo from "@/assets/images/Prospira_logos.png";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
   const inputUsername = useRef<HTMLInputElement>(null);
   const inputPassword = useRef<HTMLInputElement>(null);
   const baseURL = import.meta.env.VITE_BASE_URL;
+  const logout = useOTManagementSystemStore((state) => state.logout);
+
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -77,6 +80,10 @@ const Login: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    logout()
+  },[])
+
   return (
     <div className="w-full flex justify-center items-center min-h-screen">
       <motion.div
@@ -88,11 +95,14 @@ const Login: React.FC = () => {
           boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
         }}
       >
-        <div className="w-full p-[4rem]">
-          <div className="flex mb-[1rem] gap-x-4">
+        <div className="w-full px-[1rem] py-[2rem]">
+          <div className="px-[1rem]">
+            <img src={Logo} alt={Logo} className="h-[1.4rem]" />
+          </div>
+          <div className="flex mb-[1rem] gap-x-4 mt-[1rem]">
             <div className="w-[8px] bg-[#AECCF6] rounded-[2px]"></div>
             <div className="flex flex-col">
-              <h4 className="font-bold tracking-tight lg:text-xl text-gray-600">
+              <h4 className="font-medium tracking-tight lg:text-xl text-gray-600">
                 OT Management System
               </h4>
               <h4 className="scroll-m-20 text-sm tracking-tight lg:text-md text-gray-400">
@@ -105,13 +115,11 @@ const Login: React.FC = () => {
             position="top-center"
             richColors
             toastOptions={{
-              
               duration: 1500,
               style: {
                 paddingRight: 20,
                 paddingLeft: 20,
               },
-                
             }}
           />
 

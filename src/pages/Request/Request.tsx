@@ -418,6 +418,7 @@ const Request: React.FC = () => {
                       }));
 
                       if (selectedUser?.length > 0) {
+
                         const payload = {
                           overtimeDateStart:
                             moment(startFullDate).format("YYYY-MM-DD HH:mm"),
@@ -473,6 +474,7 @@ const Request: React.FC = () => {
                             </div>
                           );
                         }
+                        
                       } else {
                         setSubmitting(false);
                         setIsSubmit(false);

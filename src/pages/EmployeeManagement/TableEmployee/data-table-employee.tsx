@@ -30,19 +30,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, CirclePlus, FileDown, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, CirclePlus, Search } from "lucide-react";
 import ButtonExcelExport from "@/components/custom/ButtonExcelExport/ButtonExcelExport";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  setShowDialogAdd:React.Dispatch<React.SetStateAction<boolean>>;
+  setShowDialogAdd: React.Dispatch<React.SetStateAction<boolean>>;
+
 }
 
-export function DataTablePlanOB<TData, TValue>({
+export function DatatableEmployee<TData, TValue>({
   columns,
   data,
-  setShowDialogAdd
+  setShowDialogAdd,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -96,18 +97,22 @@ export function DataTablePlanOB<TData, TValue>({
   return (
     <div className="px-4">
       <div className="my-2 flex items-center gap-x-2">
-        <Button size={"sm"} onClick={() => setShowDialogAdd(true)} className="bg-[#107EDB] text-white hover:bg-[#1c77c2]">
+        <Button
+          size={"sm"}
+          onClick={() => setShowDialogAdd(true)}
+          className="bg-[#107EDB] text-white hover:bg-[#1c77c2]"
+        >
           <CirclePlus /> Add
         </Button>
 
-        <ButtonExcelExport data={data} fileName="PlanOB"/>
+        <ButtonExcelExport fileName="Employees all" data={data}/>
 
       </div>
       <div className="flex items-center gap-x-2">
         <div className="flex justify-between items-center gap-x-2 w-full my-2">
           <div>
             <p className="text-[14px] mb-2 text-gray-800">
-              แผนการทำโอที | Overtime Plan (OB) ({data?.length} รายการ)
+              รายชื่อผู้อนุมัติ | List of Aprover ({data?.length} รายการ)
             </p>
           </div>
           <div className="relative">
@@ -156,11 +161,7 @@ export function DataTablePlanOB<TData, TValue>({
               <TableBody>
                 {table.getRowModel().rows.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                     
-                      className="text-center"
-                    >
+                    <TableRow key={row.id} className="text-center">
                       {row.getVisibleCells().map((cell) => (
                         <TableCell
                           key={cell.id}

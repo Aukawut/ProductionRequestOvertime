@@ -11,6 +11,8 @@ import Approve from "./pages/Approve/Approve";
 import MainPlan from "./pages/MainPlan/MainPlan";
 import OvertimeActual from "./pages/OvertimeActual/OvertimeActual";
 import PlanOB from "./pages/PlanOB/PlanOB";
+import EmployeeManagement from "./pages/EmployeeManagement/EmployeeManagement";
+import OvertimeActualReport from "./pages/OvertimeActualReport/OvertimeActualReport";
 
 const router = createBrowserRouter(
   [
@@ -23,9 +25,11 @@ const router = createBrowserRouter(
         { path: "/request/me", element: <MyRequest /> },
         { path: "/approve", element: <Approve /> },
         { path: "/setting/approver", element: <ApproverManagement /> },
+        { path: "/setting/employee", element: <EmployeeManagement /> },
         { path: "/main/plan", element: <MainPlan /> },
         { path: "/plan/ob", element: <PlanOB /> },
         { path: "/overtime/actual", element: <OvertimeActual /> },
+        { path: "/report/actual/overtime", element: <OvertimeActualReport /> },
       ],
     },
     {

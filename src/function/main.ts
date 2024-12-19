@@ -177,18 +177,21 @@ export const GetWorkcellGroup: (token: string) => Promise<any> = async (
   }
 };
 
-export const GetWorkcellByFactory: (token: string,factory:number) => Promise<any> = async (
+export const GetWorkcellByFactory: (
   token: string,
-  factory:number
-) => {
+  factory: number
+) => Promise<any> = async (token: string, factory: number) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
-    const response = await axios.get(`${VITE_BASE_URL}/workcell/factory/${factory}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.get(
+      `${VITE_BASE_URL}/workcell/factory/${factory}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!response.data.err && response.data.status == "Ok") {
       return response.data.results;
@@ -491,7 +494,7 @@ export const GetRequestDetailByRequest = async (
 
   try {
     const response = await axios.get(
-    `${VITE_BASE_URL}/summary/request/lasted/${requestNo}`,
+      `${VITE_BASE_URL}/summary/request/lasted/${requestNo}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -499,7 +502,7 @@ export const GetRequestDetailByRequest = async (
       }
     );
 
-    console.log("response.data",response.data);
+    console.log("response.data", response.data);
     if (!response.data.err && response.data.status == "Ok") {
       return response.data?.results;
     } else {
@@ -577,8 +580,8 @@ interface PayloadMainPlan {
   month: number;
   year: number;
   hours: number;
-  action:string ;
-  userGroup:number ;
+  action: string;
+  userGroup: number;
 }
 export const InsertMainPlan = async (
   token: string,
@@ -607,14 +610,11 @@ interface PayloadPlanOB {
   month: number;
   year: number;
   hours: number;
-  action:string ;
-  userGroup:number ;
+  action: string;
+  userGroup: number;
 }
 
-export const InsertPlanOB = async (
-  token: string,
-  payload: PayloadPlanOB
-) => {
+export const InsertPlanOB = async (token: string, payload: PayloadPlanOB) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
@@ -702,7 +702,6 @@ export const GetMenuyearOverview = () => {
 
   const currentYear = new Date().getFullYear() - 5;
 
-  
   for (let i = currentYear; i < new Date().getFullYear() + 3; i++) {
     menu.push(i);
   }
@@ -710,8 +709,7 @@ export const GetMenuyearOverview = () => {
   return menu;
 };
 
-
-export const GetAllFactory = async (token:string) => {
+export const GetAllFactory = async (token: string) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
@@ -730,21 +728,25 @@ export const GetAllFactory = async (token:string) => {
 
     return [];
   }
-}
+};
 
 export const UpdateMainPlan = async (
   token: string,
   payload: PayloadMainPlan,
-  id:number
+  id: number
 ) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
-    const response = await axios.put(`${VITE_BASE_URL}/plan/main/${id}`, payload, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.put(
+      `${VITE_BASE_URL}/plan/main/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     console.log(response.data);
     return response.data;
@@ -758,16 +760,20 @@ export const UpdateMainPlan = async (
 export const UpdatePlanOB = async (
   token: string,
   payload: PayloadPlanOB,
-  id:number
+  id: number
 ) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
-    const response = await axios.put(`${VITE_BASE_URL}/ob/plan/${id}`, payload, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.put(
+      `${VITE_BASE_URL}/ob/plan/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     console.log(response.data);
     return response.data;
@@ -781,17 +787,25 @@ export const UpdatePlanOB = async (
 export const GetPlanByFactory: (
   token: string,
   idFactory: number,
-  year : number ,
-  month : number ,
-) => Promise<any> = async (token: string, idFactory: number,year:number,month:number) => {
+  year: number,
+  month: number
+) => Promise<any> = async (
+  token: string,
+  idFactory: number,
+  year: number,
+  month: number
+) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
-    const response = await axios.get(`${VITE_BASE_URL}/plan/factory/${year}/${month}/${idFactory}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.get(
+      `${VITE_BASE_URL}/plan/factory/${year}/${month}/${idFactory}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!response.data.err && response.data.status == "Ok") {
       return response.data.results;
@@ -808,17 +822,25 @@ export const GetPlanByFactory: (
 export const GetPlanByWorkcell: (
   token: string,
   idWorkcell: number,
-  year : number ,
-  month : number ,
-) => Promise<any> = async (token: string, idWorkcell: number,year:number,month:number) => {
+  year: number,
+  month: number
+) => Promise<any> = async (
+  token: string,
+  idWorkcell: number,
+  year: number,
+  month: number
+) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
-    const response = await axios.get(`${VITE_BASE_URL}/plan/workcell/${year}/${month}/${idWorkcell}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.get(
+      `${VITE_BASE_URL}/plan/workcell/${year}/${month}/${idWorkcell}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!response.data.err && response.data.status == "Ok") {
       return response.data.results;
@@ -832,7 +854,9 @@ export const GetPlanByWorkcell: (
   }
 };
 
-export const GetAllWorkcell: (token: string) => Promise<any> = async (token: string) => {
+export const GetAllWorkcell: (token: string) => Promise<any> = async (
+  token: string
+) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
@@ -854,7 +878,9 @@ export const GetAllWorkcell: (token: string) => Promise<any> = async (token: str
   }
 };
 
-export const GetUserGroup: (token: string) => Promise<any> = async (token: string) => {
+export const GetUserGroup: (token: string) => Promise<any> = async (
+  token: string
+) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
@@ -875,9 +901,36 @@ export const GetUserGroup: (token: string) => Promise<any> = async (token: strin
     return [];
   }
 };
+export const GetUserType: (token: string) => Promise<any> = async (
+  token: string
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/users/type`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
 
 
-export const DeletePlan: (token: string,id:number) => Promise<any> = async (token: string,id:number) => {
+
+export const DeletePlan: (token: string, id: number) => Promise<any> = async (
+  token: string,
+  id: number
+) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
@@ -888,16 +941,19 @@ export const DeletePlan: (token: string,id:number) => Promise<any> = async (toke
     });
 
     if (!response.data.err && response.data.status == "Ok") {
-      return {err: false, msg : response.data.msg}
+      return { err: false, msg: response.data.msg };
     } else {
-      return {err: true, msg : response.data.msg};
+      return { err: true, msg: response.data.msg };
     }
   } catch (err) {
-    return {err: true, msg : err};
+    return { err: true, msg: err };
   }
 };
 
-export const DeletePlanOB: (token: string,id:number) => Promise<any> = async (token: string,id:number) => {
+export const DeletePlanOB: (token: string, id: number) => Promise<any> = async (
+  token: string,
+  id: number
+) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
@@ -908,21 +964,22 @@ export const DeletePlanOB: (token: string,id:number) => Promise<any> = async (to
     });
 
     if (!response.data.err && response.data.status == "Ok") {
-      return {err: false, msg : response.data.msg}
+      return { err: false, msg: response.data.msg };
     } else {
-      return {err: true, msg : response.data.msg};
+      return { err: true, msg: response.data.msg };
     }
   } catch (err) {
-    return {err: true, msg : err};
+    return { err: true, msg: err };
   }
 };
 
-export const ConvertDateFormat = (date:Date) => {
-    return moment(date).format("YYYY-MM-DD HH:mm")
-}
+export const ConvertDateFormat = (date: Date) => {
+  return moment(date).format("YYYY-MM-DD HH:mm");
+};
 
-
-export const GetActualOvertime: (token: string) => Promise<any> = async (token: string) => {
+export const GetActualOvertime: (token: string) => Promise<any> = async (
+  token: string
+) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
@@ -944,15 +1001,21 @@ export const GetActualOvertime: (token: string) => Promise<any> = async (token: 
   }
 };
 
-export const GetSummaryActualComparePlan: (token: string,year:number) => Promise<any> = async (token: string,year:number) => {
+export const GetSummaryActualComparePlan: (
+  token: string,
+  year: number
+) => Promise<any> = async (token: string, year: number) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
-    const response = await axios.get(`${VITE_BASE_URL}/actual/summary/compare/plan/${year}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.get(
+      `${VITE_BASE_URL}/actual/summary/compare/plan/${year}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!response.data.err && response.data.status == "Ok") {
       return response.data.results;
@@ -966,15 +1029,28 @@ export const GetSummaryActualComparePlan: (token: string,year:number) => Promise
   }
 };
 
-export const GetSummaryActualByFactory: (token: string,start:string,end:string,ugroup:number) => Promise<any> = async (token: string,start:string,end:string,ugroup:number) => {
+export const GetSummaryActualByFactory: (
+  token: string,
+  start: string,
+  end: string,
+  ugroup: number
+) => Promise<any> = async (
+  token: string,
+  start: string,
+  end: string,
+  ugroup: number
+) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
-    const response = await axios.get(`${VITE_BASE_URL}/actual/summary/factory/plan/${start}/${end}/${ugroup}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.get(
+      `${VITE_BASE_URL}/actual/summary/factory/plan/${start}/${end}/${ugroup}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!response.data.err && response.data.status == "Ok") {
       return response.data.results;
@@ -988,15 +1064,28 @@ export const GetSummaryActualByFactory: (token: string,start:string,end:string,u
   }
 };
 
-export const GetCountActualByUserGroup: (token: string,start:string,end:string,ugroup:number) => Promise<any> = async (token: string,start:string,end:string,ugroup:number) => {
+export const GetCountActualByUserGroup: (
+  token: string,
+  start: string,
+  end: string,
+  ugroup: number
+) => Promise<any> = async (
+  token: string,
+  start: string,
+  end: string,
+  ugroup: number
+) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
-    const response = await axios.get(`${VITE_BASE_URL}/actual/count/${start}/${end}/${ugroup}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.get(
+      `${VITE_BASE_URL}/actual/count/${start}/${end}/${ugroup}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     if (!response.data.err && response.data.status == "Ok") {
       return response.data.results;
@@ -1010,18 +1099,200 @@ export const GetCountActualByUserGroup: (token: string,start:string,end:string,u
   }
 };
 
-
-export const GetSummaryActualByDate: (token: string,start:string,end:string,ugroup:number) => Promise<any> = async (token: string,start:string,end:string,ugroup:number) => {
+export const GetSummaryActualByDate: (
+  token: string,
+  start: string,
+  end: string,
+  ugroup: number
+) => Promise<any> = async (
+  token: string,
+  start: string,
+  end: string,
+  ugroup: number
+) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
-    const response = await axios.get(`${VITE_BASE_URL}/actual/summary/date/${start}/${end}/${ugroup}`, {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/actual/summary/date/${start}/${end}/${ugroup}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const GetAllEmployee: (token: string) => Promise<any> = async (
+  token: string
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/employee`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
+    console.log(response.data);
     if (!response.data.err && response.data.status == "Ok") {
+      console.log(response.data);
+
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export interface EmployeesByCode {
+  Prefix: string;
+  EmployeeCode: string;
+  FnameTH: string;
+  LnameTH: string;
+  FnameEN: string;
+  LnameEN: string;
+}
+
+export const GetAllEmployeeByCode: (
+  token: string,
+  code: string
+) => Promise<any> = async (token: string, code: string) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/employee/${code}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log(response.data);
+    if (!response.data.err && response.data.status == "Ok") {
+      console.log(response.data);
+
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export interface BodyInsertEmployee {
+  code: string;
+  factory: number;
+  group: number;
+  prefix: string;
+  fnameTH: string;
+  lnameTH: string;
+  fnameEN: string;
+  lnameEN: string;
+  role: number;
+  ugroup: number;
+  type: number;
+  actionBy: string;
+}
+
+export const InsertEmployee: (
+  token: string,
+  payload: BodyInsertEmployee
+) => Promise<any> = async (token: string, payload: BodyInsertEmployee) => {
+  const { VITE_BASE_URL } = import.meta.env;
+  
+  try {
+    const response = await axios.post(`${VITE_BASE_URL}/employee`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log(response.data);
+    if (!response.data.err && response.data.status == "Ok") {
+      console.log(response.data);
+
+      return {err:false,msg:response.data.msg,status : "Ok"};
+    } else {
+      return {err:true,msg:response.data.msg};
+    }
+  } catch (err) {
+    console.log(err);
+
+    return {err:true,msg:err};
+  }
+};
+
+export const DeleteEmployee: (
+  token: string,
+  code: string
+) => Promise<any> = async (token: string, code: string) => {
+  const { VITE_BASE_URL } = import.meta.env;
+  
+  try {
+    const response = await axios.delete(`${VITE_BASE_URL}/employee/${code}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log(response.data);
+    if (!response.data.err && response.data.status == "Ok") {
+      console.log(response.data);
+
+      return {err:false,msg:response.data.msg,status : "Ok"};
+    } else {
+      return {err:true,msg:response.data.msg};
+    }
+  } catch (err) {
+    console.log(err);
+
+    return {err:true,msg:err};
+  }
+};
+
+export const GetActualOvertimeByDate: (
+  token: string,
+  start:string,
+  end:string,
+  ugroup:string,
+  utype:string,
+) => Promise<any> = async (token: string,
+  start:string,
+  end:string,
+  ugroup:string,
+  utype:string) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/actual/ot/${start}/${end}/${ugroup}/${utype}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log(response.data);
+    if (!response.data.err && response.data.status == "Ok") {
+      console.log(response.data);
+
       return response.data.results;
     } else {
       return [];

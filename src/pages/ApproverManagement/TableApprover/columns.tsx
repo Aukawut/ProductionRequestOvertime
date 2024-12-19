@@ -18,6 +18,7 @@ export const columns = (
   fetchData: (load:boolean) => Promise<void>,
   baseImageUrl:string ,
   
+  
 ): ColumnDef<Approvers>[] => [
   {
     accessorKey: "ID_OB_PLAN",

@@ -59,12 +59,12 @@ export const data = {
           url: "/setting/approver",
         },
         {
-          title: "Employee",
-          url: "/employee",
+          title: "Employees",
+          url: "/setting/employee",
         },
       
         {
-          title: "Overtime Actual",
+          title: "Upload Overtime Actual",
           url: "/overtime/actual",
         },
         {
@@ -80,8 +80,8 @@ export const data = {
       icon: ChartSpline,
       items: [
         {
-          title: "Introduction",
-          url: "#",
+          title: "Overtime Actual",
+          url: "/report/actual/overtime",
         },
         {
           title: "Get Started",
