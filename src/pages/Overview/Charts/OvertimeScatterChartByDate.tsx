@@ -47,7 +47,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
     const { DATE_OT, COUNT_OT, SUM_TOTAL } = payload[0].payload;
 
     return (
-      <div className="custom-tooltip bg-[white] shadow-smooth p-2 rounded-sm">
+      <div className="custom-tooltip p-2 rounded-sm bg-white">
         <p className="text-[13px] font-medium">{`Date: ${moment(DATE_OT).format(
           "YYYY-MM-DD"
         )}`}</p>
@@ -67,7 +67,7 @@ const OvertimeScatterChartByDate: React.FC<OvertimeScatterChartByDateProp> = ({
 
   return (
     <>
-      <div className="h-[300px] bg-white py-2">
+      <div className="h-[300px] py-2">
         <ResponsiveContainer width="100%">
           <ScatterChart
             margin={{
@@ -83,6 +83,7 @@ const OvertimeScatterChartByDate: React.FC<OvertimeScatterChartByDateProp> = ({
               dataKey="COUNT_OT"
               name="Amount"
               className="text-[11.50px]"
+            
             >
               <Label
                 value="Number of people working overtime (People)"

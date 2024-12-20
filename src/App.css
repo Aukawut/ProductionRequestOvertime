@@ -25,18 +25,26 @@
 .vertical-timeline-element-title {
   font-size: 14px !important;
 }
-.vertical-timeline-element-subtitle{
+.vertical-timeline-element-subtitle {
   font-size: 12px !important;
   margin: 0 !important;
 }
-.vertical-timeline-element-comment{
+.vertical-timeline-element-comment {
   font-size: 12px !important;
 }
-.vertical-timeline-element-date{
+.vertical-timeline-element-date {
   font-size: 14px !important;
 }
 
-button:focus-visible{
-  border: none;  
+button:focus-visible {
+  border: none;
 }
 
+.bg-gradient {
+  background: rgb(221, 240, 255);
+  background: linear-gradient(
+    90deg,
+    rgb(213, 236, 255) 0%,
+    rgba(255, 255, 255, 1) 60%
+  );
+}

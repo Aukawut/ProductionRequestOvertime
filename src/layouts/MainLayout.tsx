@@ -18,9 +18,11 @@ const MainLayout: React.FC = () => {
         <div className="h-[40px] w-full flex items-center justify-between px-[2rem]">
           {/* Breadcrumb Menu */}
           <BreadcrumbMenu path={location.pathname} />
+          
           <div className="relative">
           <Bell size={20}  />
-          <div className="p-2 flex justify-center text-[12px] text-red-100 absolute top-2 rounded-full bg-red-500 w-[20px] h-[20px] items-center right-3">1</div>
+          <div className="p-3 flex justify-center text-[12px] text-red-100 absolute 
+          top-2 rounded-full bg-red-500 w-[20px] h-[20px] items-center right-3">9+</div>
           </div>
         </div>
         <div className="h-[95%] overflow-auto">

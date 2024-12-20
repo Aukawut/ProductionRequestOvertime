@@ -37,6 +37,8 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import Polygon from "@/components/custom/Polygon/Polygon";
+import CircleShape from "@/components/custom/CircleShape/CircleShape";
 
 export interface UserGroup {
   ID_UGROUP: number;
@@ -159,10 +161,10 @@ const Overview: React.FC = () => {
 
   useEffect(() => {
     setStartDate(new Date());
-    setEndDate(moment(new Date()).add(5,"days").toDate());
+    setEndDate(moment(new Date()).add(5, "days").toDate());
 
     setStartDateScatter(new Date());
-    setEndDateScatter(moment(new Date()).add(5,"days").toDate())
+    setEndDateScatter(moment(new Date()).add(5, "days").toDate());
 
     setMenuYear(GetMenuyearOverview());
     fetchData(true);
@@ -174,16 +176,20 @@ const Overview: React.FC = () => {
     </div>
   ) : (
     <div className="p-[0.5rem]">
-
-     {/* <-------- [START] Section 1 ------->*/}
+      {/* <-------- [START] Section 1 ------->*/}
 
       <div
-        className="w-full rounded-[16px] bg-[white]"
+        className="w-full rounded-[16px] bg-gradient relative overflow-hidden"
         style={{
           boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
         }}
       >
-       
+        <div className="absolute -left-[8rem] -top-[10rem] -z-1">
+          <div className="flex w-[12rem]">
+            <Polygon color="#EBF6FE" />
+          </div>
+        </div>
+
         <div className="flex flex-col p-[1rem] justify-center w-full items-start">
           <p className="text-[13px] text-gray-700">Summary Report OT / Year</p>
           <div className="mt-2 flex gap-x-2 items-center">
@@ -195,7 +201,7 @@ const Overview: React.FC = () => {
                 value={year?.toString()}
                 onValueChange={(e) => setYear(Number(e))}
               >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px] bg-white">
                   <SelectValue placeholder="Select Year" />
                 </SelectTrigger>
                 <SelectContent>
@@ -224,10 +230,10 @@ const Overview: React.FC = () => {
                   value={ugroup?.toString()}
                   onValueChange={(e) => setUgroup(Number(e))}
                 >
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[180px] bg-white">
                     <SelectValue placeholder="Select Year" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="">
                     <SelectGroup>
                       <SelectLabel className="text-[14px]">
                         User Group
@@ -278,15 +284,22 @@ const Overview: React.FC = () => {
           <QuaterMonthBarChart data={actual} year={year} />
         )}
       </div>
-            {/* <-------- [END] Section 1 ------->*/}
+      {/* <-------- [END] Section 1 ------->*/}
 
       {/* <-------- [START] Section 2 ------->*/}
       <div
-        className="w-full rounded-[16px] bg-[white] p-2 my-2"
+        className="w-full rounded-[16px] p-2 my-2 bg-gradient relative overflow-hidden"
         style={{
           boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
         }}
       >
+        <div className="absolute -left-[6.5rem] top-[7rem] ">
+          <div className="flex w-[1rem] h-auto">
+            <div className="w-full">
+              <CircleShape color="#EBF6FE" />
+            </div>
+          </div>
+        </div>
         <div className="flex flex-col p-[0.5rem] justify-center w-full items-start mb-2">
           <p className="text-[13px] text-gray-700 font-medium">
             Summary Report OT By Factory
@@ -303,7 +316,7 @@ const Overview: React.FC = () => {
                   value={group?.toString()}
                   onValueChange={(e) => setGroup(Number(e))}
                 >
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[180px] bg-white " style={{zIndex:20}}>
                     <SelectValue placeholder="Select Year" />
                   </SelectTrigger>
                   <SelectContent>
@@ -499,11 +512,27 @@ const Overview: React.FC = () => {
       {/* <-------- [END] Section 2 ------->*/}
 
       <div
-        className="p-4 bg-white rounded-[16px] h-full flex flex-col justify-center mt-2"
+        className="p-4 rounded-[16px] h-full flex flex-col justify-center mt-2 bg-gradient relative overflow-hidden"
         style={{
           boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
         }}
       >
+        <div className="absolute -left-[4rem] -top-[5rem] -z-1">
+          <div className="flex w-[12rem]">
+            <Polygon color="#EBF6FE" />
+          </div>
+        </div>
+        <div className="absolute -right-[2rem] -top-[4rem]">
+          <div className="flex w-[10rem]">
+            <Polygon color="#F8FCFF" />
+          </div>
+        </div>
+        <div className="absolute -right-[2rem] -top-[12rem]">
+          <div className="flex w-[5rem]">
+            <Polygon color="#FBFDFF" />
+          </div>
+        </div>
+
         <div className="flex flex-col p-[1rem] justify-center w-full items-start">
           <p className="text-[13px] text-gray-700">Summary Report OT By Date</p>
           <p className="text-[12px] text-gray-500">Scatter Chart</p>
@@ -519,7 +548,7 @@ const Overview: React.FC = () => {
                   value={ugroupScatter?.toString()}
                   onValueChange={(e) => setUgroupScatter(Number(e))}
                 >
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[180px] bg-white">
                     <SelectValue placeholder="Select Year" />
                   </SelectTrigger>
                   <SelectContent>
@@ -640,21 +669,18 @@ const Overview: React.FC = () => {
         </div>
         <hr className="my-2" />
 
-    
-          {reRenderScatter ? (
-            <div className="h-[250px] flex justify-center items-center">
-              <LoadingCircle />
-            </div>
-          ) : (
-            countActualByDate?.length > 0 ? 
-            <OvertimeScatterChartByDate data={countActualByDate} /> : <div className="w-full h-[300px] flex justify-center items-center"> 
+        {reRenderScatter ? (
+          <div className="h-[250px] flex justify-center items-center">
+            <LoadingCircle />
+          </div>
+        ) : countActualByDate?.length > 0 ? (
+          <OvertimeScatterChartByDate data={countActualByDate} />
+        ) : (
+          <div className="w-full h-[300px] flex justify-center items-center">
             -
-            </div>
-          )}
-        </div> 
-            
-       
-
+          </div>
+        )}
+      </div>
     </div>
   );
 };
