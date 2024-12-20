@@ -40,7 +40,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
+export function DataTableOvertime<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -50,7 +50,7 @@ export function DataTable<TData, TValue>({
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowsPerPage, setRowsPerPage] = useState(10); // Set initial rows per page
+  const [rowsPerPage, setRowsPerPage] = useState(100); // Set initial rows per page
 
   const [pagination, setPagination] = useState({
     pageIndex: 0, // Initial page index
@@ -113,7 +113,7 @@ export function DataTable<TData, TValue>({
         
       </div>
       <div className="rounded-md border w-full">
-        <div className="overflow-auto h-[40vh]">
+        <div className="overflow-auto h-[60vh]">
           <Table className="text-[13px] w-full text-center">
             <TableHeader className="sticky top-0 z-10 bg-[#0E7FDB]">
               {table.getHeaderGroups().map((headerGroup) => (

@@ -18,13 +18,7 @@ export const columns = (
   handleCheckedAll: (checked: boolean) => void,
   usersData: Users[]
 ): ColumnDef<Users>[] => [
-  {
-    accessorKey: "CHECKED",
-    enableSorting: false,
-    enableHiding: true, //
-    cell: () => null,
-    header: () => null,
-  },
+ 
   {
     id: "No",
     header: ({ table }) => {
@@ -46,7 +40,8 @@ export const columns = (
     },
     cell: ({ row }) => (
       <Checkbox
-        checked={row.getValue("CHECKED")}
+        // checked={row.getValue("CHECKED")}
+        checked={usersData[row.index].CHECKED}
         onCheckedChange={(value) => {
           row.toggleSelected(!!value);
           // Callback ส่งค่ากลับไป Parent

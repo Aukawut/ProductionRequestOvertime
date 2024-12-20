@@ -1,10 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 
-import { ArrowUpDown} from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import { Actual } from "../OvertimeActualReport";
 import { ConvertDateFormat } from "@/function/main";
-
+import moment from "moment";
 
 export const columnsOvertime = (): ColumnDef<Actual>[] => [
   {
@@ -39,12 +39,12 @@ export const columnsOvertime = (): ColumnDef<Actual>[] => [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Employee ID
+          วันที่
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
-    cell: ({ row }) => row.getValue("OT_DATE"),
+    cell: ({ row }) => moment(row.getValue("OT_DATE")).format("YYYY-MM-DD"),
   },
   {
     accessorKey: "SCAN_IN",
@@ -60,7 +60,11 @@ export const columnsOvertime = (): ColumnDef<Actual>[] => [
         </Button>
       );
     },
-    cell: ({ row }) => row.getValue("SCAN_IN"),
+    cell: ({ row }) => (
+      <div className="w-[120px]">
+        {ConvertDateFormat(moment(row.getValue("SCAN_IN")).toDate())}
+      </div>
+    ),
   },
   {
     accessorKey: "SCAN_OUT",
@@ -76,7 +80,8 @@ export const columnsOvertime = (): ColumnDef<Actual>[] => [
         </Button>
       );
     },
-    cell: ({ row }) => row.getValue("SCAN_OUT"),
+    cell: ({ row }) =>
+      ConvertDateFormat(moment(row.getValue("SCAN_OUT")).toDate()),
   },
   {
     accessorKey: "HOURS",

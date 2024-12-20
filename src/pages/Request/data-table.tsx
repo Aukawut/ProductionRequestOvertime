@@ -165,7 +165,7 @@ export function DataTable<TData, TValue>({
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}
-                      data-state={row.getValue("CHECKED") && "selected"}
+                      // data-state={data[row.index].CHECKED && "selected"}
                       className="text-center"
                     >
                       {row.getVisibleCells().map((cell) => (

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Formik, Form, FormikHelpers } from "formik";
 import Swal from "sweetalert2";
@@ -152,6 +152,7 @@ const Request: React.FC = () => {
   const [descGroup, setDescGroup] = useState("");
   const [planByFactory, setPlanByFactory] = useState<PlanByFactory[]>([]);
   const [planByWorkcell, setPlanByWorkcell] = useState<PlanByWorkcell[]>([]);
+  
   const [actualWorkcell, setActualWorkcell] = useState(0);
   const [actualFactory, setActualFactory] = useState(0);
 
@@ -333,6 +334,9 @@ const Request: React.FC = () => {
         console.log(err);
       });
   };
+
+
+ 
 
   const clearState = () => {
     setFactory(role[0]?.ID_FACTORY);
@@ -1034,6 +1038,7 @@ const Request: React.FC = () => {
                         placeholder="หมายเหตุ (ถ้ามี)"
                         onChange={handleChange}
                         rows={3}
+                       
                         name="remark"
                         value={values.remark}
                         id="remark"

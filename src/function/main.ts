@@ -1274,16 +1274,16 @@ export const GetActualOvertimeByDate: (
   start:string,
   end:string,
   ugroup:string,
-  utype:string,
+  factory:string,
 ) => Promise<any> = async (token: string,
   start:string,
   end:string,
   ugroup:string,
-  utype:string) => {
+  factory:string) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
-    const response = await axios.get(`${VITE_BASE_URL}/actual/ot/${start}/${end}/${ugroup}/${utype}`, {
+    const response = await axios.get(`${VITE_BASE_URL}/actual/ot/${start}/${end}/${ugroup}/${factory}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

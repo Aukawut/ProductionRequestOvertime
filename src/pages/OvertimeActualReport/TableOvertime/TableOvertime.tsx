@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+
 import { columnsOvertime } from "./columns-overtime";
-import { useOTManagementSystemStore } from "../../../../store";
 import { Actual } from "../OvertimeActualReport";
 import { DataTableOvertime } from "./data-overtime-table";
+import ButtonExcelExport from "@/components/custom/ButtonExcelExport/ButtonExcelExport";
 
 interface TableOvertimeProps {
   data: Actual[];
@@ -11,11 +11,10 @@ interface TableOvertimeProps {
 const TableOvertime: React.FC<TableOvertimeProps> = ({
   data,
 }) => {
-  const token = useOTManagementSystemStore((state) => state.token);
-
-  useEffect(() => {}, []);
+ 
   return (
     <div>
+      <ButtonExcelExport data={data} fileName="Overtime Actual"/>
       <div className="container mx-auto py-1">
         <DataTableOvertime columns={columnsOvertime()} data={data} />
       </div>

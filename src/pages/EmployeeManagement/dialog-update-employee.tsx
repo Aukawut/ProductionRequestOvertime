@@ -223,7 +223,7 @@ const DialogAddEmployee: React.FC<DialogAddPlan> = ({
                             value={values?.group?.toString()}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a fruit" />
+                              <SelectValue placeholder="Select" />
                             </SelectTrigger>
                             <SelectContent className="h-[200px]">
                               <SelectGroup>
@@ -254,7 +254,7 @@ const DialogAddEmployee: React.FC<DialogAddPlan> = ({
                             value={values.factory?.toString()}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a fruit" />
+                              <SelectValue placeholder="Select" />
                             </SelectTrigger>
                             <SelectContent className="h-[200px]">
                               <SelectGroup>
@@ -286,7 +286,7 @@ const DialogAddEmployee: React.FC<DialogAddPlan> = ({
                             value={values.ugroup?.toString()}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a fruit" />
+                              <SelectValue placeholder="Select" />
                             </SelectTrigger>
                             <SelectContent className="h-[200px]">
                               <SelectGroup>
@@ -317,7 +317,7 @@ const DialogAddEmployee: React.FC<DialogAddPlan> = ({
                             value={values.type?.toString()}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a fruit" />
+                              <SelectValue placeholder="Select" />
                             </SelectTrigger>
                             <SelectContent className="h-[200px]">
                               <SelectGroup>

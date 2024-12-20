@@ -17,12 +17,20 @@ import {
 import TableRequestDetail from "./table-request-detail";
 import { DataTable } from "./TableUsersRequest/data-table";
 import { columns } from "./TableUsersRequest/columns";
-import { CommentApprover, PlanWorkcell, SummaryRequestLastRev, UserDetail } from "./Approve";
+import {
+  CommentApprover,
+  PlanWorkcell,
+  SummaryRequestLastRev,
+  UserDetail,
+} from "./Approve";
 import TimelineApprove from "./timeline-approve";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import moment from "moment";
 import { ConvertDateFormat } from "@/function/main";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
+
 
 interface ShowUsersSelected {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -45,7 +53,7 @@ export interface TimelineDataApproval {
   position: string;
   status: string;
   comment: string;
-  empCode:string;
+  empCode: string;
 }
 
 const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
@@ -55,25 +63,55 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
   requestDetail,
   users,
   commentApprover,
-  planWorkcell
+  planWorkcell,
 }) => {
-  const comment:TimelineDataApproval[] = commentApprover?.map((item) => ({
-    date: item.UPDATED_AT == null || item.UPDATED_AT == "" ? "-" : moment(item.UPDATED_AT).format("YYYY-MM-DD"),
+  const inputRefRemark = useRef<HTMLTextAreaElement>(null);
+
+  const comment: TimelineDataApproval[] = commentApprover?.map((item) => ({
+    date:
+      item.UPDATED_AT == null || item.UPDATED_AT == ""
+        ? "-"
+        : moment(item.UPDATED_AT).format("YYYY-MM-DD"),
     icon: MessageCircleMore,
-    lastUpdate: item.UPDATED_AT == null || item.UPDATED_AT == "" ? "-" : ConvertDateFormat(moment(item.UPDATED_AT).toDate()),
+    lastUpdate:
+      item.UPDATED_AT == null || item.UPDATED_AT == ""
+        ? "-"
+        : ConvertDateFormat(moment(item.UPDATED_AT).toDate()),
     name: item.FULLNAME,
-    position: item.DEPARTMENT && item.POSITION  ? `${item.DEPARTMENT} - ${item.POSITION}` : "ไม่พบข้อมูล",
+    position:
+      item.DEPARTMENT && item.POSITION
+        ? `${item.DEPARTMENT} - ${item.POSITION}`
+        : "ไม่พบข้อมูล",
     status: item.NAME_STATUS,
     comment: item.REMARK == "" || item.REMARK == null ? "-" : item.REMARK,
-    empCode:item.CODE_APPROVER
-  }))
+    empCode: item.CODE_APPROVER,
+  }));
+
+  const [remark, setRemark] = useState("");
+
+  const ApproveRequest = async (status: number) => {
+    // 1	Pending
+    // 2	Reject
+    // 3	Done
+    // 4	Not Approve
+
+    if (status !== 3 && remark == "") {
+      toast.error("กรุณาระบุ หมายเหตุ!");
+      setTimeout(() => {
+        if (inputRefRemark?.current) {
+          inputRefRemark.current?.focus();
+        }
+      }, 300);
+      return;
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="w-[90%] max-w-none h-[95vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-[14.5px] text-gray-700 font-medium">
-            Request No : {requestNo}  ( Revise : {requestDetail[0]?.REV} )
+            Request No : {requestNo} ( Revise : {requestDetail[0]?.REV} )
           </DialogTitle>
           <DialogDescription className="text-[13px] flex items-center gap-x-2">
             <Info size={15} color={"red"} /> กรุณาตรวจสอบข้อมูลก่อนอนุมัติคำขอ
@@ -84,13 +122,29 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
             <Button
               className="bg-[#1ECD97] hover:bg-[#18a377] text-white"
               size="sm"
+              type="button"
+              onClick={async () => {
+                await ApproveRequest(3);
+              }}
             >
               <CircleCheck size={13} /> Approve
             </Button>
-            <Button variant="destructive" size={"sm"}>
+            <Button
+              variant="destructive"
+              size={"sm"}
+              onClick={async () => {
+                await ApproveRequest(4);
+              }}
+            >
               <CircleX size={13} /> Not Approve
             </Button>
-            <Button  className="bg-[#FFB639] text-white hover:bg-[#eea933]" size={"sm"}>
+            <Button
+              className="bg-[#FFB639] text-white hover:bg-[#eea933]"
+              size={"sm"}
+              onClick={async () => {
+                await ApproveRequest(2);
+              }}
+            >
               <RotateCcw size={13} /> Reject
             </Button>
           </div>
@@ -98,7 +152,10 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
             <div className="col-span-12 lg:col-span-4">
               <div className="bg-white shadow-smooth rounded-[12px] p-2">
                 <p className="text-[13px] my-[0.8rem]">รายละเอียดคำขอ</p>
-                <TableRequestDetail requestDetail={requestDetail} planWorkcell={planWorkcell}/>
+                <TableRequestDetail
+                  requestDetail={requestDetail}
+                  planWorkcell={planWorkcell}
+                />
               </div>
             </div>
             <div className="col-span-12 lg:col-span-8">
@@ -107,8 +164,17 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
               </div>
             </div>
             <div className="w-full col-span-12 lg:col-span-6 my-3">
-                <p className="text-[13px] text-gray-900 font-medium mb-1">หมายเหตุ :</p>
-              <Textarea className="w-full" placeholder="หมายเหตุ....." rows={3} />
+              <p className="text-[13px] text-gray-900 font-medium mb-1">
+                หมายเหตุ :
+              </p>
+              <Textarea
+                className="w-full"
+                placeholder="หมายเหตุ....."
+                rows={3}
+                ref={inputRefRemark}
+                value={remark}
+                onChange={(e) => setRemark(e.target.value)}
+              />
             </div>
           </div>
 
