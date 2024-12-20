@@ -33,7 +33,7 @@ const TableRequestDetail: React.FC<DetailRequestProps> = ({
         <div className="overflow-auto">
           <Table className="text-[12px] w-full">
             <TableHeader>
-              <TableRow className="bg-blue-200">
+              <TableRow className="bg-[#0E7FDB]">
                 <TableHead className="text-center text-gray-900">
                   หัวข้อ
                 </TableHead>

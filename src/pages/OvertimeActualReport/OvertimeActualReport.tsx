@@ -26,6 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import BarStackChart from "./BarStackChart/BarStackChart";
+import PieChartActual from "./PieChartActual/PieChartActual";
 
 export interface CsvData {
   date: string;
@@ -296,6 +298,16 @@ const OvertimeActualReport: React.FC = () => {
       </div>
 
       <hr />
+      <div className="grid grid-cols-12">
+        <div className="col-span-4">
+          <div className="w-full">
+            <PieChartActual />
+          </div>
+        </div>
+      </div>
+      <div className="my-2 p-2">
+        <BarStackChart />
+      </div>
 
       <div className="p-2 my-2">
         <p className="text-[13.5px] font-medium text-gray-800">
@@ -303,9 +315,9 @@ const OvertimeActualReport: React.FC = () => {
         </p>
         {!load ? (
           <motion.div
-            initial={{opacity:0,y:20}}
-            animate={{opacity:1,y:0}}
-            transition={{type:"tween",duration:0.3}}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "tween", duration: 0.3 }}
           >
             <TableOvertime data={allActual} />
           </motion.div>

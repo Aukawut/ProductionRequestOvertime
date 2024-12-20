@@ -31,6 +31,7 @@ import {
   } from "@/components/ui/table";
   import { useEffect, useState } from "react";
   import { ChevronLeft, ChevronRight, CirclePlus, Search } from "lucide-react";
+import ButtonExcelExport from "@/components/custom/ButtonExcelExport/ButtonExcelExport";
   
   interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -98,6 +99,7 @@ import {
           <Button size={"sm"} onClick={() => setShowDialogAdd(true)} className="bg-[#107EDB] text-white hover:bg-[#1c77c2]">
             <CirclePlus /> Add
           </Button>
+          <ButtonExcelExport data={data} fileName="Approver"/>
         
         </div>
         <div className="flex items-center gap-x-2">

@@ -65,9 +65,7 @@ export const columns = (
     accessorKey: "COUNT_USER",
     header: () => {
       return (
-        <Button size={"sm"} variant="ghost">
-          จำนวนพนักงาน (คน)
-        </Button>
+        "จำนวนพนักงาน (คน)"
       );
     },
     cell: ({ row }) => row.getValue("COUNT_USER"),
@@ -83,9 +81,9 @@ export const columns = (
     accessorKey: "SUM_MINUTE",
     header: () => {
       return (
-        <Button size={"sm"} variant="ghost">
-          เวลา / คน (ชั่วโมง)
-        </Button>
+        
+         " เวลา / คน (ชั่วโมง)"
+      
       );
     },
     cell: ({ row }) => Number(convertMinutesToHoursMinutes(row.getValue("SUM_MINUTE"))) / Number(row.getValue("COUNT_USER")),

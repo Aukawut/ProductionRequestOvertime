@@ -517,7 +517,7 @@ const Overview: React.FC = () => {
           boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
         }}
       >
-        <div className="absolute -left-[4rem] -top-[5rem] -z-1">
+        <div className="absolute -left-[7rem] -top-[5rem] -z-1">
           <div className="flex w-[12rem]">
             <Polygon color="#EBF6FE" />
           </div>

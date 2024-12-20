@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Popover, PopoverTrigger } from "@radix-ui/react-popover";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, Pin, PlusCircle, Search } from "lucide-react";
+import { CalendarIcon, Gauge, PlusCircle, Search } from "lucide-react";
 import { PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
@@ -58,14 +58,12 @@ const OvertimeActual: React.FC = () => {
   const fetchData = async () => {
     setLoad(true);
     await Promise.all([await GetActualOvertime(token)]).then((res) => {
-   
       if (res[0]?.length > 0) {
         setAllActual(res[0]);
       } else {
         setAllActual([]);
       }
       setLoad(false);
-    
     });
   };
 
@@ -77,7 +75,8 @@ const OvertimeActual: React.FC = () => {
   return (
     <div>
       <div className="my-2 flex items-center gap-x-2">
-        <Pin size={16} color="red" />
+        <Gauge size={17} color="red" />
+
         <p className="text-[14.5px] text-gray-800">Overtime Actual</p>
       </div>
 
@@ -163,6 +162,7 @@ const OvertimeActual: React.FC = () => {
       </div>
       <hr />
 
+      
       <DialogAddOvertime setIsOpen={setShowAdd} isOpen={showAdd} />
 
       <div className="p-2 my-2">
@@ -173,7 +173,9 @@ const OvertimeActual: React.FC = () => {
           <TableOvertime data={allActual} />
         ) : (
           <div className="flex justify-center items-center h-[50vh]">
-            <div ><LoadingCircle /></div>
+            <div>
+              <LoadingCircle />
+            </div>
           </div>
         )}
       </div>
