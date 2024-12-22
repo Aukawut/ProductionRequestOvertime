@@ -27,9 +27,10 @@ import TimelineApprove from "./timeline-approve";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import moment from "moment";
-import { ConvertDateFormat } from "@/function/main";
-import { useRef, useState } from "react";
+import { ApproveRequest, CalActualyFac, ConvertDateFormat, PayLoadApprove } from "@/function/main";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useOTManagementSystemStore } from "../../../store";
 
 
 interface ShowUsersSelected {
@@ -41,6 +42,7 @@ interface ShowUsersSelected {
   users: UserDetail[];
   commentApprover: CommentApprover[];
   planWorkcell: PlanWorkcell[];
+  rev:number;
 }
 
 export interface TimelineDataApproval {
@@ -56,6 +58,11 @@ export interface TimelineDataApproval {
   empCode: string;
 }
 
+export interface Actual {
+  SUN_HOURS : number ;
+}
+
+
 const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
   isOpen,
   setIsOpen,
@@ -64,8 +71,12 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
   users,
   commentApprover,
   planWorkcell,
+  rev
 }) => {
   const inputRefRemark = useRef<HTMLTextAreaElement>(null);
+  const token = useOTManagementSystemStore((state) => state.token)
+  const info = useOTManagementSystemStore((state) => state.info)
+  const [isSubmit,setIsSubmit] = useState(false)
 
   const comment: TimelineDataApproval[] = commentApprover?.map((item) => ({
     date:
@@ -88,8 +99,14 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
   }));
 
   const [remark, setRemark] = useState("");
-
-  const ApproveRequest = async (status: number) => {
+  const [actual,setActual] = useState<Actual[]>([])
+  const ApproveRequestByRequest = async (status: number,requestNo:string,rev:number) => {
+    setIsSubmit(true)
+    const payload:PayLoadApprove = {
+      status:status,
+      remark:remark,
+      actionBy:info?.EmployeeCode
+    }
     // 1	Pending
     // 2	Reject
     // 3	Done
@@ -97,14 +114,44 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
 
     if (status !== 3 && remark == "") {
       toast.error("กรุณาระบุ หมายเหตุ!");
+      setIsSubmit(false)
       setTimeout(() => {
+        
         if (inputRefRemark?.current) {
           inputRefRemark.current?.focus();
         }
       }, 300);
       return;
     }
+
+    const response = await ApproveRequest(token,requestNo,rev,payload);
+    console.log(response);
+    if(!response?.err && response?.status === "Ok") {
+      toast.success(response.msg)
+      setIsSubmit(false)
+      setIsOpen(false)
+    }else{
+      toast.error(response.msg)
+      setIsSubmit(false)
+    }
+    
   };
+
+  const fetchData = async() => {
+    if(requestDetail !== undefined) {
+    Promise.all([CalActualyFac(token,moment(requestDetail[0]?.START_DATE).year(),moment(requestDetail[0]?.START_DATE).month() + 1,requestDetail[0]?.ID_FACTORY)]).then((res) => {
+      if(res[0]?.length > 0) {
+        setActual(res[0])
+      }
+    })
+  }
+  }
+useEffect(() => {   
+  console.log(requestDetail);
+  
+
+  fetchData()
+})
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -123,8 +170,9 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
               className="bg-[#1ECD97] hover:bg-[#18a377] text-white"
               size="sm"
               type="button"
+              disabled={isSubmit}
               onClick={async () => {
-                await ApproveRequest(3);
+                await ApproveRequestByRequest(3,requestNo,rev);
               }}
             >
               <CircleCheck size={13} /> Approve
@@ -132,8 +180,9 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
             <Button
               variant="destructive"
               size={"sm"}
+              disabled={isSubmit}
               onClick={async () => {
-                await ApproveRequest(4);
+                await ApproveRequestByRequest(4,requestNo,rev);
               }}
             >
               <CircleX size={13} /> Not Approve
@@ -141,8 +190,9 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
             <Button
               className="bg-[#FFB639] text-white hover:bg-[#eea933]"
               size={"sm"}
+              disabled={isSubmit}
               onClick={async () => {
-                await ApproveRequest(2);
+                await ApproveRequestByRequest(2,requestNo,rev);
               }}
             >
               <RotateCcw size={13} /> Reject
@@ -155,6 +205,7 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
                 <TableRequestDetail
                   requestDetail={requestDetail}
                   planWorkcell={planWorkcell}
+                  actual={actual}
                 />
               </div>
             </div>

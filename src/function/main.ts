@@ -925,8 +925,6 @@ export const GetUserType: (token: string) => Promise<any> = async (
   }
 };
 
-
-
 export const DeletePlan: (token: string, id: number) => Promise<any> = async (
   token: string,
   id: number
@@ -1218,7 +1216,7 @@ export const InsertEmployee: (
   payload: BodyInsertEmployee
 ) => Promise<any> = async (token: string, payload: BodyInsertEmployee) => {
   const { VITE_BASE_URL } = import.meta.env;
-  
+
   try {
     const response = await axios.post(`${VITE_BASE_URL}/employee`, payload, {
       headers: {
@@ -1230,14 +1228,14 @@ export const InsertEmployee: (
     if (!response.data.err && response.data.status == "Ok") {
       console.log(response.data);
 
-      return {err:false,msg:response.data.msg,status : "Ok"};
+      return { err: false, msg: response.data.msg, status: "Ok" };
     } else {
-      return {err:true,msg:response.data.msg};
+      return { err: true, msg: response.data.msg };
     }
   } catch (err) {
     console.log(err);
 
-    return {err:true,msg:err};
+    return { err: true, msg: err };
   }
 };
 
@@ -1246,7 +1244,7 @@ export const DeleteEmployee: (
   code: string
 ) => Promise<any> = async (token: string, code: string) => {
   const { VITE_BASE_URL } = import.meta.env;
-  
+
   try {
     const response = await axios.delete(`${VITE_BASE_URL}/employee/${code}`, {
       headers: {
@@ -1258,36 +1256,41 @@ export const DeleteEmployee: (
     if (!response.data.err && response.data.status == "Ok") {
       console.log(response.data);
 
-      return {err:false,msg:response.data.msg,status : "Ok"};
+      return { err: false, msg: response.data.msg, status: "Ok" };
     } else {
-      return {err:true,msg:response.data.msg};
+      return { err: true, msg: response.data.msg };
     }
   } catch (err) {
     console.log(err);
 
-    return {err:true,msg:err};
+    return { err: true, msg: err };
   }
 };
 
 export const GetActualOvertimeByDate: (
   token: string,
-  start:string,
-  end:string,
-  ugroup:string,
-  factory:string,
-) => Promise<any> = async (token: string,
-  start:string,
-  end:string,
-  ugroup:string,
-  factory:string) => {
+  start: string,
+  end: string,
+  ugroup: string,
+  factory: string
+) => Promise<any> = async (
+  token: string,
+  start: string,
+  end: string,
+  ugroup: string,
+  factory: string
+) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
-    const response = await axios.get(`${VITE_BASE_URL}/actual/ot/${start}/${end}/${ugroup}/${factory}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.get(
+      `${VITE_BASE_URL}/actual/ot/${start}/${end}/${ugroup}/${factory}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     console.log(response.data);
     if (!response.data.err && response.data.status == "Ok") {
@@ -1301,5 +1304,81 @@ export const GetActualOvertimeByDate: (
     console.log(err);
 
     return [];
+  }
+};
+
+export interface PayLoadApprove {
+  status: number;
+  actionBy: string;
+  remark: string;
+}
+export const ApproveRequest: (
+  token: string,
+
+  requestNo: string,
+  rev: number,
+  payload:PayLoadApprove
+) => Promise<any> = async (
+  token: string,
+  requestNo: string,
+
+  rev: number,
+  payload:PayLoadApprove
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.put(
+      `${VITE_BASE_URL}/request/update/${requestNo}/${rev}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (err) {
+    console.log(err);
+
+    return {err:true,msg:err};
+  }
+};
+
+
+
+export const CalActualyFac: (
+  token: string,
+  year: number,
+  month: number,
+  fac:number
+) => Promise<any> = async (
+  token: string,
+  year: number,
+  month: number,
+  fac:number
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/actual/cal/${year}/${month}/${fac}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if(!response.data.err && response.data.status == "Ok") {
+
+      return response.data.results;
+    }else{
+      return []
+    }
+  } catch (err) {
+    console.log(err);
+
+    return []
   }
 };

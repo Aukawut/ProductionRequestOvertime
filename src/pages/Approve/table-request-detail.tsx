@@ -10,15 +10,18 @@ import {
 import { PlanWorkcell, SummaryRequestLastRev } from "./Approve";
 import moment from "moment";
 import { ConvertDateFormat } from "@/function/main";
+import { Actual } from "./dialog-detail-request";
 
 interface DetailRequestProps {
   requestDetail: SummaryRequestLastRev[];
   planWorkcell: PlanWorkcell[];
+  actual: Actual[]
 }
 
 const TableRequestDetail: React.FC<DetailRequestProps> = ({
   requestDetail,
   planWorkcell,
+  actual
 }) => {
   const sumHoursReq = Number(requestDetail[0]?.SUM_MINUTE) / 60;
   const plan = Number(requestDetail[0]?.SUM_PLAN);
@@ -107,6 +110,14 @@ const TableRequestDetail: React.FC<DetailRequestProps> = ({
               </TableCell>
               <TableCell className="text-center bg-red-400 text-red-50">
                 {planWC}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="text-center">
+                Actual OT
+              </TableCell>
+              <TableCell className="text-center bg-blue-400 text-red-50">
+                {actual?.length >0  ? actual[0]?.SUN_HOURS : 0}
               </TableCell>
             </TableRow>
           

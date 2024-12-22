@@ -58,7 +58,7 @@ export const data = [
     Icon: Check,
     bgColor: "#C1EFDF",
     textColor: "#005A2B",
-    aliasTitle: "Approved",
+    aliasTitle: "Done",
     titleTH: "อนุมัติ",
   },
 ];
@@ -129,6 +129,7 @@ export interface PlanWorkcell {
   YEAR: number;
 }
 
+
 const Approve: React.FC = () => {
   const [countApprove, setCountApprove] = useState<CountApprove[]>([]);
   const [detailApprove, setDetailApprove] = useState<DetailApprove[]>([]);
@@ -142,6 +143,7 @@ const Approve: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [requestNo, setRequestNo] = useState("");
+  const [rev, setRev] = useState(0);
   const info = useOTManagementSystemStore((state) => state.info);
   const token = useOTManagementSystemStore((state) => state.token);
   const [planWorkcell, setPlanWorkcell] = useState<PlanWorkcell[]>([]);
@@ -177,6 +179,8 @@ const Approve: React.FC = () => {
       if (res?.length > 0) {
         if (res[0]?.length > 0 && res[1]?.length) {
           setRequestDetail(res[0]);
+          console.log("res[0]",res[0]);
+          
           setUsers(res[1]);
           setShowDetail(true);
 
@@ -257,6 +261,7 @@ const Approve: React.FC = () => {
           users={users}
           commentApprover={commentApprover}
           planWorkcell={planWorkcell}
+          rev={rev}
         />
 
         <div className="p-2 bg-white rounded-[13px] shadow-smooth mt-1">
@@ -271,6 +276,7 @@ const Approve: React.FC = () => {
             data={detailApprove}
             FetchDetailRequest={FetchDetailRequest}
             setRequestNo={setRequestNo}
+            setRev={setRev}
             GetPlanByWorkcell={GetPlanByWorkcell}
           />
         </div>
