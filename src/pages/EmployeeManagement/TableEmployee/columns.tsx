@@ -44,12 +44,15 @@ export const columns = (
                 cancelButtonText: "ยกเลิก",
               }).then(async (result) => {
                 if (result.isConfirmed) {
-                  const deleteUser = await DeleteEmployee(token,row.getValue("EMPLOYEE_CODE"));
-                  fetchData(false)
-                  
-                  if(!deleteUser.err) {
+                  const deleteUser = await DeleteEmployee(
+                    token,
+                    row.getValue("EMPLOYEE_CODE")
+                  );
+                  fetchData(false);
+
+                  if (!deleteUser.err) {
                     toast.success(deleteUser?.msg);
-                  }else{
+                  } else {
                     toast.error(deleteUser?.msg);
                   }
                 }
@@ -80,10 +83,28 @@ export const columns = (
   {
     accessorKey: "FAC",
     header: () => "ชื่อ - สกุล",
-    cell: ({ row }) =>
-      `${data[row.index]?.PREFIX}${data[row.index]?.FNAME_TH} ${
-        data[row.index]?.LNAME_TH
-      }`,
+    cell: ({ row }) => (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <div className="w-[120px] flex justify-start">
+              <p className="text-[13px] text-gray-900 truncate">
+                {`${data[row.index]?.PREFIX}${data[row.index]?.FNAME_TH} ${
+                  data[row.index]?.LNAME_TH
+                }`}
+              </p>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+          <p className="text-[12px]">
+                {`${data[row.index]?.PREFIX}${data[row.index]?.FNAME_TH} ${
+                  data[row.index]?.LNAME_TH
+                }`}
+              </p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    ),
   },
   {
     accessorKey: "EMPLOYEE_CODE",
@@ -141,7 +162,9 @@ export const columns = (
             </div>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{ConvertDateFormat(moment(row.getValue("CREATED_AT")).toDate())}</p>
+            <p>
+              {ConvertDateFormat(moment(row.getValue("CREATED_AT")).toDate())}
+            </p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

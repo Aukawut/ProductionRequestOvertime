@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Formik } from "formik";
 
-import { CheckCircle, Info, Search, User } from "lucide-react";
+import { CheckCircle, Info, Search, Trash2, User } from "lucide-react";
 
 import {
   BodyInsertEmployee,
@@ -117,7 +117,7 @@ const DialogAddEmployee: React.FC<DialogAddPlan> = ({
           <div>
             <Formik
               initialValues={{ ...initialPayload }}
-              onSubmit={async (values, { resetForm }) => {
+              onSubmit={async (values, { resetForm,setSubmitting }) => {
                 const insert = await InsertEmployee(token, values);
                 if (!insert.err) {
                   resetForm()
@@ -137,6 +137,7 @@ const DialogAddEmployee: React.FC<DialogAddPlan> = ({
                   );
              
                 }else{
+                  setSubmitting(false)
                   toast.error(insert.msg)
                 }
                 console.log("insert", insert);
@@ -351,6 +352,7 @@ const DialogAddEmployee: React.FC<DialogAddPlan> = ({
                             <Table className="w-full text-[13px]">
                               <TableHeader>
                                 <TableRow>
+                                  <TableHead>Action</TableHead>
                                   <TableHead>รหัสพนักงาน</TableHead>
                                   <TableHead>คำนำหน้า</TableHead>
                                   <TableHead>ชื่อ (TH)</TableHead>
@@ -362,6 +364,13 @@ const DialogAddEmployee: React.FC<DialogAddPlan> = ({
                               <TableBody>
                                 {employeeInfo?.map((emp) => (
                                   <TableRow key={emp.EmployeeCode}>
+                                    <TableCell className="font-medium">
+                                      <Button size={"sm"} variant={"ghost"} className="bg-[#FED0D0]" onClick={()=> {
+                                        setEmployeeInfo([])
+                                      }}>
+                                      <Trash2 color="#A30014" size={15} />
+                                      </Button>
+                                    </TableCell>
                                     <TableCell className="font-medium">
                                       {emp.EmployeeCode}
                                     </TableCell>
@@ -386,7 +395,7 @@ const DialogAddEmployee: React.FC<DialogAddPlan> = ({
                     size={"sm"}
                     className="bg-[#107EDB] text-white hover:bg-[#1c77c2] my-4"
                   >
-                    <CheckCircle /> Save Plan
+                    <CheckCircle /> Save
                   </Button>
                 </form>
               )}

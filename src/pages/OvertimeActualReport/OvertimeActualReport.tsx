@@ -13,6 +13,9 @@ import { useOTManagementSystemStore } from "../../../store";
 import {
   GetActualOvertimeByDate,
   GetAllFactory,
+  GetSummaryOvertimeByFactory,
+  GetSummaryOvertimeByType,
+  GetSummaryOvertimeGroupByDate,
   GetUserGroup,
 } from "@/function/main";
 import LoadingCircle from "@/components/custom/loading-circle";
@@ -28,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import BarStackChart from "./BarStackChart/BarStackChart";
 import PieChartActual from "./PieChartActual/PieChartActual";
+import AreaChartReport from "./AreaChart/AreaChart";
 
 export interface CsvData {
   date: string;
@@ -88,12 +92,34 @@ interface Factory {
   FACTORY_NAME: string;
 }
 
+export interface ActualByFactory {
+  FACTORY_NAME: string;
+  ID_FACTORY: number;
+  INLINE_HOURS: number;
+  OFFLINE_HOURS: number;
+}
+export interface ActualByOvertimeType {
+  ID_TYPE_OT: number;
+  HOURS_AMOUNT: string;
+  SUM_HOURS: number;
+}
+export interface ActualByOvertimeDate {
+  INLINE_HOURS: number;
+  OFFLINE_HOURS: number;
+  DATE_OT: string;
+}
+
 const OvertimeActualReport: React.FC = () => {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [allActual, setAllActual] = useState<Actual[]>([]);
   const [ugroupList, setUgroupList] = useState<UGroup[]>([]);
   const [allFactory, setAllFactory] = useState<Factory[]>([]);
+  const [summaryByFac, setSummaryByFac] = useState<ActualByFactory[]>([]);
+  const [summaryByType, setSummaryByType] = useState<ActualByOvertimeType[]>(
+    []
+  );
+  const [summaryByDate, setSummaryByDate] = useState<ActualByOvertimeDate[]>([]);
   const token = useOTManagementSystemStore((state) => state.token);
   const [load, setLoad] = useState(false);
   const [uGroup, setUGroup] = useState("0");
@@ -111,6 +137,27 @@ const OvertimeActualReport: React.FC = () => {
       ),
       await GetUserGroup(token),
       await GetAllFactory(token),
+      await GetSummaryOvertimeByFactory(
+        token,
+        moment(moment(new Date())).format("YYYY-MM-DD"),
+        moment(moment(new Date()).add(5, "days")).format("YYYY-MM-DD"),
+        uGroup,
+        factory
+      ),
+      await GetSummaryOvertimeByType(
+        token,
+        moment(moment(new Date())).format("YYYY-MM-DD"),
+        moment(moment(new Date()).add(5, "days")).format("YYYY-MM-DD"),
+        uGroup,
+        factory
+      ),
+      await GetSummaryOvertimeGroupByDate(
+        token,
+        moment(moment(new Date())).format("YYYY-MM-DD"),
+        moment(moment(new Date()).add(5, "days")).format("YYYY-MM-DD"),
+        uGroup,
+        factory
+      ),
     ]).then((res) => {
       if (res[0]?.length > 0) {
         setAllActual(res[0]);
@@ -137,6 +184,22 @@ const OvertimeActualReport: React.FC = () => {
         setAllFactory(allFac);
       } else {
         setAllFactory([]);
+      }
+      if (res[3]?.length > 0) {
+        setSummaryByFac(res[3]);
+      } else {
+        setSummaryByFac([]);
+      }
+
+      if (res[4]?.length > 0) {
+        setSummaryByType(res[4]);
+      } else {
+        setSummaryByType([]);
+      }
+      if (res[5]?.length > 0) {
+        setSummaryByDate(res[5]);
+      } else {
+        setSummaryByDate([]);
       }
 
       setLoad(false);
@@ -283,10 +346,57 @@ const OvertimeActualReport: React.FC = () => {
                   uGroup,
                   factory
                 );
+
+                const responseByFac = await GetSummaryOvertimeByFactory(
+                  token,
+                  moment(moment(startDate)).format("YYYY-MM-DD"),
+                  moment(moment(endDate)).format("YYYY-MM-DD"),
+                  uGroup,
+                  factory
+                );
+
+                const responseByType = await GetSummaryOvertimeByType(
+                  token,
+                  moment(moment(startDate)).format("YYYY-MM-DD"),
+                  moment(moment(endDate)).format("YYYY-MM-DD"),
+                  uGroup,
+                  factory
+                );
+                const responseByDate = await GetSummaryOvertimeGroupByDate(
+                  token,
+                  moment(moment(startDate)).format("YYYY-MM-DD"),
+                  moment(moment(endDate)).format("YYYY-MM-DD"),
+                  uGroup,
+                  factory
+                );
+
                 if (response?.length > 0) {
                   setAllActual(response);
                 } else {
                   setAllActual([]);
+                }
+
+                if (responseByFac?.length > 0) {
+                  console.log("responseByFac", responseByFac);
+
+                  setSummaryByFac(responseByFac);
+                } else {
+                  setSummaryByFac([]);
+                }
+
+                if (responseByType?.length > 0) {
+                  console.log("setSummaryByType", responseByType);
+
+                  setSummaryByType(responseByType);
+                } else {
+                  setSummaryByType([]);
+                }
+                if (responseByDate?.length > 0) {
+                  console.log("setSummaryByDate", responseByDate);
+
+                  setSummaryByDate(responseByDate);
+                } else {
+                  setSummaryByDate([]);
                 }
                 setLoad(false);
               }}
@@ -298,37 +408,49 @@ const OvertimeActualReport: React.FC = () => {
       </div>
 
       <hr />
-      <div className="grid grid-cols-12">
-        <div className="col-span-4">
-          <div className="w-full">
-            <PieChartActual />
+      {load ? (
+        <div className="flex justify-center items-center h-[50vh]">
+          <div>
+            <LoadingCircle />
           </div>
         </div>
-      </div>
-      <div className="my-2 p-2">
-        <BarStackChart />
-      </div>
-
-      <div className="p-2 my-2">
-        <p className="text-[13.5px] font-medium text-gray-800">
-          ตารางแสดงข้อมูลการทำโอที | Table showing Overtime Data
-        </p>
-        {!load ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ type: "tween", duration: 0.3 }}
-          >
-            <TableOvertime data={allActual} />
-          </motion.div>
-        ) : (
-          <div className="flex justify-center items-center h-[50vh]">
-            <div>
-              <LoadingCircle />
+      ) : (
+        <>
+          <div>
+            <div className="grid grid-cols-12 mt-2 gap-2">
+              <div className="col-span-4">
+                <div className="w-full">
+                  <PieChartActual summaryByType={summaryByType} />
+                </div>
+              </div>
+              <div className="col-span-8">
+                <AreaChartReport
+                  start={moment(startDate).format("YYYY-MM-DD")}
+                  end={moment(endDate).format("YYYY-MM-DD")}
+                  summaryByDate={summaryByDate}
+                />
+              </div>
+            </div>
+            <div className="my-2 p-2">
+              <BarStackChart summaryByFac={summaryByFac} />
             </div>
           </div>
-        )}
-      </div>
+
+          <div className="p-2 my-2">
+            <p className="text-[13.5px] font-medium text-gray-800">
+              ตารางแสดงข้อมูลการทำโอที | Table showing Overtime Data
+            </p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "tween", duration: 0.3 }}
+            >
+              <TableOvertime data={allActual} />
+            </motion.div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

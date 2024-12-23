@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Formik, Form, FormikHelpers } from "formik";
 import Swal from "sweetalert2";
@@ -42,6 +42,7 @@ import {
 import StepApproval from "@/components/custom/approval-step";
 
 import {
+  CalActualyFac,
   GetAllFactoryByGroup,
   GetAllOvertimeList,
   GetGroupDepartmentActive,
@@ -128,6 +129,11 @@ interface InitialData {
   groupworkcell: number;
 }
 
+export interface Actual {
+  SUN_HOURS : number ;
+}
+
+
 const Request: React.FC = () => {
   const token = useOTManagementSystemStore((state) => state.token);
   const [isSubmit, setIsSubmit] = useState(false);
@@ -153,7 +159,6 @@ const Request: React.FC = () => {
   const [planByFactory, setPlanByFactory] = useState<PlanByFactory[]>([]);
   const [planByWorkcell, setPlanByWorkcell] = useState<PlanByWorkcell[]>([]);
   
-  const [actualWorkcell, setActualWorkcell] = useState(0);
   const [actualFactory, setActualFactory] = useState(0);
 
   const employeeCode = useOTManagementSystemStore(
@@ -298,6 +303,15 @@ const Request: React.FC = () => {
             month
           )
         );
+        
+        const actual:Actual[]  = await CalActualyFac(token, new Date().getFullYear(),month,Number(role[0]?.ID_FACTORY))
+        
+        if(actual?.length > 0) {
+          setActualFactory(actual[0]?.SUN_HOURS)
+        }else{
+          setActualFactory(0)
+        }
+            
 
         setInitialData((prev) => {
           prev.factory = role[0]?.ID_FACTORY;
@@ -548,12 +562,45 @@ const Request: React.FC = () => {
                                       moment(new Date()).utc().toDate()
                                     );
                                   }}
-                                  onSelect={(date) => {
+                                  onSelect={async (date) => {
                                     setDateRequestStart(date as Date);
                                     setDateRequestEnd(
                                       moment(date).add(3, "hours").toDate()
                                     );
                                     setFieldValue("overtimeDate", date);
+
+                                    // Calculate Actual By Factory
+                                    const actual:Actual[]  = await CalActualyFac(token, 
+                                      moment(date).year(),moment(date).month() + 1,Number(values.factory))
+                                      
+                                      // Set Plan By Factory
+                                      setPlanByFactory(
+                                        await GetPlanByFactory(
+                                          token,
+                                          Number(Number(values.factory)),
+                                          moment(date).year(),
+                                          moment(date).month() + 1
+                                        )
+                                      );
+
+                                      // set Plan By Workcell
+                                      setPlanByWorkcell(
+                                        await GetPlanByWorkcell(
+                                          token,
+                                          Number(values.workcell),
+                                          moment(date).year(),
+                                          moment(date).month() + 1
+                                        )
+                                      );
+
+                                    if(actual?.length > 0) {
+                                      setActualFactory(actual[0]?.SUN_HOURS)
+                                    }else{
+                                      setActualFactory(0)
+                                    }
+
+                                    
+                                   
                                   }}
                                   initialFocus
                                 />
@@ -730,6 +777,15 @@ const Request: React.FC = () => {
                               getUserDataByFactory(Number(fac[0]?.ID_FACTORY));
                               setFactory(Number(fac[0]?.ID_FACTORY));
 
+                              const actual:Actual[]  = await CalActualyFac(token, moment(dateStart).year(),moment(dateStart).month() + 1,Number(fac[0]?.ID_FACTORY))
+        
+                              if(actual?.length > 0) {
+                                setActualFactory(actual[0]?.SUN_HOURS)
+                              }else{
+                                setActualFactory(0)
+                              }
+
+
                               setTimeout(() => {
                                 setFieldValue("factory", fac[0]?.ID_FACTORY);
                               }, 300);
@@ -877,6 +933,13 @@ const Request: React.FC = () => {
                               token,
                               Number(e)
                             );
+                            const actual:Actual[]  = await CalActualyFac(token, moment(dateStart).year(),moment(dateStart).month() + 1,Number(e))
+        
+                            if(actual?.length > 0) {
+                              setActualFactory(actual[0]?.SUN_HOURS)
+                            }else{
+                              setActualFactory(0)
+                            }
                             let year = moment(dateRequestStart).year()
                             let month =  moment(dateRequestStart)?.month() + 1
                             setPlanByFactory(

@@ -488,13 +488,14 @@ export const convertMinutesToHoursMinutes = (minutes: number) => {
 
 export const GetRequestDetailByRequest = async (
   token: string,
-  requestNo: string
+  requestNo: string,
+  rev:number
 ) => {
   const { VITE_BASE_URL } = import.meta.env;
 
   try {
     const response = await axios.get(
-      `${VITE_BASE_URL}/summary/request/lasted/${requestNo}`,
+      `${VITE_BASE_URL}/summary/request/${requestNo}/${rev}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1307,10 +1308,131 @@ export const GetActualOvertimeByDate: (
   }
 };
 
+export const GetSummaryOvertimeByFactory: (
+  token: string,
+  start: string,
+  end: string,
+  ugroup: string,
+  factory: string
+) => Promise<any> = async (
+  token: string,
+  start: string,
+  end: string,
+  ugroup: string,
+  factory: string
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/actual/factory/${start}/${end}/${ugroup}/${factory}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log(response.data);
+    if (!response.data.err && response.data.status == "Ok") {
+      console.log(response.data);
+
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const GetSummaryOvertimeByType: (
+  token: string,
+  start: string,
+  end: string,
+  ugroup: string,
+  factory: string
+) => Promise<any> = async (
+  token: string,
+  start: string,
+  end: string,
+  ugroup: string,
+  factory: string
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/actual/type/${start}/${end}/${ugroup}/${factory}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log(response.data);
+    if (!response.data.err && response.data.status == "Ok") {
+      console.log(response.data);
+
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const GetSummaryOvertimeGroupByDate: (
+  token: string,
+  start: string,
+  end: string,
+  ugroup: string,
+  factory: string
+) => Promise<any> = async (
+  token: string,
+  start: string,
+  end: string,
+  ugroup: string,
+  factory: string
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/actual/bydate/${start}/${end}/${ugroup}/${factory}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log(response.data);
+    if (!response.data.err && response.data.status == "Ok") {
+      console.log(response.data);
+
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
 export interface PayLoadApprove {
   status: number;
   actionBy: string;
   remark: string;
+  special:string;
 }
 export const ApproveRequest: (
   token: string,
@@ -1360,10 +1482,118 @@ export const CalActualyFac: (
   fac:number
 ) => {
   const { VITE_BASE_URL } = import.meta.env;
-
+  if(fac !== undefined){
   try {
     const response = await axios.get(
       `${VITE_BASE_URL}/actual/cal/${year}/${month}/${fac}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if(!response.data.err && response.data.status == "Ok") {
+
+      return response.data.results;
+    }else{
+      return []
+    }
+  } catch (err) {
+    console.log(err);
+
+    return []
+  }
+}
+};
+
+export const CalActualyWorkcell: (
+  token: string,
+  year: number,
+  month: number,
+  requestNo:string,
+  rev:number
+) => Promise<any> = async (
+  token: string,
+  year: number,
+  month: number,
+  requestNo:string,
+  rev:number
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+  if(requestNo !== undefined && rev !== undefined){
+  try {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/actual/workcell/${requestNo}/${rev}/${year}/${month}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if(!response.data.err && response.data.status == "Ok") {
+
+      return response.data.results;
+    }else{
+      return []
+    }
+  } catch (err) {
+    console.log(err);
+
+    return []
+  }
+}
+};
+
+
+export const GetRequestListByCodeAndStatus: (
+  token: string,
+  status: number,
+  code: string,
+
+) => Promise<any> = async (
+  token: string,
+  status: number,
+  code: string,
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+ 
+  try {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/lasted/request/${status}/${code}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if(!response.data.err && response.data.status == "Ok") {
+
+      return response.data.results;
+    }else{
+      return []
+    }
+  } catch (err) {
+    console.log(err);
+
+    return []
+  }
+};
+
+export const GetRequestListByUserCodeAndStatus: (
+  token: string,
+  status: number,
+  code: string,
+
+) => Promise<any> = async (
+  token: string,
+  status: number,
+  code: string,
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+ 
+  try {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/lasted/user/request/${status}/${code}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

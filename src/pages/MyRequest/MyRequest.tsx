@@ -6,17 +6,27 @@ import { cardMenu } from "./data";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import DonutRequest from "./chart/DonutRequest";
+
 import {
   CountRequestByEmpCode,
   CountRequestByYear,
   GetYearMenuOption,
   GetMonthMenuOption,
   GetRequestNoAndStatusByUser,
+  GetRequestDetailByRequest,
+  GetUserByRequestAndRev,
+  GetCommentApproverByRequestNo,
+  GetPlanByWorkcell,
+  GetRequestListByUserCodeAndStatus,
 } from "../../function/main";
 import { motion } from "framer-motion";
 import { useOTManagementSystemStore } from "../../../store";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useNavigate } from "react-router-dom";
+import DialogRequestList from "../Approve/dialog-request-list";
+import moment from "moment";
+import { toast } from "sonner";
+import DialogDetailRequest from "../Approve/dialog-detail-request";
 
 export interface CountRequest {
   AMOUNT: number;
@@ -46,9 +56,86 @@ export interface RequestNoByUser {
   NAME_STATUS: string;
 }
 
+export interface CountApprove {
+  NAME_STATUS: string;
+  ID_STATUS_APV: number;
+  AMOUNT: number;
+}
+
+export interface DetailApprove {
+  REQUEST_NO: string;
+  CODE_APPROVER: string;
+  REV: number;
+  FACTORY_NAME: string;
+  NAME_GROUP: string;
+  ID_FACTORY: number;
+  ID_GROUP_DEPT: number;
+  COUNT_USER: number;
+  DURATION: number;
+  HOURS_AMOUNT: number;
+  SUM_MINUTE: number;
+  MINUTE_TOTAL: number;
+}
+
+export interface SummaryRequestLastRev {
+  REQUEST_NO: string;
+  REV: number;
+  NAME_STATUS: string;
+  FULLNAME: string;
+  OT_TYPE: number;
+  FACTORY_NAME: string;
+  NAME_WORKGRP: string;
+  NAME_WORKCELL: string;
+  USERS_AMOUNT: number;
+  SUM_MINUTE: number;
+  START_DATE: string;
+  END_DATE: string;
+  ID_FACTORY: number;
+  SUM_PLAN: number;
+  SUM_PLAN_OB: number;
+  ID_WORK_CELL: number;
+  REMARK:string ;
+}
+
+export interface UserDetail {
+  EMPLOYEE_CODE: string;
+  FULLNAME: string;
+  UHR_Position: string;
+}
+
+export interface CommentApprover {
+  REQUEST_NO: string;
+  ID_STATUS_APV: number;
+  CODE_APPROVER: string;
+  CREATED_AT: string;
+  UPDATED_AT: string;
+  NAME_STATUS: string;
+  REMARK: string;
+  DEPARTMENT: string;
+  POSITION: string;
+  FULLNAME: string;
+}
+export interface RequestList {
+  DURATION: number;
+  FACTORY_NAME: string;
+  HOURS_AMOUNT: string;
+  HOURS_TOTAL: number;
+  ID_TYPE_OT: number;
+  PERSON: number;
+  REQUEST_NO: string;
+  REV: number;
+}
+
+export interface PlanWorkcell {
+  ID_FACTORY: number;
+  MONTH: number;
+  SUM_HOURS: number;
+  YEAR: number;
+}
+
 const MyRequest: React.FC = () => {
   const [countRequest, setCountRequest] = useState<CountRequest[]>([]);
-  const token = useOTManagementSystemStore((state) => state.token);
+
   const sum = countRequest?.reduce((acc, obj) => acc + obj.AMOUNT, 0);
   const containerTop = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(true);
@@ -56,6 +143,7 @@ const MyRequest: React.FC = () => {
   const [monthMenu, setMonthMenu] = useState<MonthMenu[]>([]);
   const [requestByYear, setRequestByYear] = useState<RequestByYear[]>([]);
   const [requests, setRequests] = useState<RequestNoByUser[]>([]);
+  const [requestList, setRequestList] = useState<RequestList[]>([]);
 
   const empCode = useOTManagementSystemStore(
     (state) => state.info?.EmployeeCode
@@ -81,7 +169,7 @@ const MyRequest: React.FC = () => {
     Promise.all([
       setCountRequest(await CountRequestByEmpCode(token, empCode)),
       setYearMenu(await GetYearMenuOption(token)),
-      setMonthMenu(await GetMonthMenuOption(token,year)),
+      setMonthMenu(await GetMonthMenuOption(token, year)),
       setRequestByYear(await CountRequestByYear(token, year)),
       setRequests(await GetRequestNoAndStatusByUser(token, empCode)),
     ]).then(() => {
@@ -103,7 +191,90 @@ const MyRequest: React.FC = () => {
   };
 
   const navigate = useNavigate();
+
+  const [requestDetail, setRequestDetail] = useState<SummaryRequestLastRev[]>(
+    []
+  );
+  const [commentApprover, setCommentApprover] = useState<CommentApprover[]>([]);
+  const [users, setUsers] = useState<UserDetail[]>([]);
+    const [status, setStatus] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [showDetail, setShowDetail] = useState(false);
+    const [requestNo, setRequestNo] = useState("");
+    const [rev, setRev] = useState(0);
+    const info = useOTManagementSystemStore((state) => state.info);
+    const token = useOTManagementSystemStore((state) => state.token);
+    const [planWorkcell, setPlanWorkcell] = useState<PlanWorkcell[]>([]);
+    const [showRequestList, setShowRequestList] = useState(false);
+    const [idStatus,setIdStatus] = useState(0);
   
+
+  const FetchDetailRequest = async (
+    tokenStr: string,
+    requestNo: string,
+    rev: number
+  ) => {
+    await Promise.all([
+      GetRequestDetailByRequest(tokenStr, requestNo,rev),
+      GetUserByRequestAndRev(tokenStr, requestNo, rev),
+      GetCommentApproverByRequestNo(tokenStr, requestNo, rev),
+    ]).then(async (res) => {
+      if (res?.length > 0) {
+        if (res[0]?.length > 0 && res[1]?.length) {
+          setRequestDetail(res[0]);
+          console.log("res[0]", res[0]);
+
+          setUsers(res[1]);
+          setShowDetail(true);
+
+          const month = moment(res[0][0]?.START_DATE).month() + 1;
+          const year = moment(res[0][0]?.START_DATE).year();
+          const work = res[0][0]?.ID_WORK_CELL;
+
+          const planWorkcell = await GetPlanByWorkcell(
+            token,
+            work,
+            year,
+            month
+          );
+
+          setPlanWorkcell(planWorkcell);
+        }
+        if (res[2]?.length > 0) {
+          setCommentApprover(res[2]);
+        } else {
+          setCommentApprover([]);
+        }
+      } else {
+        toast.error("--- ไม่พบข้อมูล ---");
+      }
+    });
+  };
+
+
+  const GetRequestList = async (status: number, code: string) => {
+    setIdStatus(status)
+    // 1 = Pending
+    if (status == 1) {
+     
+      await Promise.all([GetRequestListByUserCodeAndStatus(token, status, code)])
+        .then((response) => {
+          console.log("res", response);
+          if (response[0]?.length > 0) {
+            setRequestList(response[0]);
+            setShowRequestList(true)
+          } else {
+            setRequestList([]);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
+
+  const CloseDialogDetail = () => setShowDetail(false)
+
   useEffect(() => {
     const container = containerTop.current;
     if (container) {
@@ -115,7 +286,6 @@ const MyRequest: React.FC = () => {
       }
     };
   }, []);
-  
 
   useEffect(() => {}, [scrollInfo]);
 
@@ -166,6 +336,7 @@ const MyRequest: React.FC = () => {
             {cardMenu?.map((item, index) => (
               <div className="col-span-12 lg:col-span-3" key={index}>
                 <CardRequest
+                  GetRequestList={GetRequestList}
                   Icon={item.Icon}
                   title={item.title}
                   amount={findAmount(item.aliasTitle)}
@@ -173,12 +344,26 @@ const MyRequest: React.FC = () => {
                   bgColor={item.bgColor}
                   textColor={item.textColor}
                   titleTH={item.titleTH}
+                  status={item.status}
                 />
               </div>
             ))}
           </div>
         </div>
       </div>
+       {/* Dialog */}
+       <DialogDetailRequest
+          setIsOpen={setShowDetail}
+          isOpen={showDetail}
+          closeDialog={CloseDialogDetail}
+          requestNo={requestNo}
+          requestDetail={requestDetail}
+          users={users}
+          commentApprover={commentApprover}
+          planWorkcell={planWorkcell}
+          rev={rev}
+          showAction={false}
+        />
 
       <div className="grid grid-cols-12 mt-2 gap-x-2">
         <div className="col-span-12 lg:col-span-6">
@@ -193,7 +378,7 @@ const MyRequest: React.FC = () => {
               size={"sm"}
               className="rounded-[8px] text-[12px] mt-2"
               onClick={() => {
-                navigate("/request")
+                navigate("/request");
               }}
             >
               <Plus />
@@ -250,6 +435,18 @@ const MyRequest: React.FC = () => {
             </Alert>
           )}
         </div>
+
+        <DialogRequestList
+            data={requestList}
+            FetchDetailRequest={FetchDetailRequest}
+            setRequestNo={setRequestNo}
+            setRev={setRev}
+            GetPlanByWorkcell={GetPlanByWorkcell}
+            setIsOpen={setShowRequestList}
+            isOpen={showRequestList}
+            requestList={requestList}
+            status={idStatus}
+          />
       </div>
     </motion.div>
   );

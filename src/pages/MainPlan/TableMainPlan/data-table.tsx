@@ -30,7 +30,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, CirclePlus, FileDown, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, CirclePlus, Search } from "lucide-react";
+import ButtonExcelExport from "@/components/custom/ButtonExcelExport/ButtonExcelExport";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -98,9 +99,8 @@ export function DataTableMainPlan<TData, TValue>({
         <Button size={"sm"} onClick={() => setShowDialogAdd(true)} className="bg-[#107EDB] text-white hover:bg-[#1c77c2]">
           <CirclePlus /> Add
         </Button>
-        <Button size={"sm"} onClick={() => setShowDialogAdd(true)} className="bg-[#107C41]">
-        <FileDown /> Export
-        </Button>
+        <ButtonExcelExport data={data} fileName="Plan By Factory"/>
+      
       </div>
       <div className="flex items-center gap-x-2">
         <div className="flex justify-between items-center gap-x-2 w-full my-2">

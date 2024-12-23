@@ -119,7 +119,7 @@ const DialogAddPlan: React.FC<DialogAddPlan> = ({
                           <SelectContent>
                             <SelectGroup>
                               {factory?.map((item, index) => (
-                                <SelectItem value={item.ID_FACTORY?.toString()} key={index}>
+                                <SelectItem value={item.ID_FACTORY?.toString()} key={index} className="text-[13px]">
                                   {item.FACTORY_NAME}
                                 </SelectItem>
                               ))}
@@ -241,6 +241,7 @@ const DialogAddPlan: React.FC<DialogAddPlan> = ({
                           name="hours"
                           onChange={handleChange}
                           onBlur={handleBlur}
+                         style={{fontSize:13}}
                           value={values.hours}
                         />
                         <p className="text-[red] text-[12px]">

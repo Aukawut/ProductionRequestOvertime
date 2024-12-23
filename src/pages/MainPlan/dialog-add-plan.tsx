@@ -312,6 +312,7 @@ const DialogAddPlan: React.FC<DialogAddPlan> = ({
                           onChange={handleChange}
                           onBlur={handleBlur}
                           value={values.hours}
+                          style={{fontSize:13}}
                         />
                         <p className="text-[red] text-[12px]">
                           {errors.hours && touched.hours && errors.hours}

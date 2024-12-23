@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import TableApprove from "./TableApprove/TableApprove";
-import CardRequest from "@/components/custom/card-myrequest";
 import { Check, CheckCheckIcon, CircleX, Clock8, Undo2 } from "lucide-react";
 
 import {
@@ -9,6 +8,7 @@ import {
   GetDetailCountApproveByCode,
   GetPlanByWorkcell,
   GetRequestDetailByRequest,
+  GetRequestListByCodeAndStatus,
   GetUserByRequestAndRev,
   findCountApproverStatus,
 } from "@/function/main";
@@ -18,6 +18,8 @@ import { toast, Toaster } from "sonner";
 import { motion } from "framer-motion";
 import LoadingCircle from "@/components/custom/loading-circle";
 import moment from "moment";
+import DialogRequestList from "./dialog-request-list";
+import CardRequestList from "@/components/custom/card-request";
 
 export const data = [
   {
@@ -29,6 +31,7 @@ export const data = [
     textColor: "#2697FF",
     aliasTitle: "Pending",
     titleTH: "รออนุมัติ",
+    statusId: 1,
   },
   {
     title: "Reject",
@@ -39,6 +42,7 @@ export const data = [
     textColor: "#FF9E0E",
     aliasTitle: "Reject",
     titleTH: "แก้ไข",
+    statusId: 2,
   },
 
   {
@@ -50,6 +54,7 @@ export const data = [
     textColor: "#A30014",
     aliasTitle: "Not Approve",
     titleTH: "ไม่อนุมัติ",
+    statusId: 4,
   },
   {
     title: "Success",
@@ -60,6 +65,7 @@ export const data = [
     textColor: "#005A2B",
     aliasTitle: "Done",
     titleTH: "อนุมัติ",
+    statusId: 3,
   },
 ];
 
@@ -101,6 +107,7 @@ export interface SummaryRequestLastRev {
   SUM_PLAN: number;
   SUM_PLAN_OB: number;
   ID_WORK_CELL: number;
+  REMARK : string;
 }
 
 export interface UserDetail {
@@ -121,6 +128,16 @@ export interface CommentApprover {
   POSITION: string;
   FULLNAME: string;
 }
+export interface RequestList {
+  DURATION: number;
+  FACTORY_NAME: string;
+  HOURS_AMOUNT: string;
+  HOURS_TOTAL: number;
+  ID_TYPE_OT: number;
+  PERSON: number;
+  REQUEST_NO: string;
+  REV: number;
+}
 
 export interface PlanWorkcell {
   ID_FACTORY: number;
@@ -128,7 +145,6 @@ export interface PlanWorkcell {
   SUM_HOURS: number;
   YEAR: number;
 }
-
 
 const Approve: React.FC = () => {
   const [countApprove, setCountApprove] = useState<CountApprove[]>([]);
@@ -147,6 +163,8 @@ const Approve: React.FC = () => {
   const info = useOTManagementSystemStore((state) => state.info);
   const token = useOTManagementSystemStore((state) => state.token);
   const [planWorkcell, setPlanWorkcell] = useState<PlanWorkcell[]>([]);
+  const [showRequestList, setShowRequestList] = useState(false);
+  const [idStatus,setIdStatus] = useState(0);
 
   const CloseDialogDetail = () => setShowDetail(false);
 
@@ -171,16 +189,17 @@ const Approve: React.FC = () => {
     requestNo: string,
     rev: number
   ) => {
+
     await Promise.all([
-      GetRequestDetailByRequest(tokenStr, requestNo),
+      GetRequestDetailByRequest(tokenStr, requestNo,rev),
       GetUserByRequestAndRev(tokenStr, requestNo, rev),
       GetCommentApproverByRequestNo(tokenStr, requestNo, rev),
     ]).then(async (res) => {
       if (res?.length > 0) {
         if (res[0]?.length > 0 && res[1]?.length) {
           setRequestDetail(res[0]);
-          console.log("res[0]",res[0]);
-          
+          console.log("res[0]", res[0]);
+
           setUsers(res[1]);
           setShowDetail(true);
 
@@ -207,6 +226,27 @@ const Approve: React.FC = () => {
       }
     });
   };
+  const [requestList, setRequestList] = useState<RequestList[]>([]);
+
+  const GetRequestList = async (status: number, code: string) => {
+    setIdStatus(status)
+    // 1 = Pending
+    if (status == 1) {
+      await Promise.all([GetRequestListByCodeAndStatus(token, status, code)])
+        .then((response) => {
+          console.log("res", response);
+          if (response[0]?.length > 0) {
+            setRequestList(response[0]);
+            setShowRequestList(true)
+          } else {
+            setRequestList([]);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -232,7 +272,8 @@ const Approve: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
           {data?.map((item, index) => {
             return (
-              <CardRequest
+              <CardRequestList
+                GetRequestList={GetRequestList}
                 key={index}
                 title={item.title}
                 amount={
@@ -241,6 +282,7 @@ const Approve: React.FC = () => {
                     ? findCountApproverStatus(item.aliasTitle, countApprove)
                     : 0
                 }
+                status={item.statusId}
                 sumAll={sumAll}
                 Icon={item.Icon}
                 bgColor={item.bgColor}
@@ -262,12 +304,14 @@ const Approve: React.FC = () => {
           commentApprover={commentApprover}
           planWorkcell={planWorkcell}
           rev={rev}
+          showAction={true}
         />
 
         <div className="p-2 bg-white rounded-[13px] shadow-smooth mt-1">
           <div className="flex flex-col justify-start p-2 mt-2">
             <p className="text-[14px] flex items-center gap-x-2">
-              <CheckCheckIcon size={13} color="red" /> Approve Requests (Pending)
+              <CheckCheckIcon size={13} color="red" /> Approve Requests
+              (Pending)
             </p>
             <p className="text-[13px] text-gray-600">คำขอรอการอนุมัติจากท่าน</p>
           </div>
@@ -278,6 +322,19 @@ const Approve: React.FC = () => {
             setRequestNo={setRequestNo}
             setRev={setRev}
             GetPlanByWorkcell={GetPlanByWorkcell}
+          />
+
+          {/* Dialog Request List */}
+          <DialogRequestList
+            data={requestList}
+            FetchDetailRequest={FetchDetailRequest}
+            setRequestNo={setRequestNo}
+            setRev={setRev}
+            GetPlanByWorkcell={GetPlanByWorkcell}
+            setIsOpen={setShowRequestList}
+            isOpen={showRequestList}
+            requestList={requestList}
+            status={idStatus}
           />
         </div>
         <div className="flex"></div>

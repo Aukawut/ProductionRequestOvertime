@@ -67,7 +67,7 @@ export const columns: ColumnDef<RequestNoByUser>[] = [
                 ? "bg-[#E9F5FF] text-[#42A5FF]"
                 : row.getValue("NAME_STATUS") == "Approved"
                 ? "bg-[#C1EFDF] text-[#005A2B]"
-                :row.getValue("NAME_STATUS") == "Cancel"
+                :row.getValue("NAME_STATUS") == "Cancel" || row.getValue("NAME_STATUS") == "Not Approve"
                 ? "bg-[#FED0D0] text-[#A30014]": ""
             }`}
           >

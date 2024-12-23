@@ -12,6 +12,7 @@ export interface CardRequestProps {
   textColor: string;
   aliasTitle: string;
   titleTH: string;
+  status:number;
 }
 
 export const cardMenu: CardRequestProps[] = [
@@ -24,16 +25,18 @@ export const cardMenu: CardRequestProps[] = [
     textColor: "#2697FF",
     aliasTitle: "Pending",
     titleTH: "รออนุมัติ",
+    status:1,
   },
   {
     title: "Reject",
-    amount: 1,
+    amount: 5,
     sumAll: 100,
     Icon: Undo2,
     bgColor: "#FFF6E7",
     textColor: "#FF9E0E",
     aliasTitle: "Reject",
     titleTH: "รอแก้ไข",
+    status:5,
   },
 
   {
@@ -45,6 +48,7 @@ export const cardMenu: CardRequestProps[] = [
     textColor: "#005A2B",
     aliasTitle: "Approved",
     titleTH: "อนุมัติ",
+    status:2,
   },
   {
     title: "Not Approve",
@@ -55,6 +59,7 @@ export const cardMenu: CardRequestProps[] = [
     textColor: "#A30014",
     aliasTitle: "Not Approve",
     titleTH: "ไม่อนุมัติ",
+    status:3,
   },
   {
     title: "Cancel",
@@ -65,6 +70,7 @@ export const cardMenu: CardRequestProps[] = [
     textColor: "#A30014",
     aliasTitle: "Cancel",
     titleTH: "ยกเลิก",
+    status:4,
   },
 ];
 
