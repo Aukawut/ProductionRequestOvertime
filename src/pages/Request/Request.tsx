@@ -556,12 +556,12 @@ const Request: React.FC = () => {
                                 <Calendar
                                   mode="single"
                                   selected={dateRequestStart}
-                                  disabled={(date) => {
-                                    return (
-                                      moment(date).utc().toDate() <
-                                      moment(new Date()).utc().toDate()
-                                    );
-                                  }}
+                                  // disabled={(date) => {
+                                  //   return (
+                                  //     moment(date).utc().toDate() <
+                                  //     moment(new Date()).utc().toDate()
+                                  //   );
+                                  // }}
                                   onSelect={async (date) => {
                                     setDateRequestStart(date as Date);
                                     setDateRequestEnd(

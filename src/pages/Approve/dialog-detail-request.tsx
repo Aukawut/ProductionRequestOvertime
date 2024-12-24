@@ -11,6 +11,7 @@ import {
   CircleX,
   Info,
   InfoIcon,
+  LoaderCircle,
   LucideProps,
   MessageCircleMore,
   MessageSquareQuote,
@@ -37,9 +38,10 @@ import {
   IsHavePermission,
   PayLoadApprove,
 } from "@/function/main";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useOTManagementSystemStore } from "../../../store";
+import DialogConfirmAction from "@/components/custom/DialogConfirmAction/DialogConfirmAction";
 
 interface ShowUsersSelected {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -52,6 +54,7 @@ interface ShowUsersSelected {
   planWorkcell: PlanWorkcell[];
   rev: number;
   showAction: boolean;
+
 }
 
 export interface TimelineDataApproval {
@@ -91,9 +94,8 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
   const token = useOTManagementSystemStore((state) => state.token);
   const info = useOTManagementSystemStore((state) => state.info);
   const [isSubmit, setIsSubmit] = useState(false);
-  const [special,setSpecial] = useState("N")
-
-  
+  const [special, setSpecial] = useState("N");
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const comment: TimelineDataApproval[] = commentApprover?.map((item) => ({
     date:
@@ -118,7 +120,16 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
   const [remark, setRemark] = useState("");
   const [actual, setActual] = useState<Actual[]>([]);
   const [actualWorkcell, setActualWorkcell] = useState<ActualWorkcell[]>([]);
-  const [isApprover,setIsApprover] = useState(false)
+  const [isApprover, setIsApprover] = useState(false);
+
+  const sumHoursReq = Number(requestDetail[0]?.SUM_MINUTE) / 60;
+  const plan = Number(requestDetail[0]?.SUM_PLAN);
+  const workcellActual = actualWorkcell?.length > 0 ? actualWorkcell[0]?.SUM_HOURS : 0;
+  const factoryActual = actual?.length > 0 ? actual[0]?.SUM_HOURS : 0;
+  const setRender = useOTManagementSystemStore((state) => state.setRender)
+
+  const planWC =
+    planWorkcell?.length > 0 ? Number(planWorkcell[0]?.SUM_HOURS) : 0;
 
   const ApproveRequestByRequest = async (
     status: number,
@@ -130,7 +141,7 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
       status: status,
       remark: remark,
       actionBy: info?.EmployeeCode,
-      special:status == 3 ? special : "N"
+      special: status == 3 ? special : "N",
     };
     // 1	Pending
     // 2	Reject
@@ -149,27 +160,31 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
     }
 
     const response = await ApproveRequest(token, requestNo, rev, payload);
-  
+
     if (!response?.err && response?.status === "Ok") {
       toast.success(response.msg);
       setIsSubmit(false);
       setIsOpen(false);
+      setTimeout(() => {
+        setRender()
+      },300)
     } else {
       toast.error(response.msg);
       setIsSubmit(false);
     }
   };
 
-  const fetchData = async () => {
-    if (requestDetail !== undefined) {
+  const fetchData = useCallback(async () => {
+
+    if (requestDetail !== undefined && requestNo !== "" && rev !== 0  ) {
       await Promise.all([
-        CalActualyFac(
+        await CalActualyFac(
           token,
           moment(requestDetail[0]?.START_DATE).year(),
           moment(requestDetail[0]?.START_DATE).month() + 1,
           requestDetail[0]?.ID_FACTORY
         ),
-        CalActualyWorkcell(
+        await CalActualyWorkcell(
           token,
           moment(requestDetail[0]?.START_DATE).year(),
           moment(requestDetail[0]?.START_DATE).month() + 1,
@@ -178,24 +193,27 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
         ),
       ]).then((res) => {
         if (res[0]?.length > 0) {
+          console.log("res[0]",res[0]);
+          
           setActual(res[0]);
         }
         if (res[1]?.length > 0) {
-          setActualWorkcell(res[0]);
+          setActualWorkcell(res[1]);
         }
       });
     }
-  };
-  
-  useEffect(() => {
+  },[token, requestDetail, requestNo, rev]) 
 
-    const permission = info?.Role?.map((x) => x.NAME_ROLE);
-    setIsApprover(IsHavePermission(["APPROVER"],permission))
+  const dialogRef = useRef<any>(null);
 
+  useEffect( () => {
+ 
     fetchData();
-    
-    
-  }, []);
+    const permission = info?.Role?.map((x) => x.NAME_ROLE);
+    setIsApprover(IsHavePermission(["APPROVER"], permission));
+
+   
+  }, [requestDetail]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -222,10 +240,19 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
                 type="button"
                 disabled={isSubmit}
                 onClick={async () => {
-                  await ApproveRequestByRequest(3, requestNo, rev);
+                  
+                  if ((sumHoursReq + factoryActual) > plan || (sumHoursReq + workcellActual) > planWC) {
+                    const result = await dialogRef.current?.confirm();
+
+                    if (result) {
+                      await ApproveRequestByRequest(3, requestNo, rev);
+                    }
+                  } else {
+                    await ApproveRequestByRequest(3, requestNo, rev);
+                  }
                 }}
               >
-                <CircleCheck size={13} /> Approve
+                {isSubmit ? <LoaderCircle className="animate-spin" /> : <CircleCheck size={13} />} Approve
               </Button>
               <Button
                 variant="destructive"
@@ -235,7 +262,7 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
                   await ApproveRequestByRequest(4, requestNo, rev);
                 }}
               >
-                <CircleX size={13} /> Not Approve
+                {isSubmit ? <LoaderCircle className="animate-spin" /> : <CircleX size={13} />} Not Approve
               </Button>
               <Button
                 className="bg-[#FFB639] text-white hover:bg-[#eea933]"
@@ -245,18 +272,24 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
                   await ApproveRequestByRequest(2, requestNo, rev);
                 }}
               >
-                <RotateCcw size={13} /> Reject
+                {isSubmit ? <LoaderCircle className="animate-spin" /> : <RotateCcw size={13} />} Reject
               </Button>
             </div>
           ) : (
             <></>
           )}
 
+          <DialogConfirmAction
+            isOpen={showConfirm}
+            setIsOpen={setShowConfirm}
+            ref={dialogRef}
+          />
+
           <div className="grid grid-cols-12 gap-x-2 px-3 mt-2">
             <div className="col-span-12 lg:col-span-5">
               <div className="bg-white shadow-smooth rounded-[12px] p-2">
                 <div className="flex items-center gap-x-2">
-                  <InfoIcon size={16} className="text-gray-800"/>
+                  <InfoIcon size={16} className="text-gray-800" />
                   <p className="text-[13px] my-[0.8rem]">รายละเอียดคำขอ</p>
                 </div>
 
@@ -281,13 +314,11 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
                 </p>
                 <Textarea
                   className="w-full"
-                 
                   placeholder="ระบุหมายเหตุ....."
                   rows={3}
-                  
                   ref={inputRefRemark}
                   value={remark}
-                  style={{fontSize:13}}
+                  style={{ fontSize: 13 }}
                   onChange={(e) => setRemark(e.target.value)}
                 />
               </div>
@@ -299,10 +330,10 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
           {/* Timeline */}
           <div className="w-full mt-[1rem]">
             <div className="flex items-center gap-x-2">
-            <MessageSquareQuote  size={16}/>
-            <p className="text-gray-800 text-[13px] my-2 font-medium">
-              Timeline การอนุมัติคำขอ
-            </p>
+              <MessageSquareQuote size={16} />
+              <p className="text-gray-800 text-[13px] my-2 font-medium">
+                Timeline การอนุมัติคำขอ
+              </p>
             </div>
             <TimelineApprove data={comment} />
           </div>

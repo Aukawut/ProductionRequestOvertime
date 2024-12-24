@@ -105,7 +105,7 @@ const Login: React.FC = () => {
               <h4 className="font-medium tracking-tight lg:text-xl text-gray-600">
                 OT Management System
               </h4>
-              <h4 className="scroll-m-20 text-sm tracking-tight lg:text-md text-gray-400">
+              <h4 className="scroll-m-20 text-sm tracking-tight lg:text-[14px] text-gray-400">
                 ระบบบริหารจัดการทำงานล่วงเวลา (โอที)
               </h4>
             </div>
@@ -123,7 +123,7 @@ const Login: React.FC = () => {
             }}
           />
 
-          <div className="flex flex-col gap-y-4">
+          <div className="flex flex-col gap-y-4 my-2">
             <div className="relative">
               <User
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
@@ -173,23 +173,23 @@ const Login: React.FC = () => {
           <div className="my-[1rem]">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
-                <Checkbox id="terms" />
+                <Checkbox id="terms" className="w-4 h-4" />
                 <label
                   htmlFor="terms"
-                  className="text-sm  font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-[13px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Remember me
                 </label>
               </div>
               <div>
-                <Link to="/" className="text-sm underline">
+                <Link to="#" onClick={() => toast.info("กรุณาติดต่อผู้ดูแลระบบ")} className="text-[12px] underline">
                   Forgot password
                 </Link>
               </div>
             </div>
           </div>
           <div className="mt-6">
-            <Button className="w-full py-[1.5rem]" onClick={handleLogin}>
+            <Button className="w-full py-[1.3rem]" onClick={handleLogin}>
               Sign in
             </Button>
           </div>

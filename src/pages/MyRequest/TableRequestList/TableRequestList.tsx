@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { columns } from "./columns";
 import { DataTable } from "./data-request-table";
-import { RequestList } from "../Approve";
+import { RequestList } from "../MyRequest";
 import { useOTManagementSystemStore } from "../../../../store";
 
 

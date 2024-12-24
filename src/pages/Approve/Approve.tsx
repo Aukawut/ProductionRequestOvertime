@@ -21,6 +21,7 @@ import moment from "moment";
 import DialogRequestList from "./dialog-request-list";
 import CardRequestList from "@/components/custom/card-request";
 
+
 export const data = [
   {
     title: "Pending",
@@ -149,6 +150,8 @@ export interface PlanWorkcell {
 const Approve: React.FC = () => {
   const [countApprove, setCountApprove] = useState<CountApprove[]>([]);
   const [detailApprove, setDetailApprove] = useState<DetailApprove[]>([]);
+ 
+
   const [requestDetail, setRequestDetail] = useState<SummaryRequestLastRev[]>(
     []
   );
@@ -247,11 +250,12 @@ const Approve: React.FC = () => {
     
   };
 
+  const render = useOTManagementSystemStore((state) => state.render)
 
   useEffect(() => {
     fetchData();
     setStatus(1);
-  }, []);
+  }, [render]);
 
   return loading ? (
     <div className="flex min-h-screen justify-center items-center">
@@ -306,6 +310,8 @@ const Approve: React.FC = () => {
           rev={rev}
           showAction={showAction}
         />
+
+
 
         <div className="p-2 bg-white rounded-[13px] shadow-smooth mt-1">
           <div className="flex flex-col justify-start p-2 mt-2">

@@ -79,13 +79,17 @@ const DonutRequest: React.FC<DountRequestProps> = ({ yearMenu,requestByYear ,mon
       <Card data-chart={id} className="flex flex-col">
         <ChartStyle id={id} config={chartConfig} />
         <CardHeader className="flex-row items-start space-y-0 pb-0 gap-x-2 justify-between">
-          <div className="grid gap-1">
-            <CardTitle className="text-[13px]">
-              Summary Overtime (OT)
+          <div className="gap-1">
+            <CardTitle className="text-[13px] font-medium">
+              Summary Overtime (OT) / Year and Month
             </CardTitle>
-            <CardDescription>January - June 2024</CardDescription>
+            <CardDescription className="text-[12px]">Doughnut</CardDescription>
           </div>
-            <div className="flex gap-x-2">
+        
+        </CardHeader>
+        <CardContent className="flex justify-center pb-0 flex-col">
+          
+          <div className="flex gap-x-2 mt-3">
           <Select
             value={(year).toString()}
             onValueChange={async (e) => {
@@ -112,7 +116,7 @@ const DonutRequest: React.FC<DountRequestProps> = ({ yearMenu,requestByYear ,mon
             }}
           >
             <SelectTrigger
-              className="ml-auto h-7 w-[130px] rounded-lg pl-2.5"
+              className="ml-auto h-7 w-[180px] rounded-lg pl-2.5"
               aria-label="Select a value"
             >
               <SelectValue placeholder="Select Year" />
@@ -123,7 +127,7 @@ const DonutRequest: React.FC<DountRequestProps> = ({ yearMenu,requestByYear ,mon
                   <SelectItem
                     key={index}
                     value={key.YEAR_RQ.toString()}
-                    className="rounded-lg [&_span]:flex"
+                    className="rounded-lg [&_span]:flex text-[13px]"
                   >
                     {key.YEAR_RQ}
                   </SelectItem>
@@ -137,7 +141,7 @@ const DonutRequest: React.FC<DountRequestProps> = ({ yearMenu,requestByYear ,mon
             setActiveMonth(Number(e))
           }}> 
             <SelectTrigger
-              className="ml-auto h-7 w-[130px] rounded-lg pl-2.5"
+              className="ml-auto h-7 rounded-lg pl-2.5"
               aria-label="Select a value"
             >
               <SelectValue placeholder="Select month" />
@@ -168,8 +172,7 @@ const DonutRequest: React.FC<DountRequestProps> = ({ yearMenu,requestByYear ,mon
             </SelectContent>
           </Select>
           </div>
-        </CardHeader>
-        <CardContent className="flex flex-1 justify-center pb-0">
+          
           <ChartContainer
             id={id}
             config={chartConfig}

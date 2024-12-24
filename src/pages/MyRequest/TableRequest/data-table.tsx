@@ -30,7 +30,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
-import { ListFilter, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, ListFilter, Search } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -47,7 +48,12 @@ export function DataTable<TData, TValue>({
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState("");
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-
+  const [rowsPerPage, setRowsPerPage] = useState(50);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0, // Initial page index
+    pageSize: rowsPerPage, // Initial page size
+  });
+  
   const table = useReactTable({
     data,
     columns,
@@ -69,9 +75,18 @@ export function DataTable<TData, TValue>({
       globalFilter,
     },
   });
+   // Handle rows per page change
+   const handleRowsPerPageChange = (value: string) => {
+    const newPageSize = Number(value);
+    setRowsPerPage(newPageSize);
+    setPagination({
+      ...pagination,
+      pageSize: newPageSize,
+    });
+  };
 
   return (
-    <div className="py-1 px-4">
+    <>
       <div className="flex items-center py-4">
         <div className="relative">
           <Search
@@ -101,7 +116,7 @@ export function DataTable<TData, TValue>({
                 return (
                   <DropdownMenuCheckboxItem
                     key={column.id}
-                    className="capitalize"
+                    className="capitalize text-[13px]"
                     checked={column.getIsVisible()}
                     onCheckedChange={(value) =>
                       column.toggleVisibility(!!value)
@@ -114,15 +129,19 @@ export function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border relative w-full">
-        <div className="overflow-auto h-full">
-          <Table className="text-[13px] min-w-full">
-            <TableHeader className="sticky top-0 z-10 bg-[#0E7FDB]">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id} className=" text-white">
+
+      <div className="w-full">
+        <div className="shadow-smooth">
+          <div className="relative h-[60vh] overflow-auto">
+            <Table className="w-full relative text-[13px]">
+              <TableHeader className="sticky top-0 z-10 bg-[#0E7FDB]">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead
+                        key={header.id}
+                        className="h-10 overflow-clip relative text-white"
+                      >
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -130,24 +149,20 @@ export function DataTable<TData, TValue>({
                               header.getContext()
                             )}
                       </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-          </Table>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
 
-          <div className="overflow-auto h-[50vh]">
-            <Table className="text-[13px] min-w-full">
               <TableBody>
-                {table.getRowModel().rows?.length ? (
+                {table.getRowModel().rows.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
+                    <TableRow key={row.id} className="text-center">
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
+                        <TableCell
+                          key={cell.id}
+                          className="text-[12.5px] text-center"
+                        >
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()
@@ -174,24 +189,54 @@ export function DataTable<TData, TValue>({
 
       {/* Pagination */}
 
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
+      <div className="flex items-center justify-between py-2">
+        <div className="flex items-center gap-x-1">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            type="button"
+          >
+            <ChevronLeft />
+         
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            type="button"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            <ChevronRight />
+          </Button>
+        </div>
+
+        {/* Page Information */}
+        <div className="text-sm flex gap-x-2 items-center">
+          <div className="flex items-center py-2">
+            <Select
+              value={rowsPerPage.toString()}
+              onValueChange={handleRowsPerPageChange}
+              
+            >
+              <SelectTrigger>
+                <SelectValue>{rowsPerPage} rows / page</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {[10, 25, 50, 100].map((size) => (
+                  <SelectItem key={size} value={size.toString()} className="text-[13px]">
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <span className="text-[13px]">
+            Page {pagination.pageIndex + 1} of {table.getPageCount()} pages
+          </span>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

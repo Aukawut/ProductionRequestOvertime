@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 
 import { ArrowUpDown, Info } from "lucide-react";
-import {  RequestList } from "../Approve";
+import {  RequestList } from "../MyRequest";
 import BadgeStyle from "@/components/custom/BadgeStyle/BadgeStyle";
 
 export const columns = (

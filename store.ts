@@ -28,6 +28,8 @@ interface OTManagementSystemStore {
   setInfo: (info: UserInfo) => void;
   token: string;
   setToken: (token: string) => void;
+  render:boolean;
+  setRender:() => void;
 
 }
 
@@ -37,7 +39,7 @@ export const useOTManagementSystemStore = create<OTManagementSystemStore>()(
       (set) => ({
         isLogin: false,
         token: "",
-       
+        render:false,
         info: {
             EmployeeCode:"",
             Department: "",
@@ -66,6 +68,7 @@ export const useOTManagementSystemStore = create<OTManagementSystemStore>()(
           set((state) => ({ info: (state.info = info) })),
         setToken: (token: string) =>
           set((state) => ({ token: (state.token = token) })),
+        setRender: () => set((state) => ({ render: (state.render = !state.render) })),
        
       }),
 

@@ -51,10 +51,10 @@ const TableRequestDetail: React.FC<DetailRequestProps> = ({
           <Table className="text-[12px] w-full">
             <TableHeader>
               <TableRow className="bg-[#0E7FDB]">
-                <TableHead className="text-center text-gray-900">
+                <TableHead className="text-center text-white">
                   หัวข้อ
                 </TableHead>
-                <TableHead className="text-center text-gray-900">
+                <TableHead className="text-center text-white">
                   ข้อมูลรายละเอียด
                 </TableHead>
               </TableRow>
@@ -177,7 +177,7 @@ const TableRequestDetail: React.FC<DetailRequestProps> = ({
               <TableCell className={`text-center`}>รวม (คน x ชั่วโมง)</TableCell>
               <TableCell className={`text-center bg-blue-100`}>
                 <div className={`flex justify-center items-center  ${(sumHoursReq + factoryActual) > plan 
-                || (sumHoursReq + workcellActual) > plan ? 'text-[red]' :''}`}>
+                || (sumHoursReq + workcellActual) > planWC ? 'text-[red]' :''}`}>
                   {sumHoursReq?.toFixed(2)}
                 </div>
               </TableCell>

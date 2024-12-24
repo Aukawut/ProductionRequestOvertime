@@ -154,7 +154,7 @@ export function DataTable<TData, TValue>({
                     {headerGroup.headers.map((header) => (
                       <TableHead
                         key={header.id}
-                        className="h-10 overflow-clip relative text-gray-800"
+                        className="h-10 overflow-clip relative text-white"
                       >
                         {header.isPlaceholder
                           ? null

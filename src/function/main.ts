@@ -1071,6 +1071,9 @@ export const DeletePlanOB: (token: string, id: number) => Promise<any> = async (
 export const ConvertDateFormat = (date: Date) => {
   return moment(date).format("YYYY-MM-DD HH:mm");
 };
+export const ConvertTimeFormat = (date: Date) => {
+  return moment(date).format("HH:mm");
+};
 
 export const GetActualOvertime: (token: string) => Promise<any> = async (
   token: string
@@ -1079,6 +1082,55 @@ export const GetActualOvertime: (token: string) => Promise<any> = async (
 
   try {
     const response = await axios.get(`${VITE_BASE_URL}/actual/overtime`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+
+export const CountRequestByEmployee: (token: string,code:string,status:number) => Promise<any> = async (
+  token: string,code:string,status:number
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/request/count/${status}/${code}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const CountRequestApproverByEmployee: (token: string,code:string,status:number) => Promise<any> = async (
+  token: string,code:string,status:number
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/request/approve/count/${status}/${code}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

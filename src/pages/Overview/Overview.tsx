@@ -159,6 +159,9 @@ const Overview: React.FC = () => {
     });
   };
 
+  const setRender = useOTManagementSystemStore((state) => state.setRender);
+
+
   useEffect(() => {
     setStartDate(new Date());
     setEndDate(moment(new Date()).add(5, "days").toDate());
@@ -177,7 +180,7 @@ const Overview: React.FC = () => {
   ) : (
     <div className="p-[0.5rem]">
       {/* <-------- [START] Section 1 ------->*/}
-
+      <Button onClick={setRender}>Render</Button>
       <div
         className="w-full rounded-[16px] bg-gradient relative overflow-hidden"
         style={{

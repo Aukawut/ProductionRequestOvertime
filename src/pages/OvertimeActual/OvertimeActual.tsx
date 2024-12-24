@@ -11,7 +11,7 @@ import DialogAddOvertime from "./dialog-add-actual";
 import { Toaster } from "sonner";
 import TableOvertime from "./TablePreviewOvertime/TableOvertime";
 import { useOTManagementSystemStore } from "../../../store";
-import { GetActualOvertime, GetActualOvertimeByDateDuration } from "@/function/main";
+import {GetActualOvertimeByDateDuration } from "@/function/main";
 import LoadingCircle from "@/components/custom/loading-circle";
 import moment from "moment";
 

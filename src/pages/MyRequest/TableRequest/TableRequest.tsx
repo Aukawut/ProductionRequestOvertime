@@ -21,24 +21,28 @@ interface TableRequest {
   ) => Promise<any>;
   setRev: React.Dispatch<React.SetStateAction<number>>;
   status: number;
-  token:string ;
+  token: string;
 }
 const TableRequest: React.FC<TableRequest> = ({
   requests,
   setRev,
   setRequestNo,
   FetchDetailRequest,
-  token
+  token,
 }) => {
   useEffect(() => {}, [requests]);
   return (
     <div>
-      <div className="container mx-auto py-1">
-        <DataTable
-          columns={columns( FetchDetailRequest,setRequestNo,setRev,token)}
-          data={requests}
-        />
-      </div>
+      <DataTable
+        columns={columns(
+          FetchDetailRequest,
+          setRequestNo,
+          setRev,
+          token,
+          requests
+        )}
+        data={requests}
+      />
     </div>
   );
 };

@@ -23,7 +23,7 @@ import { motion } from "framer-motion";
 import { useOTManagementSystemStore } from "../../../store";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useNavigate } from "react-router-dom";
-import DialogRequestList from "../Approve/dialog-request-list";
+import DialogRequestList from "./dialog-request-list";
 import moment from "moment";
 import { toast } from "sonner";
 import DialogDetailRequest from "../Approve/dialog-detail-request";
@@ -50,10 +50,15 @@ export interface RequestByYear {
 }
 
 export interface RequestNoByUser {
-  REQUEST_NO: string;
-  REQ_STATUS: number;
-  REV: number;
+  DURATION: number;
+  END_DATE: string;
+  FACTORY_NAME: string;
   NAME_STATUS: string;
+  NAME_WORKCELL: string;
+  PERSON: number;
+  REQUEST_NO: string;
+  REV: number;
+  START_DATE: string;
 }
 
 export interface CountApprove {
@@ -251,23 +256,20 @@ const MyRequest: React.FC = () => {
 
   const GetRequestList = async (status: number, code: string) => {
     setIdStatus(status);
-  
-      await Promise.all([
-        GetRequestListByUserCodeAndStatus(token, status, code),
-      ])
-        .then((response) => {
-          console.log("res", response);
-          if (response[0]?.length > 0) {
-            setRequestList(response[0]);
-            setShowRequestList(true);
-          } else {
-            setRequestList([]);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    
+
+    await Promise.all([GetRequestListByUserCodeAndStatus(token, status, code)])
+      .then((response) => {
+        console.log("res", response);
+        if (response[0]?.length > 0) {
+          setRequestList(response[0]);
+          setShowRequestList(true);
+        } else {
+          setRequestList([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const CloseDialogDetail = () => setShowDetail(false);
@@ -363,7 +365,7 @@ const MyRequest: React.FC = () => {
       />
 
       <div className="grid grid-cols-12 mt-2 gap-x-2">
-        <div className="col-span-12 lg:col-span-6">
+        <div className="col-span-12 lg:col-span-7">
           <div
             className="bg-white rounded-[16px] w-full p-4"
             style={{
@@ -381,6 +383,7 @@ const MyRequest: React.FC = () => {
               <Plus />
               New
             </Button>
+
             <div className="py-1 mt-2">
               <p className="text-[14px] font-medium">
                 The table displays the status of your requests
@@ -405,7 +408,7 @@ const MyRequest: React.FC = () => {
         </div>
 
         {/* Chart */}
-        <div className="col-span-12 lg:col-span-6">
+        <div className="col-span-12 lg:col-span-5">
           {progress ? (
             <div className="h-[300px] flex justify-center items-center w-full">
               <svg
@@ -444,6 +447,7 @@ const MyRequest: React.FC = () => {
           )}
         </div>
 
+        {/* Dialog Request List */}
         <DialogRequestList
           data={requestList}
           FetchDetailRequest={FetchDetailRequest}
