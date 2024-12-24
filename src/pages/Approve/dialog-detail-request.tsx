@@ -34,6 +34,7 @@ import {
   CalActualyFac,
   CalActualyWorkcell,
   ConvertDateFormat,
+  IsHavePermission,
   PayLoadApprove,
 } from "@/function/main";
 import { useEffect, useRef, useState } from "react";
@@ -117,6 +118,7 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
   const [remark, setRemark] = useState("");
   const [actual, setActual] = useState<Actual[]>([]);
   const [actualWorkcell, setActualWorkcell] = useState<ActualWorkcell[]>([]);
+  const [isApprover,setIsApprover] = useState(false)
 
   const ApproveRequestByRequest = async (
     status: number,
@@ -147,7 +149,7 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
     }
 
     const response = await ApproveRequest(token, requestNo, rev, payload);
-    console.log(response);
+  
     if (!response?.err && response?.status === "Ok") {
       toast.success(response.msg);
       setIsSubmit(false);
@@ -184,10 +186,15 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
       });
     }
   };
+  
   useEffect(() => {
-    console.log(requestDetail);
+
+    const permission = info?.Role?.map((x) => x.NAME_ROLE);
+    setIsApprover(IsHavePermission(["APPROVER"],permission))
 
     fetchData();
+    
+    
   }, []);
 
   return (
@@ -207,7 +214,7 @@ const DialogDetailRequest: React.FC<ShowUsersSelected> = ({
         </DialogHeader>
         <div className="h-[95vh] overflow-auto">
           {/* Action Button */}
-          {showAction ? (
+          {showAction && isApprover ? (
             <div className="my-2 flex gap-x-1">
               <Button
                 className="bg-[#1ECD97] hover:bg-[#18a377] text-white"

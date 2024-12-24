@@ -198,12 +198,10 @@ const MyRequest: React.FC = () => {
   );
   const [commentApprover, setCommentApprover] = useState<CommentApprover[]>([]);
   const [users, setUsers] = useState<UserDetail[]>([]);
-  const [status, setStatus] = useState(1);
-  const [loading, setLoading] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [requestNo, setRequestNo] = useState("");
   const [rev, setRev] = useState(0);
-  const info = useOTManagementSystemStore((state) => state.info);
+
   const token = useOTManagementSystemStore((state) => state.token);
   const [planWorkcell, setPlanWorkcell] = useState<PlanWorkcell[]>([]);
   const [showRequestList, setShowRequestList] = useState(false);
