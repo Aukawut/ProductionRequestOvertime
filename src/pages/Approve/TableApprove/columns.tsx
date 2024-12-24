@@ -14,7 +14,9 @@ export const columns = (
   ) => Promise<void>,
   setRequestNo: React.Dispatch<React.SetStateAction<string>>,
   tokenStore: string,
-  setRev:React.Dispatch<React.SetStateAction<number>>
+  setRev:React.Dispatch<React.SetStateAction<number>>,
+  showAction:boolean,
+  setShowAction: React.Dispatch<React.SetStateAction<boolean>>
 ): ColumnDef<DetailApprove>[] => [
   {
     accessorKey: "no",
@@ -115,7 +117,10 @@ export const columns = (
           className="bg-[#F1F4FF] shadow-smooth text-[#452AAF] hover:bg-[#bca7d3]"
           onClick={() => {
             setRequestNo(row.getValue("REQUEST_NO"));
-            setRev(Number(row.getValue("REV")))
+            setRev(Number(row.getValue("REV")));
+            setShowAction(true) // State Show Button
+            console.log(showAction);
+            
             FetchDetailRequest(
               tokenStore,
               row.getValue("REQUEST_NO"),

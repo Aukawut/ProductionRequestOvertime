@@ -13,6 +13,8 @@ import OvertimeActual from "./pages/OvertimeActual/OvertimeActual";
 import PlanOB from "./pages/PlanOB/PlanOB";
 import EmployeeManagement from "./pages/EmployeeManagement/EmployeeManagement";
 import OvertimeActualReport from "./pages/OvertimeActualReport/OvertimeActualReport";
+import OvertimeActualWorkCellReport from "./pages/OvertimeActualWorkCellReport/OvertimeActualReport";
+import FactoryManagement from "./pages/FactoryManagement/FactoryManagement";
 
 const router = createBrowserRouter(
   [
@@ -26,10 +28,12 @@ const router = createBrowserRouter(
         { path: "/approve", element: <Approve /> },
         { path: "/setting/approver", element: <ApproverManagement /> },
         { path: "/setting/employee", element: <EmployeeManagement /> },
+        { path: "/setting/factory", element: <FactoryManagement /> },
         { path: "/main/plan", element: <MainPlan /> },
         { path: "/plan/ob", element: <PlanOB /> },
         { path: "/overtime/actual", element: <OvertimeActual /> },
         { path: "/report/actual/overtime", element: <OvertimeActualReport /> },
+        { path: "/report/work/actual/overtime", element: <OvertimeActualWorkCellReport /> },
       ],
     },
     {

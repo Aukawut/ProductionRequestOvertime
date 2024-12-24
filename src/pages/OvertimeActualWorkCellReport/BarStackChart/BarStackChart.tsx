@@ -19,7 +19,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { ActualByFactory } from "../OvertimeActualReport";
+import {  ActualByWorkcell } from "../OvertimeActualReport";
 import Polygon from "@/components/custom/Polygon/Polygon";
 
 
@@ -27,32 +27,28 @@ const chartConfig = {
   activities: {
     label: "Overtime (Hours)",
   },
-  INLINE_HOURS: {
-    label: "Inline",
+  SUM_HOURS: {
+    label: "Hours",
     color: "hsl(var(--chart-1))",
   },
-  OFFLINE_HOURS: {
-    label: "Offline",
-    color: "hsl(var(--chart-2))",
-  },
+ 
 } satisfies ChartConfig;
 
-
 interface BarStackChartProps {
-  summaryByFac: ActualByFactory[]
+  actualByWorkcell: ActualByWorkcell[]
 }
 
-const BarStackChart: React.FC<BarStackChartProps> = ({summaryByFac}) => {
+const BarStackChart: React.FC<BarStackChartProps> = ({actualByWorkcell}) => {
 
   useEffect(() => {
-    console.log("summaryByFac",summaryByFac);
+    console.log("actualByWorkcell",actualByWorkcell);
     
   },[])
   return (
     <ResponsiveContainer width="100%" height="100%">
       <Card className="flex flex-col bg-gradient p-1 relative overflow-hidden">
         <CardHeader>
-          <CardTitle className="font-medium text-[13px]">Bar Stack - Actual Overtime By Factory</CardTitle>
+          <CardTitle className="font-medium text-[13px]">Bar Chart - Actual Overtime By Workcell</CardTitle>
          
         </CardHeader>
         <div className="absolute -left-[7rem] -top-[14rem] -z-1">
@@ -65,9 +61,9 @@ const BarStackChart: React.FC<BarStackChartProps> = ({summaryByFac}) => {
             config={chartConfig}
             style={{ height: 200, width: "100%" }}
           >
-            <BarChart accessibilityLayer data={summaryByFac}>
+            <BarChart accessibilityLayer data={actualByWorkcell}>
               <XAxis
-                dataKey="FACTORY_NAME"
+                dataKey="NAME_WORKCELL"
                 tickLine={false}
                 tickMargin={10}
                 axisLine={true}
@@ -93,19 +89,13 @@ const BarStackChart: React.FC<BarStackChartProps> = ({summaryByFac}) => {
               </YAxis>
 
               <Bar
-                dataKey="INLINE_HOURS"
+                dataKey="SUM_HOURS"
                 stackId="a"
-                fill="var(--color-INLINE_HOURS)"
+                fill="var(--color-SUM_HOURS)"
                 radius={[0, 0, 3, 3]}
                 barSize={30}
               />
-              <Bar
-                dataKey="OFFLINE_HOURS"
-                stackId="a"
-                fill="var(--color-OFFLINE_HOURS)"
-                radius={[3, 3, 0, 0]}
-                barSize={30}
-              />
+              
               <ChartTooltip
                 content={
                   <ChartTooltipContent labelKey="activities" indicator="line" />
@@ -116,22 +106,7 @@ const BarStackChart: React.FC<BarStackChartProps> = ({summaryByFac}) => {
             </BarChart>
           </ChartContainer>
         </CardContent>
-        <div className="w-full flex justify-center my-2 gap-x-[2rem]">
-          <div className="flex items-center gap-x-2">
-            <div
-              style={{ background: "hsl(var(--chart-1))" }}
-              className="h-4 w-4 rounded-sm"
-            ></div>
-            <p className="text-[12px] text-gray-800">INLINE</p>
-          </div>
-          <div className="flex items-center gap-x-2">
-            <div
-              style={{ background: "hsl(var(--chart-2))" }}
-              className="h-4 w-4 rounded-sm"
-            ></div>
-            <p className="text-[12px] text-gray-800">OFFLINE</p>
-          </div>
-        </div>
+        
       </Card>
     </ResponsiveContainer>
   );

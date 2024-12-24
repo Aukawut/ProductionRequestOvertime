@@ -25,9 +25,7 @@ export const columnsOvertime = (): ColumnDef<AllActual>[] => [
     },
     cell: ({ row }) => (
       <div className="flex items-center gap-x-2 w-full justify-center">
-        <Button className="flex w-[20px] h-[30px] shadow-none bg-[#FEFBEA] hover:bg-[#FEFBEA]">
-          <Pencil size={15} className="text-[#E4A60F]" />
-        </Button>
+        
         <Button
           className="flex w-[20px] h-[30px] shadow-none bg-[#FBEAEE] hover:bg-[#efd7dd]"
           onClick={() => {

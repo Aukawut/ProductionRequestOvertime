@@ -42,6 +42,8 @@ interface DialogRequestListProps {
   setRev: React.Dispatch<React.SetStateAction<number>>;
   requestList: RequestList[];
   status:number;
+  showAction: boolean;
+  setShowAction: React.Dispatch<React.SetStateAction<boolean>>;
   
 }
 
@@ -70,7 +72,9 @@ const DialogRequestList: React.FC<DialogRequestListProps> = ({
   setRequestNo,
   setRev,
   status,
-  GetPlanByWorkcell
+  GetPlanByWorkcell,
+  showAction,
+  setShowAction
 }) => {
 
 
@@ -91,6 +95,9 @@ const DialogRequestList: React.FC<DialogRequestListProps> = ({
             setRequestNo={setRequestNo}
             setRev={setRev}
             GetPlanByWorkcell={GetPlanByWorkcell}
+            showAction={showAction}
+            setShowAction={setShowAction}
+            status={status}
           />
         </div>
       </DialogContent>

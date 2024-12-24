@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Popover, PopoverTrigger } from "@radix-ui/react-popover";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, Gauge, PlusCircle, Search } from "lucide-react";
+import { CalendarIcon, FolderUp, LoaderCircle, PlusCircle, Search } from "lucide-react";
 import { PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
@@ -11,8 +11,9 @@ import DialogAddOvertime from "./dialog-add-actual";
 import { Toaster } from "sonner";
 import TableOvertime from "./TablePreviewOvertime/TableOvertime";
 import { useOTManagementSystemStore } from "../../../store";
-import { GetActualOvertime } from "@/function/main";
+import { GetActualOvertime, GetActualOvertimeByDateDuration } from "@/function/main";
 import LoadingCircle from "@/components/custom/loading-circle";
+import moment from "moment";
 
 export interface CsvData {
   date: string;
@@ -57,7 +58,10 @@ const OvertimeActual: React.FC = () => {
 
   const fetchData = async () => {
     setLoad(true);
-    await Promise.all([await GetActualOvertime(token)]).then((res) => {
+    await Promise.all([await GetActualOvertimeByDateDuration(token,
+      moment(startDate).format("YYYY-MM-DD"),
+      moment(endDate).format("YYYY-MM-DD")
+    )]).then((res) => {
       if (res[0]?.length > 0) {
         setAllActual(res[0]);
       } else {
@@ -75,7 +79,9 @@ const OvertimeActual: React.FC = () => {
   return (
     <div>
       <div className="my-2 flex items-center gap-x-2">
-        <Gauge size={17} color="red" />
+        <div>
+          <FolderUp  size={17} color="#0890D3" />
+        </div>
 
         <p className="text-[14.5px] text-gray-800">Overtime Actual</p>
       </div>
@@ -156,13 +162,26 @@ const OvertimeActual: React.FC = () => {
           type="button"
           className="bg-[#107EDB] text-white hover:bg-[#1c77c2]"
           size={"sm"}
+          onClick={async () => {
+            setLoad(true)
+            await Promise.all([await GetActualOvertimeByDateDuration(token,
+              moment(startDate).format("YYYY-MM-DD"),
+              moment(endDate).format("YYYY-MM-DD")
+            )]).then((res) => {
+              if (res[0]?.length > 0) {
+                setAllActual(res[0]);
+              } else {
+                setAllActual([]);
+              }
+              setLoad(false);
+            });
+          }}
         >
-          ค้นหา <Search />
+          ค้นหา  {load ? <LoaderCircle className="animate-spin" /> : <Search />}
         </Button>
       </div>
       <hr />
 
-      
       <DialogAddOvertime setIsOpen={setShowAdd} isOpen={showAdd} />
 
       <div className="p-2 my-2">

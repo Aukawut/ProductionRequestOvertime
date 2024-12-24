@@ -130,7 +130,7 @@ const EmployeeManagement: React.FC = () => {
       <div className="flex items-center gap-x-2">
         <User size={18} />
 
-        <p className="text-[15px] text-gray-800 my-1">Employees setting</p>
+        <p className="text-[15px] text-gray-800 my-1">Employees Management</p>
       </div>
 
       <div className="px-[1rem] my-2">

@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 
 import { ArrowUpDown, Info } from "lucide-react";
 import {  RequestList } from "../Approve";
-import { convertMinutesToHoursMinutes } from "@/function/main";
 import BadgeStyle from "@/components/custom/BadgeStyle/BadgeStyle";
 
 export const columns = (
@@ -14,7 +13,10 @@ export const columns = (
   ) => Promise<void>,
   setRequestNo: React.Dispatch<React.SetStateAction<string>>,
   tokenStore: string,
-  setRev:React.Dispatch<React.SetStateAction<number>>
+  setRev:React.Dispatch<React.SetStateAction<number>>,
+  showAction:boolean,
+  setShowAction:React.Dispatch<React.SetStateAction<boolean>>,
+  status:number,
 ): ColumnDef<RequestList>[] => [
   {
     accessorKey: "no",
@@ -115,6 +117,14 @@ export const columns = (
           onClick={() => {
             setRequestNo(row.getValue("REQUEST_NO"));
             setRev(Number(row.getValue("REV")))
+            console.log(showAction);
+            
+            // Pending
+            if(status == 1) {
+              setShowAction(true)
+            }else{
+              setShowAction(false)
+            }
             FetchDetailRequest(
               tokenStore,
               row.getValue("REQUEST_NO"),

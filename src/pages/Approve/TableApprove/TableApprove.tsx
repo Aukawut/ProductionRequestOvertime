@@ -12,8 +12,10 @@ interface TablePendingApproveProps {
   setRequestNo: React.Dispatch<React.SetStateAction<string>>;
   GetPlanByWorkcell: (token: string, idWorkcell: number, year: number, month: number) => Promise<any>;
   setRev:React.Dispatch<React.SetStateAction<number>>;
+  showAction:boolean ;
+  setShowAction: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const TableApprove:React.FC<TablePendingApproveProps> =  ({data,FetchDetailRequest,setRequestNo,setRev}) => {
+const TableApprove:React.FC<TablePendingApproveProps> =  ({data,FetchDetailRequest,setRequestNo,setRev,showAction,setShowAction}) => {
   const token = useOTManagementSystemStore((state) => state.token )
 
   useEffect(() => {
@@ -23,7 +25,7 @@ const TableApprove:React.FC<TablePendingApproveProps> =  ({data,FetchDetailReque
     <div>
 
       <div className="container mx-auto py-1">
-        <DataTable columns={columns(FetchDetailRequest,setRequestNo,token,setRev)} data={data} />
+        <DataTable columns={columns(FetchDetailRequest,setRequestNo,token,setRev,showAction,setShowAction)} data={data} />
       </div>
     </div>
   );

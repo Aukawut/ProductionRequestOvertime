@@ -26,6 +26,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useNavigate } from "react-router-dom"
 
 
 
@@ -40,8 +41,8 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
 
-
-
+  const navigate = useNavigate()
+  
 
   return (
     <SidebarMenu>
@@ -56,7 +57,7 @@ export function NavUser({
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-lg">{String(user.name)?.split(" ")[0]?.charAt(0) }{String(user.name)?.split(" ")[1]?.charAt(0)}</AvatarFallback>
               </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
+              <div className="grid flex-1 text-left text-[13px] leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>
                 <span className="truncate text-xs">{user.email}</span>
               </div>
@@ -97,7 +98,9 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-[red]">
+            <DropdownMenuItem className="text-[red] cursor-pointer" onClick={() => {
+              navigate("/login")
+            }}>
               <LogOut  />
               Log out
             </DropdownMenuItem>

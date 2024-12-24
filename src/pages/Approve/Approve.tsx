@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import TableApprove from "./TableApprove/TableApprove";
-import { Check, CheckCheckIcon, CircleX, Clock8, Undo2 } from "lucide-react";
+import { Check, CheckCheckIcon, CircleX, Clock8, Info, Undo2 } from "lucide-react";
 
 import {
   GetCommentApproverByRequestNo,
@@ -107,7 +107,7 @@ export interface SummaryRequestLastRev {
   SUM_PLAN: number;
   SUM_PLAN_OB: number;
   ID_WORK_CELL: number;
-  REMARK : string;
+  REMARK: string;
 }
 
 export interface UserDetail {
@@ -164,7 +164,8 @@ const Approve: React.FC = () => {
   const token = useOTManagementSystemStore((state) => state.token);
   const [planWorkcell, setPlanWorkcell] = useState<PlanWorkcell[]>([]);
   const [showRequestList, setShowRequestList] = useState(false);
-  const [idStatus,setIdStatus] = useState(0);
+  const [idStatus, setIdStatus] = useState(0);
+  const [showAction,setShowAction] = useState(false);
 
   const CloseDialogDetail = () => setShowDetail(false);
 
@@ -189,9 +190,8 @@ const Approve: React.FC = () => {
     requestNo: string,
     rev: number
   ) => {
-
     await Promise.all([
-      GetRequestDetailByRequest(tokenStr, requestNo,rev),
+      GetRequestDetailByRequest(tokenStr, requestNo, rev),
       GetUserByRequestAndRev(tokenStr, requestNo, rev),
       GetCommentApproverByRequestNo(tokenStr, requestNo, rev),
     ]).then(async (res) => {
@@ -229,15 +229,14 @@ const Approve: React.FC = () => {
   const [requestList, setRequestList] = useState<RequestList[]>([]);
 
   const GetRequestList = async (status: number, code: string) => {
-    setIdStatus(status)
-    // 1 = Pending
-    if (status == 1) {
+    setIdStatus(status);
+  
       await Promise.all([GetRequestListByCodeAndStatus(token, status, code)])
         .then((response) => {
           console.log("res", response);
           if (response[0]?.length > 0) {
             setRequestList(response[0]);
-            setShowRequestList(true)
+            setShowRequestList(true);
           } else {
             setRequestList([]);
           }
@@ -245,8 +244,9 @@ const Approve: React.FC = () => {
         .catch((err) => {
           console.log(err);
         });
-    }
+    
   };
+
 
   useEffect(() => {
     fetchData();
@@ -304,7 +304,7 @@ const Approve: React.FC = () => {
           commentApprover={commentApprover}
           planWorkcell={planWorkcell}
           rev={rev}
-          showAction={true}
+          showAction={showAction}
         />
 
         <div className="p-2 bg-white rounded-[13px] shadow-smooth mt-1">
@@ -313,15 +313,28 @@ const Approve: React.FC = () => {
               <CheckCheckIcon size={13} color="red" /> Approve Requests
               (Pending)
             </p>
-            <p className="text-[13px] text-gray-600">คำขอรอการอนุมัติจากท่าน</p>
+            <div className="flex items-center gap-x-1">
+              <div className="animate-fade bg-[#C1EFDF] text-[#005A2B] rounded-[10px] text-[12px] px-2 flex items-center gap-x-1">
+              <Info color="#005A2B" size={12} />    New
+              </div>
+              <p className="text-[13px] text-gray-600">
+                คำขอรอการอนุมัติจากท่าน จำนวน:{" "}
+                {findCountApproverStatus("Pending", countApprove) != undefined
+                  ? findCountApproverStatus("Pending", countApprove)
+                  : 0}{" "}
+                รายการ
+              </p>
+            </div>
           </div>
-          {/* Table */}
+          {/* Table Pending */}
           <TableApprove
             data={detailApprove}
             FetchDetailRequest={FetchDetailRequest}
             setRequestNo={setRequestNo}
             setRev={setRev}
             GetPlanByWorkcell={GetPlanByWorkcell}
+            showAction={showAction}
+            setShowAction={setShowAction}
           />
 
           {/* Dialog Request List */}
@@ -332,9 +345,12 @@ const Approve: React.FC = () => {
             setRev={setRev}
             GetPlanByWorkcell={GetPlanByWorkcell}
             setIsOpen={setShowRequestList}
+            showAction={showAction}
+            setShowAction={setShowAction}
             isOpen={showRequestList}
             requestList={requestList}
             status={idStatus}
+
           />
         </div>
         <div className="flex"></div>

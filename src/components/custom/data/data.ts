@@ -5,22 +5,26 @@ export const singleMenuItem = [
   {
     title: "Overview",
     path: "/",
-    icon: ChartPie
+    icon: ChartPie,
+    allowed:["ADMIN","MANAGER","ASSISTANT MANAGER","GENERAL MANAGER","SENIOR SUPERVISOR","SUPERVISOR","STAFF","OPERATOR","PLANNING","LEADER"]
   },
   {
     title: "Add Request",
     path: "/request",
-    icon: ClipboardPlus 
+    icon: ClipboardPlus ,
+    allowed:["ADMIN","STAFF","LEADER","SUPERVISOR"]
   },
   {
     title: "My Request",
     path: "/request/me",
-    icon: FileUser
+    icon: FileUser,
+    allowed:["ADMIN","STAFF","LEADER","SUPERVISOR"]
   },
   {
     title: "Approve",
     path: "/approve",
-    icon: CheckCircle
+    icon: CheckCircle,
+    allowed:["APPROVER"]
   },
  
 ];
@@ -49,27 +53,34 @@ export const data = {
         {
           title: "Overtime Plan",
           url: "/main/plan",
+          allowed:["ADMIN","PLANNING"]
         },
         {
           title: "Overtime Plan (OB)",
           url: "/plan/ob",
+          allowed:["ADMIN","PLANNING"]
+          
         },
         {
           title: "Approvers",
           url: "/setting/approver",
+          allowed:["ADMIN"]
         },
         {
           title: "Employees",
           url: "/setting/employee",
+          allowed:["ADMIN","SENIOR SUPERVISOR","SUPERVISOR","ASSISTANT MANAGER","MANAGER"]
         },
       
         {
           title: "Upload Overtime Actual",
           url: "/overtime/actual",
+          allowed:["ADMIN","STAFF"]
         },
         {
           title: "Factory",
-          url: "#",
+          url: "/setting/factory",
+          allowed:["ADMIN"]
         },
       ],
     },
@@ -78,14 +89,17 @@ export const data = {
       title: "Report",
       url: "/report",
       icon: ChartSpline,
+      allowed:["ADMIN","MANAGER","ASSISTANT MANAGER","GENERAL MANAGER","SENIOR SUPERVISOR","SUPERVISOR","STAFF","OPERATOR","PLANNING","LEADER"],
       items: [
         {
           title: "Overtime Actual",
           url: "/report/actual/overtime",
+          allowed:["ADMIN","MANAGER","ASSISTANT MANAGER","GENERAL MANAGER","SENIOR SUPERVISOR","SUPERVISOR","STAFF","OPERATOR","PLANNING","LEADER"]
         },
         {
-          title: "Get Started",
-          url: "#",
+          title: "Overtime Actual - Work",
+          url: "/report/work/actual/overtime",
+          allowed:["ADMIN","MANAGER","ASSISTANT MANAGER","GENERAL MANAGER","SENIOR SUPERVISOR","SUPERVISOR","STAFF","OPERATOR","PLANNING","LEADER"]
         },
         
       ],

@@ -23,7 +23,7 @@ const renderQuarterTick = (tickProps: any): React.ReactElement => {
 
   if (month % 3 === 1) {
     return (
-      <text x={x + 30} y={y - 6} fontSize={10.5} textAnchor="middle">
+      <text x={x + 32} y={y - 7} fontSize={10.5} textAnchor="middle" fontWeight={600} color="#3c3c3c">
         {`Q${quarterNo}`}
       </text>
     );

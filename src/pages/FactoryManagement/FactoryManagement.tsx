@@ -18,8 +18,8 @@ import React, { useEffect, useState } from "react";
 import { DataTableMainPlan } from "./TableMainPlan/data-table";
 import {
   DeletePlan,
+  GetAllFactory,
   GetAllWorkcell,
-  GetMainPlan,
   GetUserGroup,
 } from "@/function/main";
 
@@ -27,14 +27,18 @@ import { useOTManagementSystemStore } from "../../../store";
 import { columns } from "./TableMainPlan/columns";
 import DialogAddPlan from "./dialog-add-plan";
 import { Toaster } from "sonner";
-import DialogUpdatePlan from "./dialog-update-plan";
+import DialogUpdatePlan from "./dialog-update-factory";
 import LoadingCircle from "@/components/custom/loading-circle";
 import { motion } from "framer-motion";
 import { BookCheck } from "lucide-react";
 
 export interface Factory {
   ID_FACTORY: number;
+  ID_GROUP_DEPT :number 
   FACTORY_NAME: string;
+  CREATED_AT : string ;
+  NAME_GROUP : string ;
+
 }
 
 export interface WorkcellAll {
@@ -48,28 +52,31 @@ export interface UserGroup {
   ID_UGROUP: number;
   NAME_UGROUP: string;
 }
-const MainPlan: React.FC = () => {
-  const [plan, setPlan] = useState<MainPlan[]>([]);
-  const [oldPlan, setOldPlan] = useState<MainPlan>();
+
+
+const FactoryManagement: React.FC = () => {
+
+  const [oldFactory, setOldFactory] = useState<Factory>();
   const token = useOTManagementSystemStore((state) => state.token);
   const [showDialogAdd, setShowDialogAdd] = useState(false);
   const [showDialogUpdate, setShowDialogUpdate] = useState(false);
   const [load, setLoad] = useState(false);
   const [workcell, setWorkcell] = useState<WorkcellAll[]>([]);
   const [userGroup, setUserGroup] = useState<UserGroup[]>([]);
+  const [allFactory,setAllFactory] = useState<Factory[]>([])
 
   const fetchData = async (load: boolean) => {
     setLoad(load);
     await Promise.all([
-      GetMainPlan(token),
+      GetAllFactory(token),
       GetAllWorkcell(token),
       GetUserGroup(token),
     ])
       .then((response) => {
         if (response[0]?.length > 0) {
-          setPlan(response[0]);
+          setAllFactory(response[0]);
         } else {
-          setPlan([]);
+          setAllFactory([]);
         }
         if (response[1]?.length > 0) {
           setWorkcell(response[1]);
@@ -85,12 +92,12 @@ const MainPlan: React.FC = () => {
       });
   };
 
-  const FindOldPlan = (idPlan: number) => {
-    const obj = plan.find((x) => x.ID_PLAN == idPlan);
-    console.log("obj", obj);
+  const FindOldPlan = (id: number) => {
+    const obj = allFactory.find((x) => x.ID_FACTORY == id);
+
 
     if (obj) {
-      setOldPlan(obj);
+      setOldFactory(obj);
       setShowDialogUpdate(true);
     }
   };
@@ -104,7 +111,7 @@ const MainPlan: React.FC = () => {
       <div className="flex items-center gap-x-2">
         <BookCheck size={18} />
         <p className="text-[15px] text-gray-800 my-1">
-          Add Overtime Plan per Workcell
+         Factory Management
         </p>
       </div>
       <Toaster
@@ -143,7 +150,7 @@ const MainPlan: React.FC = () => {
             isOpen={showDialogUpdate}
             setIsOpen={setShowDialogUpdate}
             fetchData={fetchData}
-            oldPlan={oldPlan}
+            oldFactory={oldFactory}
             workcell={workcell}
             userGroup={userGroup}
           />
@@ -151,7 +158,7 @@ const MainPlan: React.FC = () => {
           {/* Table Plan */}
           <DataTableMainPlan
             columns={columns(FindOldPlan, DeletePlan, token, fetchData)}
-            data={plan}
+            data={allFactory}
             setShowDialogAdd={setShowDialogAdd}
           />
         </motion.div>
@@ -161,4 +168,4 @@ const MainPlan: React.FC = () => {
   );
 };
 
-export default MainPlan;
+export default FactoryManagement;

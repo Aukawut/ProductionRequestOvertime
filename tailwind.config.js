@@ -5,6 +5,7 @@ module.exports = {
   theme: {
 
   	extend: {
+		
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
@@ -71,6 +72,10 @@ module.exports = {
   			}
   		},
   		keyframes: {
+			fade: {
+				'0%, 100%': { opacity: '1' },
+				'50%': { opacity: '0' },
+			},
   			'accordion-down': {
   				from: {
   					height: '0'
@@ -90,7 +95,8 @@ module.exports = {
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+			  fade: 'fade 2s infinite',
   		}
   	}
   },

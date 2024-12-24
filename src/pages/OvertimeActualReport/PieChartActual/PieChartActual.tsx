@@ -94,7 +94,7 @@ const PieChartActual: React.FC<PieChartActualProps> = ({summaryByType}) => {
     </div>
   ) : (
     <ResponsiveContainer width="100%" height="100%">
-      <Card className="flex flex-col bg-gradient p-1 relative">
+      <Card className="flex flex-col bg-gradient p-1 relative overflow-hidden">
       <CardHeader>
         <CardTitle className="text-[13px] text-gray-800 font-medium">Pie Chart - Overtime By Overtime Type</CardTitle>
        

@@ -22,6 +22,8 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { Link, useLocation } from "react-router-dom";
+import { useOTManagementSystemStore } from "../../../store";
+import { IsHavePermission } from "@/function/main";
 
 export function NavMain({
   items,
@@ -38,25 +40,30 @@ export function NavMain({
   }[];
 }) {
   const location = useLocation();
+ 
+  const info = useOTManagementSystemStore((state) => state.info)
+  const userPermission = info?.Role?.map((x) => x.NAME_ROLE)  ;
 
-  
+
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {singleMenuItem?.map((menu,index) => {
-          return <Link to={menu.path} key={index}>
+          return IsHavePermission(menu.allowed,userPermission) ? <Link to={menu.path} key={index}>
           <SidebarMenuButton
+          
          
             className={`py-5 ${
               location.pathname == menu.path ? "bg-sky-600 text-sky-200" : ""
-            } hover:bg-sky-100 hover:text-sky-800 duration-300`}
+            } hover:bg-sky-100 hover:text-sky-800 duration-300 `}
+            
           >
             <menu.icon />
             <span className="text-[13px]">{menu.title}</span>
           </SidebarMenuButton>
-        </Link>
+        </Link> : <></>
         })}
        
         {items.map((item) => (

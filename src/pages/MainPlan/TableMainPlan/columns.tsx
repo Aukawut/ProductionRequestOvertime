@@ -15,10 +15,9 @@ import { toast } from "sonner";
 
 export const columns = (
   FindOldPlan: (idPlan: number) => void,
-  DeletePlan : (token: string, id: number) => Promise<any>,
-  token:string ,
-  fetchData: (load:boolean) => Promise<void>
-  
+  DeletePlan: (token: string, id: number) => Promise<any>,
+  token: string,
+  fetchData: (load: boolean) => Promise<void>
 ): ColumnDef<MainPlan>[] => [
   {
     accessorKey: "ID_PLAN",
@@ -34,32 +33,38 @@ export const columns = (
           >
             <Pencil size={15} className="text-[#E4A60F]" />
           </Button>
-          <Button className="flex w-[20px] h-[30px] shadow-none bg-[#FBEAEE] hover:bg-[#efd7dd]" onClick={() => {
-            Swal.fire({
-              title: "คุณต้องการลบข้อมูลแผน ?",
-              text: "ระบบจะไม่สามารถกู้ข้อมูลของท่านได้!",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "#3085d6",
-              cancelButtonColor: "#d33",
-              confirmButtonText: "ยืนยัน",
-              cancelButtonText:"ยกเลิก"
-            }).then(async (result) => {
-              if (result.isConfirmed) {
-                const response = await DeletePlan(token,Number(row.getValue("ID_PLAN")))
-                console.log(response);
-                
-                if(response) {
-                  if(!response.err) {
-                    toast.success("ลบข้อมูลสำเร็จ !")
-                    fetchData(false)
-                  }else{
-                    toast.error(response.msg)
+          <Button
+            className="flex w-[20px] h-[30px] shadow-none bg-[#FBEAEE] hover:bg-[#efd7dd]"
+            onClick={() => {
+              Swal.fire({
+                title: "คุณต้องการลบข้อมูลแผน ?",
+                text: "ระบบจะไม่สามารถกู้ข้อมูลของท่านได้!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "ยืนยัน",
+                cancelButtonText: "ยกเลิก",
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  const response = await DeletePlan(
+                    token,
+                    Number(row.getValue("ID_PLAN"))
+                  );
+                  console.log(response);
+
+                  if (response) {
+                    if (!response.err) {
+                      toast.success("ลบข้อมูลสำเร็จ !");
+                      fetchData(false);
+                    } else {
+                      toast.error(response.msg);
+                    }
                   }
                 }
-              }
-            });
-          }}>
+              });
+            }}
+          >
             <Trash2 size={15} className="text-[#c93246]" />
           </Button>
         </div>
@@ -81,7 +86,20 @@ export const columns = (
         Workcell
       </Button>
     ),
-    cell: ({ row }) => row.getValue("NAME_WORKCELL"),
+    cell: ({ row }) => (
+      <div className="w-[100px]">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <p className="truncate">{row.getValue("NAME_WORKCELL")}</p>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{row.getValue("NAME_WORKCELL")}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    ),
   },
   {
     accessorKey: "FACTORY_NAME",

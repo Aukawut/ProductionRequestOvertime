@@ -481,6 +481,102 @@ export const GetDetailCountApproveByCode: (
   }
 };
 
+export const GetActualCompareWorkgroup: (
+  token: string,
+  start: string,
+  end: string
+) => Promise<any> = async ( token: string,
+  start: string,
+  end: string) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/actual/all/workgroup/${start}/${end}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log(response.data);
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const GetSummaryActualCompareWorkCell: (
+  token: string,
+  start: string,
+  end: string
+) => Promise<any> = async ( token: string,
+  start: string,
+  end: string) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/actual/group/workcell/${start}/${end}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log(response.data);
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
+export const GetSummaryActualCompareWorkGroup: (
+  token: string,
+  start: string,
+  end: string
+) => Promise<any> = async ( token: string,
+  start: string,
+  end: string) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(
+      `${VITE_BASE_URL}/actual/group/workgroup/${start}/${end}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log(response.data);
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
 export const convertMinutesToHoursMinutes = (minutes: number) => {
   const hours = (minutes / 60).toFixed(2);
   return hours;
@@ -1000,6 +1096,32 @@ export const GetActualOvertime: (token: string) => Promise<any> = async (
   }
 };
 
+export const GetActualOvertimeByDateDuration: (token: string,start:string,end:string) => Promise<any> = async (
+  token: string,
+  start:string,
+  end:string
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.get(`${VITE_BASE_URL}/actual/overtime/${start}/${end}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.data.err && response.data.status == "Ok") {
+      return response.data.results;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.log(err);
+
+    return [];
+  }
+};
+
 export const GetSummaryActualComparePlan: (
   token: string,
   year: number
@@ -1027,6 +1149,8 @@ export const GetSummaryActualComparePlan: (
     return [];
   }
 };
+
+
 
 export const GetSummaryActualByFactory: (
   token: string,
@@ -1556,10 +1680,13 @@ export const GetRequestListByCodeAndStatus: (
   code: string,
 ) => {
   const { VITE_BASE_URL } = import.meta.env;
- 
+
   try {
+    const pendingEndpoint = `${VITE_BASE_URL}/lasted/request/${status}/${code}`
+    const anyStatusEndpoint = `${VITE_BASE_URL}/details/request/${status}/${code}`
+
     const response = await axios.get(
-      `${VITE_BASE_URL}/lasted/request/${status}/${code}`,
+      Number(status) == 1 ? pendingEndpoint : anyStatusEndpoint,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1590,10 +1717,10 @@ export const GetRequestListByUserCodeAndStatus: (
   code: string,
 ) => {
   const { VITE_BASE_URL } = import.meta.env;
- 
+  alert(status)
   try {
     const response = await axios.get(
-      `${VITE_BASE_URL}/lasted/user/request/${status}/${code}`,
+      `${VITE_BASE_URL}/details/user/request/${status}/${code}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1612,3 +1739,11 @@ export const GetRequestListByUserCodeAndStatus: (
     return []
   }
 };
+
+
+export const IsHavePermission =  (allowed:string[],userPermission:string[]) => {
+  const isSubset = userPermission.some(role => allowed.includes(role));
+  return isSubset
+
+
+}

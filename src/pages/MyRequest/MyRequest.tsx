@@ -94,7 +94,7 @@ export interface SummaryRequestLastRev {
   SUM_PLAN: number;
   SUM_PLAN_OB: number;
   ID_WORK_CELL: number;
-  REMARK:string ;
+  REMARK: string;
 }
 
 export interface UserDetail {
@@ -144,6 +144,7 @@ const MyRequest: React.FC = () => {
   const [requestByYear, setRequestByYear] = useState<RequestByYear[]>([]);
   const [requests, setRequests] = useState<RequestNoByUser[]>([]);
   const [requestList, setRequestList] = useState<RequestList[]>([]);
+  const [showAction, setShowAction] = useState(false);
 
   const empCode = useOTManagementSystemStore(
     (state) => state.info?.EmployeeCode
@@ -197,17 +198,16 @@ const MyRequest: React.FC = () => {
   );
   const [commentApprover, setCommentApprover] = useState<CommentApprover[]>([]);
   const [users, setUsers] = useState<UserDetail[]>([]);
-    const [status, setStatus] = useState(1);
-    const [loading, setLoading] = useState(false);
-    const [showDetail, setShowDetail] = useState(false);
-    const [requestNo, setRequestNo] = useState("");
-    const [rev, setRev] = useState(0);
-    const info = useOTManagementSystemStore((state) => state.info);
-    const token = useOTManagementSystemStore((state) => state.token);
-    const [planWorkcell, setPlanWorkcell] = useState<PlanWorkcell[]>([]);
-    const [showRequestList, setShowRequestList] = useState(false);
-    const [idStatus,setIdStatus] = useState(0);
-  
+  const [status, setStatus] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
+  const [requestNo, setRequestNo] = useState("");
+  const [rev, setRev] = useState(0);
+  const info = useOTManagementSystemStore((state) => state.info);
+  const token = useOTManagementSystemStore((state) => state.token);
+  const [planWorkcell, setPlanWorkcell] = useState<PlanWorkcell[]>([]);
+  const [showRequestList, setShowRequestList] = useState(false);
+  const [idStatus, setIdStatus] = useState(0);
 
   const FetchDetailRequest = async (
     tokenStr: string,
@@ -215,7 +215,7 @@ const MyRequest: React.FC = () => {
     rev: number
   ) => {
     await Promise.all([
-      GetRequestDetailByRequest(tokenStr, requestNo,rev),
+      GetRequestDetailByRequest(tokenStr, requestNo, rev),
       GetUserByRequestAndRev(tokenStr, requestNo, rev),
       GetCommentApproverByRequestNo(tokenStr, requestNo, rev),
     ]).then(async (res) => {
@@ -251,18 +251,17 @@ const MyRequest: React.FC = () => {
     });
   };
 
-
   const GetRequestList = async (status: number, code: string) => {
-    setIdStatus(status)
-    // 1 = Pending
-    if (status == 1) {
-     
-      await Promise.all([GetRequestListByUserCodeAndStatus(token, status, code)])
+    setIdStatus(status);
+  
+      await Promise.all([
+        GetRequestListByUserCodeAndStatus(token, status, code),
+      ])
         .then((response) => {
           console.log("res", response);
           if (response[0]?.length > 0) {
             setRequestList(response[0]);
-            setShowRequestList(true)
+            setShowRequestList(true);
           } else {
             setRequestList([]);
           }
@@ -270,10 +269,10 @@ const MyRequest: React.FC = () => {
         .catch((err) => {
           console.log(err);
         });
-    }
+    
   };
 
-  const CloseDialogDetail = () => setShowDetail(false)
+  const CloseDialogDetail = () => setShowDetail(false);
 
   useEffect(() => {
     const container = containerTop.current;
@@ -351,19 +350,19 @@ const MyRequest: React.FC = () => {
           </div>
         </div>
       </div>
-       {/* Dialog */}
-       <DialogDetailRequest
-          setIsOpen={setShowDetail}
-          isOpen={showDetail}
-          closeDialog={CloseDialogDetail}
-          requestNo={requestNo}
-          requestDetail={requestDetail}
-          users={users}
-          commentApprover={commentApprover}
-          planWorkcell={planWorkcell}
-          rev={rev}
-          showAction={false}
-        />
+      {/* Dialog */}
+      <DialogDetailRequest
+        setIsOpen={setShowDetail}
+        isOpen={showDetail}
+        closeDialog={CloseDialogDetail}
+        requestNo={requestNo}
+        requestDetail={requestDetail}
+        users={users}
+        commentApprover={commentApprover}
+        planWorkcell={planWorkcell}
+        rev={rev}
+        showAction={false}
+      />
 
       <div className="grid grid-cols-12 mt-2 gap-x-2">
         <div className="col-span-12 lg:col-span-6">
@@ -391,7 +390,18 @@ const MyRequest: React.FC = () => {
               <p className="text-[12px] font-medium text-gray-600">
                 ตารางแสดงข้อมูลสถานะคำขอของคุณ
               </p>
-              <TableRequest users={requests} />
+
+              <TableRequest
+                requests={requests}
+                FetchDetailRequest={FetchDetailRequest}
+                setRequestNo={setRequestNo}
+                setRev={setRev}
+                GetPlanByWorkcell={GetPlanByWorkcell}
+                setIsOpen={setShowRequestList}
+                isOpen={showRequestList}
+                status={idStatus}
+                token={token}
+              />
             </div>
           </div>
         </div>
@@ -437,16 +447,18 @@ const MyRequest: React.FC = () => {
         </div>
 
         <DialogRequestList
-            data={requestList}
-            FetchDetailRequest={FetchDetailRequest}
-            setRequestNo={setRequestNo}
-            setRev={setRev}
-            GetPlanByWorkcell={GetPlanByWorkcell}
-            setIsOpen={setShowRequestList}
-            isOpen={showRequestList}
-            requestList={requestList}
-            status={idStatus}
-          />
+          data={requestList}
+          FetchDetailRequest={FetchDetailRequest}
+          setRequestNo={setRequestNo}
+          setRev={setRev}
+          GetPlanByWorkcell={GetPlanByWorkcell}
+          setIsOpen={setShowRequestList}
+          isOpen={showRequestList}
+          requestList={requestList}
+          status={idStatus}
+          showAction={showAction}
+          setShowAction={setShowAction}
+        />
       </div>
     </motion.div>
   );
