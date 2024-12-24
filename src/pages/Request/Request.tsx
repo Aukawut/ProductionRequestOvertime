@@ -689,9 +689,9 @@ const Request: React.FC = () => {
                                   Factory Plan Target :
                                 </p>
                               </td>
-                              <td className="p-1">
+                              <td className="p-1 w-[100px]">
                                 <div className="flex gap-x-2 items-center">
-                                  <span className="flex bg-blue-200 text-[13px] px-2 py-1 rounded-sm text-blue-800">
+                                  <span className="flex bg-blue-200 text-[13px] px-2 py-1 rounded-sm text-blue-800 w-full">
                                     {planByFactory?.length > 0
                                       ? Number(planByFactory[0]?.SUM_HOURS)
                                       : 0}
@@ -706,12 +706,12 @@ const Request: React.FC = () => {
                                   Workcell Plan Target :
                                 </p>
                               </td>
-                              <td className="p-1">
+                              <td className="p-1 w-[100px]">
                                 <div className="flex gap-x-2 items-center">
-                                  <span className="flex bg-blue-200 text-[13px] px-2 py-1 rounded-sm text-blue-800">
+                                  <span className="flex bg-blue-200 text-[13px] px-2 py-1 rounded-sm text-blue-800 w-full">
                                     {planByWorkcell?.length > 0
                                       ? Number(planByWorkcell[0]?.SUM_HOURS)
-                                      : 0}
+                                      : 0 }
                                   </span>
                                   <p className="text-[12px]">ชั่วโมง</p>
                                 </div>
@@ -1129,11 +1129,13 @@ const Request: React.FC = () => {
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="p-2">
+                  {/* <----- Step Approver -----> */}
                       <StepApproval
                         groupId={Number(group)}
                         factory={Number(factory)}
                         overtimeType={Number(overtimeType)}
                       />
+
                     </div>
                   </AccordionContent>
                 </AccordionItem>

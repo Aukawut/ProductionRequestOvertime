@@ -17,6 +17,7 @@ import moment from "moment";
 import { GetActualCompareWorkgroup, GetSummaryActualCompareWorkCell, GetSummaryActualCompareWorkGroup } from "@/function/main";
 import BarStackChart from "./BarStackChart/BarStackChart";
 import BarChartWorkgroup from "./BarChartWorkgroup/BarChartWorkgroup";
+import TableOvertimeWorkcell from "./TableOvertime/TableOvertimeWorkcell";
 
 
 export interface CsvData {
@@ -292,6 +293,21 @@ const OvertimeActualWorkCellReport: React.FC = () => {
               transition={{ type: "tween", duration: 0.3 }}
             >
               <TableOvertime data={allActual} />
+            </motion.div>
+          </div>
+
+          <hr />
+          <div className="p-2 my-2">
+            <p className="text-[13.5px] font-medium text-gray-800">
+              ตารางแสดงข้อมูลการทำโอทีแยกแต่ละ Workcell
+            </p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "tween", duration: 0.3 }}
+            >
+              <TableOvertimeWorkcell data={actualByWorkcell} />
             </motion.div>
           </div>
         </>

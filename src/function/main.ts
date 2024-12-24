@@ -1799,3 +1799,35 @@ export const IsHavePermission =  (allowed:string[],userPermission:string[]) => {
 
 
 }
+
+export const DeleteActualById: (
+  token: string,
+  id: number,
+
+) => Promise<any> = async (
+  token: string,
+  id: number,
+) => {
+  const { VITE_BASE_URL } = import.meta.env;
+
+  try {
+    const response = await axios.delete(
+      `${VITE_BASE_URL}/actual/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if(!response.data.err && response.data.status == "Ok") {
+
+      return response.data;
+    }else{
+      return response.data
+    }
+  } catch (err) {
+    console.log(err);
+
+    return {err:true,msg:err}
+  }
+};

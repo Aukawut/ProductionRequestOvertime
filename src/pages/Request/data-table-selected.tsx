@@ -142,11 +142,11 @@ export function DataTableSelected<TData, TValue>({
       <div className="rounded-md border relative w-full">
         <div className="overflow-auto h-full">
           <Table className="text-[13px]">
-            <TableHeader className="sticky top-0 z-10 bg-blue-50">
+            <TableHeader className="sticky top-0 z-10 bg-[#0E7FDB] hover:bg-[#0e7fdbf0] text-white">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="text-white">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -170,7 +170,7 @@ export function DataTableSelected<TData, TValue>({
                       className="text-center"
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="text-[13px]">
+                        <TableCell key={cell.id} className="text-[13px] ">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()

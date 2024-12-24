@@ -3,7 +3,13 @@ import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { Popover, PopoverTrigger } from "@radix-ui/react-popover";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, FolderUp, LoaderCircle, PlusCircle, Search } from "lucide-react";
+import {
+  CalendarIcon,
+  FolderUp,
+  LoaderCircle,
+  PlusCircle,
+  Search,
+} from "lucide-react";
 import { PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
@@ -11,9 +17,10 @@ import DialogAddOvertime from "./dialog-add-actual";
 import { Toaster } from "sonner";
 import TableOvertime from "./TablePreviewOvertime/TableOvertime";
 import { useOTManagementSystemStore } from "../../../store";
-import {GetActualOvertimeByDateDuration } from "@/function/main";
+import { GetActualOvertimeByDateDuration } from "@/function/main";
 import LoadingCircle from "@/components/custom/loading-circle";
 import moment from "moment";
+import ButtonExcelExport from "@/components/custom/ButtonExcelExport/ButtonExcelExport";
 
 export interface CsvData {
   date: string;
@@ -58,10 +65,13 @@ const OvertimeActual: React.FC = () => {
 
   const fetchData = async () => {
     setLoad(true);
-    await Promise.all([await GetActualOvertimeByDateDuration(token,
-      moment(startDate).format("YYYY-MM-DD"),
-      moment(endDate).format("YYYY-MM-DD")
-    )]).then((res) => {
+    await Promise.all([
+      await GetActualOvertimeByDateDuration(
+        token,
+        moment(startDate).subtract(6,"days").format("YYYY-MM-DD"),
+        moment(endDate).format("YYYY-MM-DD")
+      ),
+    ]).then((res) => {
       if (res[0]?.length > 0) {
         setAllActual(res[0]);
       } else {
@@ -72,7 +82,7 @@ const OvertimeActual: React.FC = () => {
   };
 
   useEffect(() => {
-    setStartDate(new Date());
+    setStartDate(moment(new Date()).subtract(6,"days").toDate());
     setEndDate(new Date());
     fetchData();
   }, []);
@@ -80,7 +90,7 @@ const OvertimeActual: React.FC = () => {
     <div>
       <div className="my-2 flex items-center gap-x-2">
         <div>
-          <FolderUp  size={17} color="#0890D3" />
+          <FolderUp size={17} color="#0890D3" />
         </div>
 
         <p className="text-[14.5px] text-gray-800">Overtime Actual</p>
@@ -98,7 +108,7 @@ const OvertimeActual: React.FC = () => {
         }}
       />
 
-      <div className="my-2">
+      <div className="my-2 flex gap-x-2">
         <Button
           size={"sm"}
           className="bg-[#107EDB] text-white hover:bg-[#1c77c2]"
@@ -106,6 +116,7 @@ const OvertimeActual: React.FC = () => {
         >
           <PlusCircle /> Add
         </Button>
+        <ButtonExcelExport data={allActual} fileName="Actual" />
       </div>
       <div className="text-[12px]">เลือกช่วงเวลา</div>
       <div className="my-1 flex items-center gap-x-1">
@@ -163,11 +174,14 @@ const OvertimeActual: React.FC = () => {
           className="bg-[#107EDB] text-white hover:bg-[#1c77c2]"
           size={"sm"}
           onClick={async () => {
-            setLoad(true)
-            await Promise.all([await GetActualOvertimeByDateDuration(token,
-              moment(startDate).format("YYYY-MM-DD"),
-              moment(endDate).format("YYYY-MM-DD")
-            )]).then((res) => {
+            setLoad(true);
+            await Promise.all([
+              await GetActualOvertimeByDateDuration(
+                token,
+                moment(startDate).format("YYYY-MM-DD"),
+                moment(endDate).format("YYYY-MM-DD")
+              ),
+            ]).then((res) => {
               if (res[0]?.length > 0) {
                 setAllActual(res[0]);
               } else {
@@ -177,7 +191,7 @@ const OvertimeActual: React.FC = () => {
             });
           }}
         >
-          ค้นหา  {load ? <LoaderCircle className="animate-spin" /> : <Search />}
+          ค้นหา {load ? <LoaderCircle className="animate-spin" /> : <Search />}
         </Button>
       </div>
       <hr />
@@ -186,10 +200,16 @@ const OvertimeActual: React.FC = () => {
 
       <div className="p-2 my-2">
         <p className="text-[14px] font-medium text-gray-800">
-          ตารางแสดงข้อมูลการทำโอที | Table showing Overtime Data
+          ตารางแสดงข้อมูลการทำโอที | Table showing Overtime Data  {Number(allActual?.length)?.toLocaleString()} รายการ
         </p>
         {!load ? (
-          <TableOvertime data={allActual} />
+          <TableOvertime
+            data={allActual}
+            GetActualOvertimeByDateDuration={GetActualOvertimeByDateDuration}
+            setAllActual={setAllActual}
+            start={moment(startDate).format("YYYY-MM-DD")}
+            end={moment(endDate).format("YYYY-MM-DD")}
+          />
         ) : (
           <div className="flex justify-center items-center h-[50vh]">
             <div>

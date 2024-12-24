@@ -11,7 +11,7 @@ const TablePreviewOvertime: React.FC<TablePreviewOvertimeProps> = ({
   data,
 }) => {
 
-  useEffect(() => {}, []);
+  useEffect(() => {}, [data]);
   return (
     <div>
    

@@ -1,14 +1,22 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 
-import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
+import { ArrowUpDown, Trash2 } from "lucide-react";
 import { AllActual } from "../OvertimeActual";
-import { ConvertDateFormat } from "@/function/main";
+import { ConvertDateFormat, DeleteActualById } from "@/function/main";
 import moment from "moment";
-import { toast } from "sonner";
-import Swal from "sweetalert2";
 
-export const columnsOvertime = (): ColumnDef<AllActual>[] => [
+import Swal from "sweetalert2";
+import { toast } from "sonner";
+
+export const columnsOvertime = (
+  token:string,
+  GetActualOvertimeByDateDuration: (token: string, start: string, end: string) => Promise<any>,
+  start:string,
+  end:string,
+  setAllActual: React.Dispatch<React.SetStateAction<AllActual[]>>
+  
+): ColumnDef<AllActual>[] => [
   {
     accessorKey: "no",
     header: "No.",
@@ -30,7 +38,7 @@ export const columnsOvertime = (): ColumnDef<AllActual>[] => [
           className="flex w-[20px] h-[30px] shadow-none bg-[#FBEAEE] hover:bg-[#efd7dd]"
           onClick={() => {
             Swal.fire({
-              title: "คุณต้องการลบข้อมูลแผน ?",
+              title: "คุณต้องการลบข้อมูลโอที ?",
               text: "ระบบจะไม่สามารถกู้ข้อมูลของท่านได้!",
               icon: "warning",
               showCancelButton: true,
@@ -40,6 +48,21 @@ export const columnsOvertime = (): ColumnDef<AllActual>[] => [
               cancelButtonText: "ยกเลิก",
             }).then(async (result) => {
               if (result.isConfirmed) {
+                const deleted = await DeleteActualById(token,row.getValue("Id"))
+                if(!deleted?.err && deleted?.status == "Ok") {
+                  toast.success(deleted?.msg)
+                  setTimeout(async () => {
+                  const response =  await GetActualOvertimeByDateDuration(token,start,end)
+               
+                  if(response?.length > 0) {
+                    setAllActual(response)
+                  }else{
+                    setAllActual([])
+                  }
+                  },300)
+                }else{
+                  toast.error(deleted?.msg)
+                }
               }
             });
           }}

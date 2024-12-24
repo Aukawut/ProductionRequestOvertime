@@ -40,11 +40,7 @@ export const columnsUsersSelected = (): ColumnDef<Users>[] => [
   {
     accessorKey: "1",
     header: () => {
-      return (
-        <Button className="text-[13px]" type="button" variant="ghost">
-          Picture
-        </Button>
-      );
+      return "Picture";
     },
     cell: ({ row }) => {
       const imageUrl =

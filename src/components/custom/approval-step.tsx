@@ -39,6 +39,7 @@ const StepApproval: React.FC<StepApprovalProps> = ({
     }
     setLoad(false);
   };
+  const baseImage = import.meta.env.VITE_BASE_USERIMG_URL;
 
   useEffect(() => {
     fetchData();
@@ -58,23 +59,40 @@ const StepApproval: React.FC<StepApprovalProps> = ({
           {approver?.length > 0 ? (
             <div className="flex items-center justify-start bg-white px-2">
               <div className="space-y-6 border-l-2 border-dashed">
-                {approver?.map((item,index) => (
+                {approver?.map((item, index) => (
                   <div className="relative w-full" key={index}>
-                    <div className="absolute left-[2%] z-10 -ml-[0.8rem] h-4 w-4 rounded-full bg-sky-600 border-2 border-[#DEE2E6]"></div>
-
-                    <div className="ml-6">
-                      <h3 className="font-bold text-sky-600 text-[13px]">
-                        {item.NAME_APPROVER}
-                      </h3>
-                      <p className="font-normal text-gray-400 text-[12px]">
-                        {item.UHR_Position}
-                      </p>
-                      <div className="flex items-center gap-x-2">
-                        <User size={12} />
-                        <p className="font-normal text-gray-400 text-[12px]">
-                          ผู้อนุมัติ คนที่ {item.STEP}
-                        </p>
-                      </div>
+                    <div className="absolute left-[2%] z-10 -ml-[1rem] h-4 w-4 rounded-full bg-sky-600 border-2 border-[#DEE2E6]"></div>
+                    <div className="ml-6 flex w-full">
+                      <table className="w-full">
+                        <tbody>
+                          <tr>
+                            <td className="w-[200px]">
+                              <div>
+                                <h3 className="font-bold text-sky-600 text-[13px]">
+                                  {item.NAME_APPROVER}
+                                </h3>
+                                <p className="font-normal text-gray-400 text-[12px]">
+                                  {item.UHR_Position}
+                                </p>
+                                <div className="flex items-center gap-x-2">
+                                  <User size={12} />
+                                  <p className="font-normal text-gray-400 text-[12px]">
+                                    ผู้อนุมัติ คนที่ {item.STEP}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="w-[60px] h-[60px] overflow-hidden rounded-full border-[2px] border-blue-50">
+                                <img
+                                  src={`${baseImage}/${item.CODE_APPROVER}`}
+                                  className="object-cover hover:scale-105 duration-300 w-full h-auto"
+                                />
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 ))}

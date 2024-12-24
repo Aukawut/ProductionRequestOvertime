@@ -221,8 +221,7 @@ const DialogAddOvertime: React.FC<DialogAddOvertimeProps> = ({
           </DialogTitle>
           <DialogDescription className="text-[13px] flex items-center gap-x-2">
             <Info size={15} color={"red"} /> กรุณาตรวจสอบข้อมูลก่อนบันทึกข้อมูล
-
-            <Button
+            {csvData?.length > 0 ?  <Button
               size={"sm"}
               disabled={isSubmit}
                onClick={() => {
@@ -231,7 +230,8 @@ const DialogAddOvertime: React.FC<DialogAddOvertimeProps> = ({
               className="bg-[#107EDB] text-white rounded-[6px] shadow-smooth p-2 flex items-center text-[13px] gap-x-2"
             >
               {isSubmit ? <Loader2 className="animate-spin"/> : <CheckCircle />} {isSubmit ? 'Waiting....' : 'บันทึก'}
-            </Button>
+            </Button> : <></>}
+           
           </DialogDescription>
         </DialogHeader>
         <div className="h-[95vh] overflow-auto">

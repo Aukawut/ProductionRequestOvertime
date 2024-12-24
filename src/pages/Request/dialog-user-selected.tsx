@@ -32,7 +32,7 @@ const DialogUserSelected: React.FC<ShowUsersSelected> = ({
             Users selected | ข้อมูลพนักงานที่ท่านเลือก ({users?.length} ท่าน)
           </DialogTitle>
           <DialogDescription className="text-[13px] flex items-center gap-x-2">
-          <Info size={15} color={"red"}/>  กรุณาตรวจสอบรายชื่อให้ถูกต้องก่อนส่งคำขอ
+          <Info size={15} color={"red"}/>  กรุณาตรวจสอบรายชื่อให้ถูกต้อง
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-center h-[100%] p-2 overflow-auto">
